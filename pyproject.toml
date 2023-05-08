@@ -1,0 +1,29 @@
+[project]
+name = "pixel-font-builder"
+version = "0.0.0"
+description = "A library that helps create pixel style fonts."
+readme = "README.md"
+license = { text = "MIT License" }
+requires-python = ">=3.10"
+authors = [
+    { name = "TakWolf" },
+]
+maintainers = [
+    { name = "TakWolf" },
+]
+keywords = ["font", "pixel"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+homepage = "https://github.com/TakWolf/pixel-font-builder"
+source = "https://github.com/TakWolf/pixel-font-builder"
+issues = "https://github.com/TakWolf/pixel-font-builder/issues"
+
+[tool.pytest.ini_options]
+pythonpath = [
+    "src",
+]
