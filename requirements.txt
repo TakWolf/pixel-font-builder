@@ -1,0 +1,3 @@
+fonttools==4.39.4
+Brotli==1.0.9
+bdffont==0.0.7
