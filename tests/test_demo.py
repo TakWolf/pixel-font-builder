@@ -1,3 +1,5 @@
+import examples.demo
 
-def test():
-    pass
+
+def test_demo():
+    examples.demo.main()
