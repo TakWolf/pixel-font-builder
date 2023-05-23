@@ -1,7 +1,11 @@
+import logging
+
 from common import path_define
 from common.services import design_service
 from common.services.font_service import FontConfig
 from common.utils import fs_util
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 def main():
