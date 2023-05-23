@@ -1,8 +1,8 @@
 import logging
 import os
 
-from common.services.font_service import FontConfig
-from common.utils import glyph_util
+from examples.services.font_service import FontConfig
+from examples.utils import glyph_util
 
 logger = logging.getLogger('design-service')
 

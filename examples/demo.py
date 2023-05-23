@@ -1,18 +1,18 @@
 import logging
 
-from common import path_define
-from common.services import design_service
-from common.services.font_service import FontConfig
-from common.utils import fs_util
+from examples import build_dir, outputs_dir, glyphs_dir
+from examples.services import design_service
+from examples.services.font_service import FontConfig
+from examples.utils import fs_util
 
 logging.basicConfig(level=logging.DEBUG)
 
 
 def main():
-    fs_util.delete_dir(path_define.build_dir)
-    fs_util.make_dirs_if_not_exists(path_define.outputs_dir)
+    fs_util.delete_dir(build_dir)
+    fs_util.make_dirs_if_not_exists(outputs_dir)
 
-    font_config = FontConfig(path_define.glyphs_dir)
+    font_config = FontConfig(glyphs_dir)
     design_service.format_glyphs(font_config)
     context = design_service.load_context(font_config)
 
