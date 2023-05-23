@@ -1,5 +1,5 @@
 from common import path_define
-from common.font_service import FontConfig
+from common.services.font_service import FontConfig
 
 
 def main():
