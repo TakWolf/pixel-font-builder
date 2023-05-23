@@ -6,10 +6,7 @@ logger = logging.getLogger('font-service')
 
 
 class FontConfig:
-    def __init__(
-            self,
-            glyphs_dir: str | bytes | os.PathLike[str] | os.PathLike[bytes],
-    ):
+    def __init__(self, glyphs_dir: str | bytes | os.PathLike[str] | os.PathLike[bytes]):
         self.glyphs_dir = glyphs_dir
 
         config_file_path = os.path.join(glyphs_dir, 'config.toml')
