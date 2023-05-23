@@ -10,6 +10,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 def main():
     fs_util.delete_dir(path_define.build_dir)
+    fs_util.make_dirs_if_not_exists(path_define.outputs_dir)
 
     font_config = FontConfig(path_define.glyphs_dir)
     design_service.format_glyphs(font_config)
