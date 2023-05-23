@@ -1,6 +1,9 @@
+from common import path_define
+from common.font_service import FontConfig
+
 
 def main():
-    pass
+    font_config = FontConfig(path_define.glyphs_dir)
 
 
 if __name__ == '__main__':
