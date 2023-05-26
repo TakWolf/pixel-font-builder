@@ -8,6 +8,7 @@ class MetaInfos:
             copyright_info: str = None,
             license_description: str = None,
             license_url: str = None,
+            manufacturer: str = None,
             designer: str = None,
             designer_url: str = None,
             vendor_url: str = None,
@@ -18,6 +19,7 @@ class MetaInfos:
         self.copyright_info = copyright_info
         self.license_description = license_description
         self.license_url = license_url
+        self.manufacturer = manufacturer
         self.designer = designer
         self.designer_url = designer_url
         self.vendor_url = vendor_url

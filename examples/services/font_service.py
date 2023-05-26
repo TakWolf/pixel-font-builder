@@ -86,6 +86,7 @@ def create_font_builder(font_config: FontConfig, design_context: DesignContext) 
         copyright_info='Copyright (c) TakWolf (https://takwolf.com).',
         license_description='This Font Software is licensed under the SIL Open Font License, Version 1.1.',
         license_url='https://scripts.sil.org/OFL',
+        manufacturer='TakWolf',
         designer='TakWolf',
         designer_url='https://takwolf.com',
         vendor_url='https://github.com/TakWolf/pixel-font-builder',
