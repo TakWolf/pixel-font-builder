@@ -35,7 +35,7 @@ def format_glyphs(font_config: 'font_service.FontConfig'):
             glyph_file_path = os.path.join(glyph_file_dir, glyph_file_name)
             glyph_data = glyph_util.load_data_from_png(glyph_file_path)[0]
             glyph_util.save_data_to_png(glyph_data, glyph_file_path)
-            logger.info(f'format glyph file: {glyph_file_path}')
+            logger.info(f"Format glyph file: '{glyph_file_path}'")
 
 
 def load_context(font_config: 'font_service.FontConfig') -> DesignContext:
