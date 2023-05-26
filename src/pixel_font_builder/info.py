@@ -23,3 +23,23 @@ class MetaInfos:
         self.designer = designer
         self.designer_url = designer_url
         self.vendor_url = vendor_url
+
+
+class OpenTypeConfigs:
+    def __init__(
+            self,
+            px_to_units: int = 100,
+    ):
+        self.px_to_units = px_to_units
+
+
+class BdfConfigs:
+    def __init__(
+            self,
+            resolution_x: int = 75,
+            resolution_y: int = 75,
+            px_to_points: int = 100,
+    ):
+        self.resolution_x = resolution_x
+        self.resolution_y = resolution_y
+        self.px_to_points = px_to_points

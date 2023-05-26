@@ -1,5 +1,5 @@
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.info import MetaInfos
+from pixel_font_builder.info import MetaInfos, OpenTypeConfigs, BdfConfigs
 
 
 class FontBuilder:
@@ -13,6 +13,8 @@ class FontBuilder:
             character_mapping: dict[int, str] = None,
             glyphs: list[Glyph] = None,
             meta_infos: MetaInfos = None,
+            opentype_configs: OpenTypeConfigs = None,
+            bdf_configs: BdfConfigs = None,
     ):
         self.size = size
         self.ascent = ascent
@@ -22,3 +24,5 @@ class FontBuilder:
         self.character_mapping = character_mapping
         self.glyphs = glyphs
         self.meta_infos = meta_infos
+        self.opentype_configs = opentype_configs
+        self.bdf_configs = bdf_configs

@@ -3,7 +3,7 @@ import os
 import tomllib
 
 from examples.services.design_service import DesignContext
-from pixel_font_builder import FontBuilder, Glyph, MetaInfos
+from pixel_font_builder import FontBuilder, Glyph, MetaInfos, OpenTypeConfigs, BdfConfigs
 
 logger = logging.getLogger('font-service')
 
@@ -91,5 +91,9 @@ def create_font_builder(font_config: FontConfig, design_context: DesignContext) 
         designer_url='https://takwolf.com',
         vendor_url='https://github.com/TakWolf/pixel-font-builder',
     )
+
+    font_builder.opentype_configs = OpenTypeConfigs()
+
+    font_builder.bdf_configs = BdfConfigs()
 
     return font_builder
