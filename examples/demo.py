@@ -1,7 +1,7 @@
 import logging
 
 from examples import build_dir, outputs_dir, glyphs_dir
-from examples.services import design_service
+from examples.services import font_service, design_service
 from examples.services.font_service import FontConfig
 from examples.utils import fs_util
 
@@ -14,7 +14,8 @@ def main():
 
     font_config = FontConfig(glyphs_dir)
     design_service.format_glyphs(font_config)
-    context = design_service.load_context(font_config)
+    design_context = design_service.load_context(font_config)
+    font_builder = font_service.create_font_builder(font_config, design_context)
 
 
 if __name__ == '__main__':
