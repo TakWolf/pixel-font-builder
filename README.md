@@ -1,5 +1,6 @@
 # Pixel Font Builder
 
+[![Python](https://img.shields.io/badge/python-3.11-brightgreen)](https://www.python.org)
 [![PyPI](https://img.shields.io/pypi/v/pixel-font-builder)](https://pypi.org/project/pixel-font-builder/)
 
 A library that helps create pixel style fonts.
