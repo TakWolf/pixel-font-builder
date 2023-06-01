@@ -1,6 +1,8 @@
+import math
 import os
 
 import bdffont
+import bdffont.xlfd
 import fontTools.fontBuilder
 
 from pixel_font_builder.glyph import Glyph
@@ -90,15 +92,33 @@ class FontBuilder:
     ):
         self.to_ttf_builder(flavor).save(file_path)
 
-    def _prepare_bdf(self):
-        self._check_ready()
-
-        # TODO
-
-        pass
+    def _create_bdf_glyph(self, code_point: int, glyph: Glyph) -> bdffont.BdfGlyph:
+        scalable_width_x = math.ceil((glyph.advance_width / self.size) * (72 / self.bdf_configs.resolution_x) * 1000)
+        if glyph.data is None:
+            glyph_width = 0
+            glyph_height = 0
+        else:
+            glyph_width = len(glyph.data[0])
+            glyph_height = len(glyph.data)
+        return bdffont.BdfGlyph(
+            name=glyph.name,
+            code_point=code_point,
+            scalable_width=(scalable_width_x, 0),
+            device_width=(glyph.advance_width, 0),
+            bounding_box_size=(glyph_width, glyph_height),
+            bounding_box_offset=glyph.offset,
+            bitmap=glyph.data,
+        )
 
     def to_bdf_builder(self) -> bdffont.BdfFont:
-        self._prepare_bdf()
+        self._check_ready()
+
+        if -1 in self.character_mapping:
+            raise Exception("Code '-1' is reserved for glyph '.notdef'")
+
+        name_to_glyph = {glyph.name: glyph for glyph in self.glyphs}
+        if '.notdef' not in name_to_glyph:
+            raise Exception("Need to provide a glyph named '.notdef'")
 
         builder = bdffont.BdfFont(
             point_size=self.size,
@@ -107,7 +127,36 @@ class FontBuilder:
             bounding_box_offset=(0, self.descent),
         )
 
-        # TODO
+        builder.add_glyph(self._create_bdf_glyph(-1, name_to_glyph['.notdef']))
+        for code_point, glyph_name in self.character_mapping.items():
+            builder.add_glyph(self._create_bdf_glyph(code_point, name_to_glyph[glyph_name]))
+
+        builder.properties.foundry = self.meta_infos.foundry
+        builder.properties.family_name = self.meta_infos.family_name
+        # builder.properties.weight_name =
+        # builder.properties.slant =
+        # builder.properties.setwidth_name =
+        # builder.properties.add_style_name =
+        builder.properties.pixel_size = self.size
+        builder.properties.point_size = self.size * 100
+        builder.properties.resolution_x = self.bdf_configs.resolution_x
+        builder.properties.resolution_y = self.bdf_configs.resolution_y
+        # builder.properties.spacing =
+        builder.properties.average_width = round(sum([glyph.scalable_width_x for glyph in builder.code_point_to_glyph.values()]) / builder.get_glyphs_count())
+        builder.properties.charset_registry = bdffont.xlfd.CharsetRegistry.ISO10646
+        builder.properties.charset_encoding = '1'
+
+        builder.properties.default_char = -1
+        builder.properties.font_ascent = self.ascent
+        builder.properties.font_descent = self.descent
+        builder.properties.x_height = self.x_height
+        builder.properties.cap_height = self.cap_height
+
+        builder.properties.font_version = self.meta_infos.version
+        builder.properties.copyright = self.meta_infos.copyright_info
+        builder.properties['LICENSE'] = self.meta_infos.license_description
+
+        builder.generate_xlfd_font_name()
 
         return builder
 
