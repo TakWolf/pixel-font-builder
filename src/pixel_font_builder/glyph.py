@@ -10,6 +10,4 @@ class Glyph:
         self.name = name
         self.advance_width = advance_width
         self.offset = offset
-        if data is None:
-            data = []
         self.data = data
