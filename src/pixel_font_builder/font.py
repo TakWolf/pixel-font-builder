@@ -6,7 +6,7 @@ import bdffont.xlfd
 import fontTools.fontBuilder
 
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.info import MetaInfos, OpenTypeConfigs, BdfConfigs
+from pixel_font_builder.info import MetaInfos, OpenTypeConfigs, BdfConfigs, OpenTypeFlavor
 
 
 class FontBuilder:
@@ -48,15 +48,8 @@ class FontBuilder:
         assert self.character_mapping is not None
         assert self.glyphs is not None
 
-    def _prepare_opentype(self):
+    def _to_opentype_builder(self, is_ttf: bool = False, flavor: OpenTypeFlavor = None) -> fontTools.fontBuilder.FontBuilder:
         self._check_ready()
-
-        # TODO
-
-        pass
-
-    def _to_opentype_builder(self, is_ttf: bool = False, flavor: str = None) -> fontTools.fontBuilder.FontBuilder:
-        self._prepare_opentype()
 
         units_per_em = self.size * self.opentype_configs.px_to_units
 
@@ -72,23 +65,23 @@ class FontBuilder:
 
         return builder
 
-    def to_otf_builder(self, flavor: str = None) -> fontTools.fontBuilder.FontBuilder:
+    def to_otf_builder(self, flavor: OpenTypeFlavor = None) -> fontTools.fontBuilder.FontBuilder:
         return self._to_opentype_builder(False, flavor)
 
     def save_otf(
             self,
             file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes],
-            flavor: str = None,
+            flavor: OpenTypeFlavor = None,
     ):
         self.to_otf_builder(flavor).save(file_path)
 
-    def to_ttf_builder(self, flavor: str = None) -> fontTools.fontBuilder.FontBuilder:
+    def to_ttf_builder(self, flavor: OpenTypeFlavor = None) -> fontTools.fontBuilder.FontBuilder:
         return self._to_opentype_builder(True, flavor)
 
     def save_ttf(
             self,
             file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes],
-            flavor: str = None,
+            flavor: OpenTypeFlavor = None,
     ):
         self.to_ttf_builder(flavor).save(file_path)
 
