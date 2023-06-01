@@ -11,11 +11,11 @@ class DesignContext:
     def __init__(
             self,
             alphabet: list[str],
-            glyph_file_paths: dict[int | str, str | bytes | os.PathLike[str] | os.PathLike[bytes]],
+            glyph_file_paths: dict[int | str, str],
     ):
         self.alphabet = alphabet
         self.glyph_file_paths = glyph_file_paths
-        self.glyph_data_pool = {}
+        self.glyph_data_pool: dict[int | str, tuple[list[list[int]], int, int]] = {}
 
     def get_glyph_data(self, code_point: int | str) -> tuple[list[list[int]], int, int]:
         glyph_file_path = self.glyph_file_paths[code_point]
