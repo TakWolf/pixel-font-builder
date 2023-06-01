@@ -42,12 +42,19 @@ class FontBuilder:
     def line_height(self) -> int:
         return self.ascent - self.descent
 
-    def check_ready(self):
+    def _check_ready(self):
         assert self.character_mapping is not None
         assert self.glyphs is not None
 
-    def _to_opentype_builder(self, is_ttf: bool = False) -> fontTools.fontBuilder.FontBuilder:
-        self.check_ready()
+    def _prepare_opentype(self):
+        self._check_ready()
+
+        # TODO
+
+        pass
+
+    def _to_opentype_builder(self, is_ttf: bool = False, flavor: str = None) -> fontTools.fontBuilder.FontBuilder:
+        self._prepare_opentype()
 
         units_per_em = self.size * self.opentype_configs.px_to_units
 
@@ -58,36 +65,40 @@ class FontBuilder:
 
         # TODO
 
+        if flavor is not None:
+            builder.font.flavor = flavor
+
         return builder
 
-    def to_otf_builder(self) -> fontTools.fontBuilder.FontBuilder:
-        return self._to_opentype_builder(is_ttf=False)
+    def to_otf_builder(self, flavor: str = None) -> fontTools.fontBuilder.FontBuilder:
+        return self._to_opentype_builder(False, flavor)
 
     def save_otf(
             self,
             file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes],
             flavor: str = None,
     ):
-        builder = self.to_otf_builder()
-        if flavor is not None:
-            builder.font.flavor = flavor
-        builder.save(file_path)
+        self.to_otf_builder(flavor).save(file_path)
 
-    def to_ttf_builder(self) -> fontTools.fontBuilder.FontBuilder:
-        return self._to_opentype_builder(is_ttf=True)
+    def to_ttf_builder(self, flavor: str = None) -> fontTools.fontBuilder.FontBuilder:
+        return self._to_opentype_builder(True, flavor)
 
     def save_ttf(
             self,
             file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes],
             flavor: str = None,
     ):
-        builder = self.to_ttf_builder()
-        if flavor is not None:
-            builder.font.flavor = flavor
-        builder.save(file_path)
+        self.to_ttf_builder(flavor).save(file_path)
+
+    def _prepare_bdf(self):
+        self._check_ready()
+
+        # TODO
+
+        pass
 
     def to_bdf_builder(self) -> bdffont.BdfFont:
-        self.check_ready()
+        self._prepare_bdf()
 
         builder = bdffont.BdfFont(
             point_size=self.size,
