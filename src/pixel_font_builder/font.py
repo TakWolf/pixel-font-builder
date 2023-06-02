@@ -63,10 +63,7 @@ class FontBuilder:
 
         units_per_em = self.size * self.opentype_configs.px_to_units
 
-        builder = fontTools.fontBuilder.FontBuilder(
-            unitsPerEm=units_per_em,
-            isTTF=is_ttf,
-        )
+        builder = fontTools.fontBuilder.FontBuilder(units_per_em, isTTF=is_ttf)
 
         # TODO
 
