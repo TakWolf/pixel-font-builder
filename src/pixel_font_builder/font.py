@@ -17,42 +17,53 @@ class FontBuilder:
             descent: int,
             x_height: int = None,
             cap_height: int = None,
-            character_mapping: dict[int, str] = None,
-            glyphs: list[Glyph] = None,
-            meta_infos: MetaInfos = None,
-            opentype_configs: OpenTypeConfigs = None,
-            bdf_configs: BdfConfigs = None,
     ):
         self.size = size
         self.ascent = ascent
         self.descent = descent
         self.x_height = x_height
         self.cap_height = cap_height
-        self.character_mapping = character_mapping
-        self.glyphs = glyphs
-        if meta_infos is None:
-            meta_infos = MetaInfos()
-        self.meta_infos = meta_infos
-        if opentype_configs is None:
-            opentype_configs = OpenTypeConfigs()
-        self.opentype_configs = opentype_configs
-        if bdf_configs is None:
-            bdf_configs = BdfConfigs()
-        self.bdf_configs = bdf_configs
+
+        self.character_mapping: dict[int, str] = {}
+        self._name_to_glyph: dict[str, Glyph] = {}
+
+        self.meta_infos = MetaInfos()
+        self.opentype_configs = OpenTypeConfigs()
+        self.bdf_configs = BdfConfigs()
 
     @property
     def line_height(self) -> int:
         return self.ascent - self.descent
 
+    def get_glyph(self, name: str) -> Glyph | None:
+        return self._name_to_glyph.get(name, None)
+
+    def get_glyphs(self) -> list[Glyph]:
+        return list(self._name_to_glyph.values())
+
+    def get_glyphs_count(self) -> int:
+        return len(self._name_to_glyph)
+
+    def set_glyph(self, glyph: Glyph):
+        self._name_to_glyph[glyph.name] = glyph
+
+    def add_glyph(self, glyph: Glyph):
+        if glyph.name in self._name_to_glyph:
+            raise Exception(f"Glyph '{glyph.name}' already exists")
+        self._name_to_glyph[glyph.name] = glyph
+
+    def add_glyphs(self, glyphs: list[Glyph]):
+        for glyph in glyphs:
+            self.add_glyph(glyph)
+
+    def remove_glyph(self, name: str) -> Glyph | None:
+        return self._name_to_glyph.pop(name, None)
+
     def check_ready(self):
-        assert self.character_mapping is not None
         if any(code_point < 0 for code_point in self.character_mapping):
             raise Exception(f"Code points must >= 0")
-        assert self.glyphs is not None
-        if all(glyph.name != '.notdef' for glyph in self.glyphs):
+        if '.notdef' not in self._name_to_glyph:
             raise Exception("Need to provide a glyph named '.notdef'")
-        for glyph in self.glyphs:
-            glyph.check_ready()
 
     # ========
     # OpenType
@@ -96,7 +107,8 @@ class FontBuilder:
     # Bitmap Distribution Format
     # ==========================
 
-    def _create_bdf_glyph(self, code_point: int, glyph: Glyph) -> bdffont.BdfGlyph:
+    def _create_bdf_glyph(self, code_point: int, glyph_name: str) -> bdffont.BdfGlyph:
+        glyph = self._name_to_glyph[glyph_name]
         scalable_width_x = math.ceil((glyph.advance_width / self.size) * (72 / self.bdf_configs.resolution_x) * 1000)
         return bdffont.BdfGlyph(
             name=glyph.name,
@@ -118,10 +130,9 @@ class FontBuilder:
             bounding_box_offset=(0, self.descent),
         )
 
-        name_to_glyph = {glyph.name: glyph for glyph in self.glyphs}
-        builder.add_glyph(self._create_bdf_glyph(-1, name_to_glyph['.notdef']))
+        builder.add_glyph(self._create_bdf_glyph(-1, '.notdef'))
         for code_point, glyph_name in self.character_mapping.items():
-            builder.add_glyph(self._create_bdf_glyph(code_point, name_to_glyph[glyph_name]))
+            builder.add_glyph(self._create_bdf_glyph(code_point, glyph_name))
 
         builder.properties.foundry = self.meta_infos.foundry
         builder.properties.family_name = self.meta_infos.family_name

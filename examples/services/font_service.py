@@ -52,23 +52,20 @@ def create_font_builder(font_config: FontConfig, design_context: DesignContext) 
         font_config.cap_height,
     )
 
-    character_mapping = {}
-    glyphs = [_create_glyph(font_config, design_context, '.notdef')]
+    font_builder.add_glyph(_create_glyph(font_config, design_context, '.notdef'))
     for c in design_context.alphabet:
         code_point = ord(c)
-        character_mapping[code_point] = _get_glyph_name(code_point)
-        glyphs.append(_create_glyph(font_config, design_context, code_point))
+        font_builder.character_mapping[code_point] = _get_glyph_name(code_point)
+        font_builder.add_glyph(_create_glyph(font_config, design_context, code_point))
     for code_point in range(ord('A'), ord('Z') + 1):
         fallback_code_point = code_point + ord('Ａ') - ord('A')
-        character_mapping[fallback_code_point] = _get_glyph_name(code_point)
+        font_builder.character_mapping[fallback_code_point] = _get_glyph_name(code_point)
     for code_point in range(ord('a'), ord('z') + 1):
         fallback_code_point = code_point + ord('ａ') - ord('a')
-        character_mapping[fallback_code_point] = _get_glyph_name(code_point)
+        font_builder.character_mapping[fallback_code_point] = _get_glyph_name(code_point)
     for code_point in range(ord('0'), ord('9') + 1):
         fallback_code_point = code_point + ord('０') - ord('0')
-        character_mapping[fallback_code_point] = _get_glyph_name(code_point)
-    font_builder.character_mapping = character_mapping
-    font_builder.glyphs = glyphs
+        font_builder.character_mapping[fallback_code_point] = _get_glyph_name(code_point)
 
     font_builder.meta_infos.version = '1.0.0'
     font_builder.meta_infos.family_name = 'Demo Pixel'
