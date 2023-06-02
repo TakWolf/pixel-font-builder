@@ -1,10 +1,9 @@
-import math
 import os
 
 import bdffont
-import bdffont.xlfd
 import fontTools.fontBuilder
 
+from pixel_font_builder import opentype, bdf
 from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.info import MetaInfos, OpenTypeConfigs, BdfConfigs, OpenTypeFlavor
 
@@ -65,26 +64,9 @@ class FontBuilder:
         if '.notdef' not in self._name_to_glyph:
             raise Exception("Need to provide a glyph named '.notdef'")
 
-    # ========
-    # OpenType
-    # ========
-
-    def _to_opentype_builder(self, is_ttf: bool = False, flavor: OpenTypeFlavor = None) -> fontTools.fontBuilder.FontBuilder:
-        self.check_ready()
-
-        units_per_em = self.size * self.opentype_configs.px_to_units
-
-        builder = fontTools.fontBuilder.FontBuilder(units_per_em, isTTF=is_ttf)
-
-        # TODO
-
-        if flavor is not None:
-            builder.font.flavor = flavor
-
-        return builder
-
     def to_otf_builder(self, flavor: OpenTypeFlavor = None) -> fontTools.fontBuilder.FontBuilder:
-        return self._to_opentype_builder(False, flavor)
+        self.check_ready()
+        return opentype.create_builder(self, False, flavor)
 
     def save_otf(
             self,
@@ -94,7 +76,8 @@ class FontBuilder:
         self.to_otf_builder(flavor).save(file_path)
 
     def to_ttf_builder(self, flavor: OpenTypeFlavor = None) -> fontTools.fontBuilder.FontBuilder:
-        return self._to_opentype_builder(True, flavor)
+        self.check_ready()
+        return opentype.create_builder(self, True, flavor)
 
     def save_ttf(
             self,
@@ -103,65 +86,9 @@ class FontBuilder:
     ):
         self.to_ttf_builder(flavor).save(file_path)
 
-    # ==========================
-    # Bitmap Distribution Format
-    # ==========================
-
-    def _create_bdf_glyph(self, code_point: int, glyph_name: str) -> bdffont.BdfGlyph:
-        glyph = self._name_to_glyph[glyph_name]
-        scalable_width_x = math.ceil((glyph.advance_width / self.size) * (72 / self.bdf_configs.resolution_x) * 1000)
-        return bdffont.BdfGlyph(
-            name=glyph.name,
-            code_point=code_point,
-            scalable_width=(scalable_width_x, 0),
-            device_width=(glyph.advance_width, 0),
-            bounding_box_size=glyph.size,
-            bounding_box_offset=glyph.offset,
-            bitmap=glyph.data,
-        )
-
     def to_bdf_builder(self) -> bdffont.BdfFont:
         self.check_ready()
-
-        builder = bdffont.BdfFont(
-            point_size=self.size,
-            resolution_xy=(self.bdf_configs.resolution_x, self.bdf_configs.resolution_y),
-            bounding_box_size=(self.size, self.line_height),
-            bounding_box_offset=(0, self.descent),
-        )
-
-        builder.add_glyph(self._create_bdf_glyph(-1, '.notdef'))
-        for code_point, glyph_name in self.character_mapping.items():
-            builder.add_glyph(self._create_bdf_glyph(code_point, glyph_name))
-
-        builder.properties.foundry = self.meta_infos.foundry
-        builder.properties.family_name = self.meta_infos.family_name
-        # builder.properties.weight_name =
-        # builder.properties.slant =
-        # builder.properties.setwidth_name =
-        # builder.properties.add_style_name =
-        builder.properties.pixel_size = self.size
-        builder.properties.point_size = self.size * 10
-        builder.properties.resolution_x = self.bdf_configs.resolution_x
-        builder.properties.resolution_y = self.bdf_configs.resolution_y
-        # builder.properties.spacing =
-        builder.properties.average_width = round(sum([glyph.scalable_width_x for glyph in builder.code_point_to_glyph.values()]) / builder.get_glyphs_count())
-        builder.properties.charset_registry = bdffont.xlfd.CharsetRegistry.ISO10646
-        builder.properties.charset_encoding = '1'
-
-        builder.properties.default_char = -1
-        builder.properties.font_ascent = self.ascent
-        builder.properties.font_descent = self.descent
-        builder.properties.x_height = self.x_height
-        builder.properties.cap_height = self.cap_height
-
-        builder.properties.font_version = self.meta_infos.version
-        builder.properties.copyright = self.meta_infos.copyright_info
-        builder.properties['LICENSE'] = self.meta_infos.license_description
-
-        builder.generate_xlfd_font_name()
-
-        return builder
+        return bdf.create_builder(self)
 
     def save_bdf(
             self,
