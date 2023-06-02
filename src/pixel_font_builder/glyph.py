@@ -28,3 +28,7 @@ class Glyph:
     @property
     def size(self) -> tuple[int, int]:
         return self.width, self.height
+
+    def check_ready(self):
+        if any(len(data_row) != len(self.data[0]) for data_row in self.data):
+            raise Exception(f"Glyph '{self.name}': lengths of data rows are not equals")

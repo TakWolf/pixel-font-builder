@@ -44,17 +44,18 @@ class FontBuilder:
     def line_height(self) -> int:
         return self.ascent - self.descent
 
-    def _check_ready(self):
+    def check_ready(self):
         assert self.character_mapping is not None
         if any(code_point < 0 for code_point in self.character_mapping):
             raise Exception(f"Code points must >= 0")
-
         assert self.glyphs is not None
         if all(glyph.name != '.notdef' for glyph in self.glyphs):
             raise Exception("Need to provide a glyph named '.notdef'")
+        for glyph in self.glyphs:
+            glyph.check_ready()
 
     def _to_opentype_builder(self, is_ttf: bool = False, flavor: OpenTypeFlavor = None) -> fontTools.fontBuilder.FontBuilder:
-        self._check_ready()
+        self.check_ready()
 
         units_per_em = self.size * self.opentype_configs.px_to_units
 
@@ -103,7 +104,7 @@ class FontBuilder:
         )
 
     def to_bdf_builder(self) -> bdffont.BdfFont:
-        self._check_ready()
+        self.check_ready()
 
         builder = bdffont.BdfFont(
             point_size=self.size,
