@@ -54,6 +54,10 @@ class FontBuilder:
         for glyph in self.glyphs:
             glyph.check_ready()
 
+    # ========
+    # OpenType
+    # ========
+
     def _to_opentype_builder(self, is_ttf: bool = False, flavor: OpenTypeFlavor = None) -> fontTools.fontBuilder.FontBuilder:
         self.check_ready()
 
@@ -90,6 +94,10 @@ class FontBuilder:
             flavor: OpenTypeFlavor = None,
     ):
         self.to_ttf_builder(flavor).save(file_path)
+
+    # ==========================
+    # Bitmap Distribution Format
+    # ==========================
 
     def _create_bdf_glyph(self, code_point: int, glyph: Glyph) -> bdffont.BdfGlyph:
         scalable_width_x = math.ceil((glyph.advance_width / self.size) * (72 / self.bdf_configs.resolution_x) * 1000)
