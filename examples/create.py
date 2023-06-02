@@ -1,17 +1,13 @@
 import logging
 import os
 
-from examples import build_dir, outputs_dir
-from examples.utils import fs_util
+from examples import outputs_dir
 from pixel_font_builder import FontBuilder, Glyph, StyleName, SerifMode, WidthMode, opentype
 
 logging.basicConfig(level=logging.DEBUG)
 
 
 def main():
-    fs_util.delete_dir(build_dir)
-    fs_util.make_dirs_if_not_exists(outputs_dir)
-
     font_builder = FontBuilder(
         size=12,
         ascent=10,
