@@ -46,7 +46,12 @@ class FontBuilder:
 
     def _check_ready(self):
         assert self.character_mapping is not None
+        if any(code_point < 0 for code_point in self.character_mapping):
+            raise Exception(f"Code points must >= 0")
+
         assert self.glyphs is not None
+        if all(glyph.name != '.notdef' for glyph in self.glyphs):
+            raise Exception("Need to provide a glyph named '.notdef'")
 
     def _to_opentype_builder(self, is_ttf: bool = False, flavor: OpenTypeFlavor = None) -> fontTools.fontBuilder.FontBuilder:
         self._check_ready()
@@ -100,13 +105,6 @@ class FontBuilder:
     def to_bdf_builder(self) -> bdffont.BdfFont:
         self._check_ready()
 
-        if -1 in self.character_mapping:
-            raise Exception("Code '-1' is reserved for glyph '.notdef'")
-
-        name_to_glyph = {glyph.name: glyph for glyph in self.glyphs}
-        if '.notdef' not in name_to_glyph:
-            raise Exception("Need to provide a glyph named '.notdef'")
-
         builder = bdffont.BdfFont(
             point_size=self.size,
             resolution_xy=(self.bdf_configs.resolution_x, self.bdf_configs.resolution_y),
@@ -114,6 +112,7 @@ class FontBuilder:
             bounding_box_offset=(0, self.descent),
         )
 
+        name_to_glyph = {glyph.name: glyph for glyph in self.glyphs}
         builder.add_glyph(self._create_bdf_glyph(-1, name_to_glyph['.notdef']))
         for code_point, glyph_name in self.character_mapping.items():
             builder.add_glyph(self._create_bdf_glyph(code_point, name_to_glyph[glyph_name]))
