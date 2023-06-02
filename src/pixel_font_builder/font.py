@@ -68,6 +68,8 @@ class FontBuilder:
             raise Exception(f"Code points must >= 0")
         if '.notdef' not in self._name_to_glyph:
             raise Exception("Need to provide a glyph named '.notdef'")
+        for glyph in self._name_to_glyph.values():
+            glyph.check_ready()
         if self.meta_infos.version is None:
             raise Exception("Missing meta infos: 'version'")
         if self.meta_infos.family_name is None:
