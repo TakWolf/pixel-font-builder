@@ -1,5 +1,5 @@
 import logging
-import os.path
+import os
 
 from examples import build_dir, outputs_dir, glyphs_dir
 from examples.services import font_service, design_service
