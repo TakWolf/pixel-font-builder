@@ -68,9 +68,14 @@ class FontBuilder:
             raise Exception(f"Code points must >= 0")
         if '.notdef' not in self._name_to_glyph:
             raise Exception("Need to provide a glyph named '.notdef'")
+        if self.meta_infos.version is None:
+            raise Exception("Missing meta infos: 'version'")
+        if self.meta_infos.family_name is None:
+            raise Exception("Missing meta infos: 'family_name'")
+        if self.meta_infos.style_name is None:
+            raise Exception("Missing meta infos: 'style_name'")
 
     def to_otf_builder(self, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
-        self.check_ready()
         return opentype.create_builder(self, False, flavor)
 
     def save_otf(
@@ -81,7 +86,6 @@ class FontBuilder:
         self.to_otf_builder(flavor).save(file_path)
 
     def to_ttf_builder(self, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
-        self.check_ready()
         return opentype.create_builder(self, True, flavor)
 
     def save_ttf(
@@ -92,7 +96,6 @@ class FontBuilder:
         self.to_ttf_builder(flavor).save(file_path)
 
     def to_bdf_builder(self) -> bdffont.BdfFont:
-        self.check_ready()
         return bdf.create_builder(self)
 
     def save_bdf(

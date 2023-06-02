@@ -3,7 +3,7 @@ import os
 import tomllib
 
 from examples.services.design_service import DesignContext
-from pixel_font_builder import FontBuilder, Glyph
+from pixel_font_builder import FontBuilder, Glyph, StyleName, SerifMode, WidthMode
 
 logger = logging.getLogger('font-service')
 
@@ -69,14 +69,16 @@ def create_font_builder(font_config: FontConfig, design_context: DesignContext) 
 
     font_builder.meta_infos.version = '1.0.0'
     font_builder.meta_infos.family_name = 'Demo Pixel'
-    font_builder.meta_infos.description = 'A demo pixel font.'
+    font_builder.meta_infos.style_name = StyleName.REGULAR
+    font_builder.meta_infos.serif_mode = SerifMode.SANS_SERIF
+    font_builder.meta_infos.width_mode = WidthMode.PROPORTIONAL
     font_builder.meta_infos.manufacturer = 'TakWolf Studio'
-    font_builder.meta_infos.foundry = 'TakWolf Studio'
     font_builder.meta_infos.designer = 'TakWolf'
+    font_builder.meta_infos.description = 'A demo pixel font.'
     font_builder.meta_infos.copyright_info = 'Copyright (c) TakWolf'
-    font_builder.meta_infos.license_description = 'This Font Software is licensed under the SIL Open Font License, Version 1.1.'
+    font_builder.meta_infos.license_info = 'This Font Software is licensed under the SIL Open Font License, Version 1.1.'
+    font_builder.meta_infos.vendor_url = 'https://github.com/TakWolf/pixel-font-builder'
     font_builder.meta_infos.designer_url = 'https://takwolf.com'
     font_builder.meta_infos.license_url = 'https://scripts.sil.org/OFL'
-    font_builder.meta_infos.vendor_url = 'https://github.com/TakWolf/pixel-font-builder'
 
     return font_builder

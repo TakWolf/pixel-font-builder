@@ -50,13 +50,31 @@ def _create_name_strings(context: 'font.FontBuilder') -> dict[str, str]:
     darkBackgroundPalette (nameID 24)
     variationsPostScriptNamePrefix (nameID 25)
     """
-    name_strings = {}
-
-    # TODO
-    name_strings['psName'] = context.meta_infos.family_name
-    name_strings['fullName'] = context.meta_infos.family_name
-    # TODO
-
+    unique_name = context.meta_infos.family_name.replace(' ', '-')
+    name_strings = {
+        'familyName': context.meta_infos.family_name,
+        'styleName': context.meta_infos.style_name,
+        'uniqueFontIdentifier': f'{unique_name}-{context.meta_infos.style_name};{context.meta_infos.version}',
+        'fullName': context.meta_infos.family_name,
+        'version': context.meta_infos.version,
+        'psName': f'{unique_name}-{context.meta_infos.style_name}',
+    }
+    if context.meta_infos.copyright_info is not None:
+        name_strings['copyright'] = context.meta_infos.copyright_info
+    if context.meta_infos.manufacturer is not None:
+        name_strings['manufacturer'] = context.meta_infos.manufacturer
+    if context.meta_infos.designer is not None:
+        name_strings['designer'] = context.meta_infos.designer
+    if context.meta_infos.description is not None:
+        name_strings['description'] = context.meta_infos.description
+    if context.meta_infos.vendor_url is not None:
+        name_strings['vendorURL'] = context.meta_infos.vendor_url
+    if context.meta_infos.designer_url is not None:
+        name_strings['designerURL'] = context.meta_infos.designer_url
+    if context.meta_infos.license_info is not None:
+        name_strings['licenseDescription'] = context.meta_infos.license_info
+    if context.meta_infos.license_url is not None:
+        name_strings['licenseInfoURL'] = context.meta_infos.license_url
     return name_strings
 
 
@@ -182,6 +200,8 @@ def _create_glyph(context: 'font.FontBuilder', glyph_name: str, is_ttf: bool) ->
 
 
 def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor) -> FontBuilder:
+    context.check_ready()
+
     units_per_em = context.size * context.opentype_configs.px_to_units
     builder = FontBuilder(units_per_em, isTTF=is_ttf)
 

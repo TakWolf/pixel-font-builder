@@ -3,6 +3,7 @@ import math
 from bdffont import BdfFont, BdfGlyph, xlfd
 
 from pixel_font_builder import font
+from pixel_font_builder.info import SerifMode, WidthMode
 
 
 class Configs:
@@ -30,6 +31,8 @@ def _create_glyph(context: 'font.FontBuilder', code_point: int, glyph_name: str)
 
 
 def create_builder(context: 'font.FontBuilder') -> BdfFont:
+    context.check_ready()
+
     builder = BdfFont(
         point_size=context.size,
         resolution_xy=(context.bdf_configs.resolution_x, context.bdf_configs.resolution_y),
@@ -41,17 +44,23 @@ def create_builder(context: 'font.FontBuilder') -> BdfFont:
     for code_point, glyph_name in context.character_mapping.items():
         builder.add_glyph(_create_glyph(context, code_point, glyph_name))
 
-    builder.properties.foundry = context.meta_infos.foundry
+    builder.properties.foundry = context.meta_infos.manufacturer
     builder.properties.family_name = context.meta_infos.family_name
-    # builder.properties.weight_name =
-    # builder.properties.slant =
-    # builder.properties.setwidth_name =
-    # builder.properties.add_style_name =
+    builder.properties.weight_name = context.meta_infos.style_name
+    builder.properties.slant = xlfd.Slant.ROMAN
+    builder.properties.setwidth_name = xlfd.SetwidthName.NORMAL
+    if context.meta_infos.serif_mode == SerifMode.SERIF:
+        builder.properties.add_style_name = xlfd.AddStyleName.SERIF
+    elif context.meta_infos.serif_mode == SerifMode.SANS_SERIF:
+        builder.properties.add_style_name = xlfd.AddStyleName.SANS_SERIF
     builder.properties.pixel_size = context.size
     builder.properties.point_size = context.size * 10
     builder.properties.resolution_x = context.bdf_configs.resolution_x
     builder.properties.resolution_y = context.bdf_configs.resolution_y
-    # builder.properties.spacing =
+    if context.meta_infos.width_mode == WidthMode.MONOSPACED:
+        builder.properties.spacing = xlfd.Spacing.MONOSPACED
+    elif context.meta_infos.width_mode == WidthMode.PROPORTIONAL:
+        builder.properties.spacing = xlfd.Spacing.PROPORTIONAL
     builder.properties.average_width = round(sum([glyph.scalable_width_x for glyph in builder.code_point_to_glyph.values()]) / builder.get_glyphs_count())
     builder.properties.charset_registry = xlfd.CharsetRegistry.ISO10646
     builder.properties.charset_encoding = '1'
@@ -64,7 +73,7 @@ def create_builder(context: 'font.FontBuilder') -> BdfFont:
 
     builder.properties.font_version = context.meta_infos.version
     builder.properties.copyright = context.meta_infos.copyright_info
-    builder.properties['LICENSE'] = context.meta_infos.license_description
+    builder.properties['LICENSE'] = context.meta_infos.license_info
 
     builder.generate_xlfd_font_name()
 
