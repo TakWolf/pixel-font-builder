@@ -5,7 +5,7 @@ import fontTools.fontBuilder
 
 from pixel_font_builder import opentype, bdf
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.info import MetaInfos, OpenTypeConfigs, BdfConfigs, OpenTypeFlavor
+from pixel_font_builder.info import MetaInfos, OpenTypeConfigs, BdfConfigs
 
 
 class FontBuilder:
@@ -64,25 +64,25 @@ class FontBuilder:
         if '.notdef' not in self._name_to_glyph:
             raise Exception("Need to provide a glyph named '.notdef'")
 
-    def to_otf_builder(self, flavor: OpenTypeFlavor = None) -> fontTools.fontBuilder.FontBuilder:
+    def to_otf_builder(self, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
         self.check_ready()
         return opentype.create_builder(self, False, flavor)
 
     def save_otf(
             self,
             file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes],
-            flavor: OpenTypeFlavor = None,
+            flavor: opentype.Flavor = None,
     ):
         self.to_otf_builder(flavor).save(file_path)
 
-    def to_ttf_builder(self, flavor: OpenTypeFlavor = None) -> fontTools.fontBuilder.FontBuilder:
+    def to_ttf_builder(self, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
         self.check_ready()
         return opentype.create_builder(self, True, flavor)
 
     def save_ttf(
             self,
             file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes],
-            flavor: OpenTypeFlavor = None,
+            flavor: opentype.Flavor = None,
     ):
         self.to_ttf_builder(flavor).save(file_path)
 

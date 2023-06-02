@@ -1,5 +1,3 @@
-from enum import StrEnum
-
 
 class MetaInfos:
     def __init__(
@@ -45,8 +43,3 @@ class BdfConfigs:
     ):
         self.resolution_x = resolution_x
         self.resolution_y = resolution_y
-
-
-class OpenTypeFlavor(StrEnum):
-    WOFF = 'woff'
-    WOFF2 = 'woff2'
