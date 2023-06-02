@@ -179,6 +179,7 @@ def _create_glyph(context: 'font.FontBuilder', glyph_name: str, is_ttf: bool) ->
 
                 # 转换左上角原点坐标系为左下角原点坐标系
                 x, y = point
+                x += glyph.offset_x * context.opentype_configs.px_to_units
                 y = (glyph.height + glyph.offset_y) * context.opentype_configs.px_to_units - y
                 point = x, y
 
