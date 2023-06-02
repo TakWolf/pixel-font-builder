@@ -61,7 +61,7 @@ def create_builder(context: 'font.FontBuilder') -> BdfFont:
         builder.properties.spacing = xlfd.Spacing.MONOSPACED
     elif context.meta_infos.width_mode == WidthMode.PROPORTIONAL:
         builder.properties.spacing = xlfd.Spacing.PROPORTIONAL
-    builder.properties.average_width = round(sum([glyph.scalable_width_x for glyph in builder.code_point_to_glyph.values()]) / builder.get_glyphs_count())
+    builder.properties.average_width = round(sum([glyph.device_width_x * 10 for glyph in builder.code_point_to_glyph.values()]) / builder.get_glyphs_count())
     builder.properties.charset_registry = xlfd.CharsetRegistry.ISO10646
     builder.properties.charset_encoding = '1'
 
