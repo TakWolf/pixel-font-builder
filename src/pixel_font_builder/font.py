@@ -133,7 +133,7 @@ class FontBuilder:
         # builder.properties.setwidth_name =
         # builder.properties.add_style_name =
         builder.properties.pixel_size = self.size
-        builder.properties.point_size = self.size * 100
+        builder.properties.point_size = self.size * 10
         builder.properties.resolution_x = self.bdf_configs.resolution_x
         builder.properties.resolution_y = self.bdf_configs.resolution_y
         # builder.properties.spacing =
