@@ -65,7 +65,7 @@ def create_font_builder(font_config: FontConfig, design_context: DesignContext) 
         font_builder.character_mapping[fallback_code_point] = _get_glyph_name(code_point)
 
     font_builder.meta_infos.version = '1.0.0'
-    font_builder.meta_infos.family_name = 'Demo Pixel'
+    font_builder.meta_infos.family_name = 'Cute Pixel'
     font_builder.meta_infos.style_name = StyleName.REGULAR
     font_builder.meta_infos.serif_mode = SerifMode.SANS_SERIF
     font_builder.meta_infos.width_mode = WidthMode.PROPORTIONAL
