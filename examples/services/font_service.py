@@ -1,11 +1,8 @@
-import logging
 import os
 import tomllib
 
 from examples.services.design_service import DesignContext
 from pixel_font_builder import FontBuilder, Glyph, StyleName, SerifMode, WidthMode
-
-logger = logging.getLogger('font-service')
 
 
 class FontConfig:
