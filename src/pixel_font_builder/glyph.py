@@ -9,10 +9,18 @@ class Glyph:
     ):
         self.name = name
         self.advance_width = advance_width
-        self.offset = offset
+        self.offset_x, self.offset_y = offset
         if data is None:
             data = []
         self.data = data
+
+    @property
+    def offset(self) -> tuple[int, int]:
+        return self.offset_x, self.offset_y
+
+    @offset.setter
+    def offset(self, value: tuple[int, int]):
+        self.offset_x, self.offset_y = value
 
     @property
     def width(self) -> int:
