@@ -64,10 +64,13 @@ class FontBuilder:
         return self._name_to_glyph.pop(name, None)
 
     def check_ready(self):
-        if any(code_point < 0 for code_point in self.character_mapping):
-            raise Exception(f"Code points must >= 0")
         if '.notdef' not in self._name_to_glyph:
             raise Exception("Need to provide a glyph named '.notdef'")
+        for code_point, glyph_name in self.character_mapping.items():
+            if code_point < 0:
+                raise Exception('Code points must >= 0')
+            if glyph_name not in self._name_to_glyph:
+                raise Exception(f"Missing glyph: '{glyph_name}'")
         for glyph in self._name_to_glyph.values():
             glyph.check_ready()
         if self.meta_infos.version is None:
