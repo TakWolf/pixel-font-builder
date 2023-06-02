@@ -5,6 +5,14 @@ from fontTools.fontBuilder import FontBuilder
 from pixel_font_builder import font
 
 
+class Configs:
+    def __init__(
+            self,
+            px_to_units: int = 100,
+    ):
+        self.px_to_units = px_to_units
+
+
 class Flavor(StrEnum):
     WOFF = 'woff'
     WOFF2 = 'woff2'

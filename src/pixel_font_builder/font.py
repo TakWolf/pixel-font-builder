@@ -5,7 +5,7 @@ import fontTools.fontBuilder
 
 from pixel_font_builder import opentype, bdf
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.info import MetaInfos, OpenTypeConfigs, BdfConfigs
+from pixel_font_builder.info import MetaInfos
 
 
 class FontBuilder:
@@ -27,8 +27,8 @@ class FontBuilder:
         self._name_to_glyph: dict[str, Glyph] = {}
 
         self.meta_infos = MetaInfos()
-        self.opentype_configs = OpenTypeConfigs()
-        self.bdf_configs = BdfConfigs()
+        self.opentype_configs = opentype.Configs()
+        self.bdf_configs = bdf.Configs()
 
     @property
     def line_height(self) -> int:

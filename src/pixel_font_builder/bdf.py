@@ -5,6 +5,16 @@ from bdffont import BdfFont, BdfGlyph, xlfd
 from pixel_font_builder import font
 
 
+class Configs:
+    def __init__(
+            self,
+            resolution_x: int = 75,
+            resolution_y: int = 75,
+    ):
+        self.resolution_x = resolution_x
+        self.resolution_y = resolution_y
+
+
 def _create_glyph(context: 'font.FontBuilder', code_point: int, glyph_name: str) -> BdfGlyph:
     glyph = context.get_glyph(glyph_name)
     scalable_width_x = math.ceil((glyph.advance_width / context.size) * (72 / context.bdf_configs.resolution_x) * 1000)
