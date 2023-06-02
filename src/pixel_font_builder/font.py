@@ -87,18 +87,12 @@ class FontBuilder:
 
     def _create_bdf_glyph(self, code_point: int, glyph: Glyph) -> bdffont.BdfGlyph:
         scalable_width_x = math.ceil((glyph.advance_width / self.size) * (72 / self.bdf_configs.resolution_x) * 1000)
-        if glyph.data is None:
-            glyph_width = 0
-            glyph_height = 0
-        else:
-            glyph_width = len(glyph.data[0])
-            glyph_height = len(glyph.data)
         return bdffont.BdfGlyph(
             name=glyph.name,
             code_point=code_point,
             scalable_width=(scalable_width_x, 0),
             device_width=(glyph.advance_width, 0),
-            bounding_box_size=(glyph_width, glyph_height),
+            bounding_box_size=glyph.size,
             bounding_box_offset=glyph.offset,
             bitmap=glyph.data,
         )
