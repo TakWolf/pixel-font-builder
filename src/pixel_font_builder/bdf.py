@@ -53,6 +53,8 @@ def create_builder(context: 'font.FontBuilder') -> BdfFont:
         builder.properties.add_style_name = xlfd.AddStyleName.SERIF
     elif context.meta_infos.serif_mode == SerifMode.SANS_SERIF:
         builder.properties.add_style_name = xlfd.AddStyleName.SANS_SERIF
+    else:
+        builder.properties.add_style_name = context.meta_infos.serif_mode
     builder.properties.pixel_size = context.size
     builder.properties.point_size = context.size * 10
     builder.properties.resolution_x = context.bdf_configs.resolution_x
@@ -61,6 +63,8 @@ def create_builder(context: 'font.FontBuilder') -> BdfFont:
         builder.properties.spacing = xlfd.Spacing.MONOSPACED
     elif context.meta_infos.width_mode == WidthMode.PROPORTIONAL:
         builder.properties.spacing = xlfd.Spacing.PROPORTIONAL
+    else:
+        builder.properties.spacing = context.meta_infos.width_mode
     builder.properties.average_width = round(sum([glyph.device_width_x * 10 for glyph in builder.code_point_to_glyph.values()]) / builder.get_glyphs_count())
     builder.properties.charset_registry = xlfd.CharsetRegistry.ISO10646
     builder.properties.charset_encoding = '1'
