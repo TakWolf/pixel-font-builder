@@ -11,10 +11,10 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 class FontConfig:
-    def __init__(self, glyphs_dir: str):
-        self.glyphs_dir = glyphs_dir
+    def __init__(self, root_dir: str):
+        self.root_dir = root_dir
 
-        config_file_path = os.path.join(glyphs_dir, 'config.toml')
+        config_file_path = os.path.join(root_dir, 'config.toml')
         with open(config_file_path, 'rb') as file:
             config_data = tomllib.load(file)['font']
 
@@ -63,7 +63,7 @@ def _save_glyph_data_to_png(data: list[list[int]], file_path: str):
 
 
 def _format_glyph_files(font_config: FontConfig):
-    for glyph_file_dir, _, glyph_file_names in os.walk(font_config.glyphs_dir):
+    for glyph_file_dir, _, glyph_file_names in os.walk(font_config.root_dir):
         for glyph_file_name in glyph_file_names:
             if not glyph_file_name.endswith('.png'):
                 continue
@@ -75,7 +75,7 @@ def _format_glyph_files(font_config: FontConfig):
 def _collect_glyph_files(font_config: FontConfig) -> tuple[dict[int, str], dict[str, str]]:
     character_mapping = {}
     glyph_file_paths = {}
-    for glyph_file_dir, _, glyph_file_names in os.walk(font_config.glyphs_dir):
+    for glyph_file_dir, _, glyph_file_names in os.walk(font_config.root_dir):
         for glyph_file_name in glyph_file_names:
             if not glyph_file_name.endswith('.png'):
                 continue
