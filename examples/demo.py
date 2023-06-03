@@ -62,7 +62,7 @@ def _save_glyph_data_to_png(data: list[list[int]], file_path: str):
     png.from_array(bitmap, 'RGBA').save(file_path)
 
 
-def _format_glyphs(font_config: FontConfig):
+def _format_glyph_files(font_config: FontConfig):
     for glyph_file_dir, _, glyph_file_names in os.walk(font_config.glyphs_dir):
         for glyph_file_name in glyph_file_names:
             if not glyph_file_name.endswith('.png'):
@@ -72,7 +72,7 @@ def _format_glyphs(font_config: FontConfig):
             _save_glyph_data_to_png(glyph_data, glyph_file_path)
 
 
-def _collect_glyphs(font_config: FontConfig) -> tuple[dict[int, str], dict[str, str]]:
+def _collect_glyph_files(font_config: FontConfig) -> tuple[dict[int, str], dict[str, str]]:
     character_mapping = {}
     glyph_file_paths = {}
     for glyph_file_dir, _, glyph_file_names in os.walk(font_config.glyphs_dir):
@@ -143,8 +143,8 @@ def _create_builder(
 
 def main():
     font_config = FontConfig(glyphs_dir)
-    _format_glyphs(font_config)
-    character_mapping, glyph_file_paths = _collect_glyphs(font_config)
+    _format_glyph_files(font_config)
+    character_mapping, glyph_file_paths = _collect_glyph_files(font_config)
     builder = _create_builder(font_config, character_mapping, glyph_file_paths)
     builder.save_otf(os.path.join(outputs_dir, 'cute.otf'))
     builder.save_otf(os.path.join(outputs_dir, 'cute.woff2'), flavor=opentype.Flavor.WOFF2)
