@@ -2,8 +2,9 @@ import logging
 import os
 import tomllib
 
+import png
+
 from examples import glyphs_dir, outputs_dir
-from examples.utils import glyph_util
 from pixel_font_builder import FontBuilder, Glyph, StyleName, SerifMode, WidthMode, opentype
 
 logging.basicConfig(level=logging.DEBUG)
@@ -30,14 +31,45 @@ def _get_glyph_name(code_point: int) -> str:
     return f'uni{code_point:04X}'
 
 
+def _load_glyph_data_from_png(file_path: str) -> tuple[list[list[int]], int, int]:
+    width, height, bitmap, _ = png.Reader(filename=file_path).read()
+    data = []
+    for bitmap_row in bitmap:
+        data_row = []
+        for x in range(0, width * 4, 4):
+            alpha = bitmap_row[x + 3]
+            if alpha > 127:
+                data_row.append(1)
+            else:
+                data_row.append(0)
+        data.append(data_row)
+    return data, width, height
+
+
+def _save_glyph_data_to_png(data: list[list[int]], file_path: str):
+    bitmap = []
+    for data_row in data:
+        bitmap_row = []
+        for x in data_row:
+            bitmap_row.append(0)
+            bitmap_row.append(0)
+            bitmap_row.append(0)
+            if x == 0:
+                bitmap_row.append(0)
+            else:
+                bitmap_row.append(255)
+        bitmap.append(bitmap_row)
+    png.from_array(bitmap, 'RGBA').save(file_path)
+
+
 def _format_glyphs(font_config: FontConfig):
     for glyph_file_dir, _, glyph_file_names in os.walk(font_config.glyphs_dir):
         for glyph_file_name in glyph_file_names:
             if not glyph_file_name.endswith('.png'):
                 continue
             glyph_file_path = os.path.join(glyph_file_dir, glyph_file_name)
-            glyph_data = glyph_util.load_data_from_png(glyph_file_path)[0]
-            glyph_util.save_data_to_png(glyph_data, glyph_file_path)
+            glyph_data = _load_glyph_data_from_png(glyph_file_path)[0]
+            _save_glyph_data_to_png(glyph_data, glyph_file_path)
 
 
 def _collect_glyphs(font_config: FontConfig) -> tuple[dict[int, str], dict[str, str]]:
@@ -83,7 +115,7 @@ def _create_builder(
         builder.character_mapping[fallback_code_point] = _get_glyph_name(code_point)
 
     for glyph_name, glyph_file_path in glyph_file_paths.items():
-        glyph_data, glyph_width, glyph_height = glyph_util.load_data_from_png(glyph_file_path)
+        glyph_data, glyph_width, glyph_height = _load_glyph_data_from_png(glyph_file_path)
         offset_y = round((glyph_height - font_config.size) / 2 + font_config.box_origin_y) - glyph_height
         builder.add_glyph(Glyph(
             name=glyph_name,
