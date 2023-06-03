@@ -20,8 +20,10 @@ class FontConfig:
 
         self.size: int = config_data['size']
         self.line_height: int = config_data['line_height']
+        assert (self.line_height - self.size) % 2 == 0
+
         self.box_origin_y: int = config_data['box_origin_y']
-        self.ascent: int = round((self.line_height - self.size) / 2 + self.box_origin_y)
+        self.ascent: int = self.box_origin_y + int((self.line_height - self.size) / 2)
         self.descent: int = self.ascent - self.line_height
         self.x_height: int = config_data['x_height']
         self.cap_height: int = config_data['cap_height']
