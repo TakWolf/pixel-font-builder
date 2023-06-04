@@ -11,7 +11,7 @@ class Glyph:
         self.advance_width = advance_width
         self.offset_x, self.offset_y = offset
         if data is None:
-            data = []
+            data = list[list[int]]()
         self.data = data
 
     @property

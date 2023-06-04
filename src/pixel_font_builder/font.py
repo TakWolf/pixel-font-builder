@@ -23,8 +23,8 @@ class FontBuilder:
         self.x_height = x_height
         self.cap_height = cap_height
 
-        self.character_mapping: dict[int, str] = {}
-        self._name_to_glyph: dict[str, Glyph] = {}
+        self.character_mapping = dict[int, str]()
+        self._name_to_glyph = dict[str, Glyph]()
 
         self.meta_infos = MetaInfos()
         self.opentype_configs = opentype.Configs()
