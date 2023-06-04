@@ -1,4 +1,5 @@
 import logging
+import math
 import os
 import tomllib
 
@@ -118,7 +119,7 @@ def _create_builder(
 
     for glyph_name, glyph_file_path in glyph_file_paths.items():
         glyph_data, glyph_width, glyph_height = _load_glyph_data_from_png(glyph_file_path)
-        offset_y = round((glyph_height - font_config.size) / 2 + font_config.box_origin_y) - glyph_height
+        offset_y = font_config.box_origin_y + math.ceil((glyph_height - font_config.size) / 2) - glyph_height
         builder.add_glyph(Glyph(
             name=glyph_name,
             advance_width=glyph_width,
