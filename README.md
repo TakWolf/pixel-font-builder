@@ -32,9 +32,9 @@ def main():
         cap_height=7,
     )
 
-    builder.character_mapping = {
+    builder.character_mapping.update({
         ord('A'): 'CAP_LETTER_A',
-    }
+    })
 
     builder.add_glyph(Glyph(
         name='.notdef',
