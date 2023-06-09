@@ -24,7 +24,7 @@ class FontConfig:
         assert (self.line_height - self.size) % 2 == 0
 
         self.box_origin_y: int = config_data['box_origin_y']
-        self.ascent: int = self.box_origin_y + int((self.line_height - self.size) / 2)
+        self.ascent: int = self.box_origin_y + (self.line_height - self.size) // 2
         self.descent: int = self.ascent - self.line_height
         self.x_height: int = config_data['x_height']
         self.cap_height: int = config_data['cap_height']
