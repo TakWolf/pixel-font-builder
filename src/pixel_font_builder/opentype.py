@@ -78,7 +78,7 @@ def _create_name_strings(context: 'font.FontBuilder') -> dict[str, str]:
     return name_strings
 
 
-def _get_outlines(glyph_data, px_to_units) -> list[list[tuple[int, int]]]:
+def _get_outlines(glyph_data: list[list[int]], px_to_units: int) -> list[list[tuple[int, int]]]:
     """
     将字形数据转换为轮廓数据，左上角原点坐标系
     """
