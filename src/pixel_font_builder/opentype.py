@@ -172,7 +172,7 @@ def _create_glyph(context: 'font.FontBuilder', glyph_name: str, is_ttf: bool) ->
     if is_ttf:
         pen = TTGlyphPen()
     else:
-        pen = T2CharStringPen(0, None)
+        pen = T2CharStringPen(glyph.advance_width * context.opentype_configs.px_to_units, None)
     if len(outlines) > 0:
         for outline_index, outline in enumerate(outlines):
             for point_index, point in enumerate(outline):
