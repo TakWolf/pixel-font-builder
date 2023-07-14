@@ -7,7 +7,7 @@ A library that helps create pixel style fonts.
 
 ## Installation
 
-```commandline
+```shell
 pip install pixel-font-builder
 ```
 
