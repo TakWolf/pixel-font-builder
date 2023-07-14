@@ -24,6 +24,7 @@ class Flavor(StrEnum):
 
 def _create_name_strings(context: 'font.FontBuilder') -> dict[str, str]:
     """
+    https://learn.microsoft.com/en-us/typography/opentype/spec/name#name-ids
     copyright (nameID 0)
     familyName (nameID 1)
     styleName (nameID 2)
@@ -75,6 +76,8 @@ def _create_name_strings(context: 'font.FontBuilder') -> dict[str, str]:
         name_strings['licenseDescription'] = context.meta_infos.license_info
     if context.meta_infos.license_url is not None:
         name_strings['licenseInfoURL'] = context.meta_infos.license_url
+    if context.meta_infos.sample_text is not None:
+        name_strings['sampleText'] = context.meta_infos.sample_text
     return name_strings
 
 

@@ -36,6 +36,7 @@ class MetaInfos:
             vendor_url: str = None,
             designer_url: str = None,
             license_url: str = None,
+            sample_text: str = None,
     ):
         self.version = version
         self.family_name = family_name
@@ -50,3 +51,4 @@ class MetaInfos:
         self.vendor_url = vendor_url
         self.designer_url = designer_url
         self.license_url = license_url
+        self.sample_text = sample_text

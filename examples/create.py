@@ -72,6 +72,7 @@ def main():
     builder.meta_infos.vendor_url = 'https://github.com/TakWolf/pixel-font-builder'
     builder.meta_infos.designer_url = 'https://takwolf.com'
     builder.meta_infos.license_url = 'https://scripts.sil.org/OFL'
+    builder.meta_infos.sample_text = 'Hello World!'
 
     builder.save_otf(os.path.join(outputs_dir, 'demo.otf'))
     builder.save_otf(os.path.join(outputs_dir, 'demo.woff2'), flavor=opentype.Flavor.WOFF2)

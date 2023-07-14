@@ -140,6 +140,7 @@ def _create_builder(
     builder.meta_infos.vendor_url = 'https://github.com/TakWolf/pixel-font-builder'
     builder.meta_infos.designer_url = 'https://takwolf.com'
     builder.meta_infos.license_url = 'https://scripts.sil.org/OFL'
+    builder.meta_infos.sample_text = 'Hello World!'
 
     return builder
 
