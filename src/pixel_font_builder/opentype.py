@@ -7,6 +7,7 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen as TTFGlyphPen
 from fontTools.ttLib.tables._g_l_y_f import Glyph as TTFGlyph
 
 from pixel_font_builder import font
+from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.info import MetaInfos
 
 
@@ -170,21 +171,19 @@ def _create_outlines(glyph_data: list[list[int]], px_to_units: int) -> list[list
     return outlines
 
 
-def _create_glyph(context: 'font.FontBuilder', glyph_name: str, is_ttf: bool) -> OTFGlyph | TTFGlyph:
-    glyph = context.get_glyph(glyph_name)
-    outlines = _create_outlines(glyph.data, context.opentype_configs.px_to_units)
+def _create_glyph(outlines: list[list[tuple[int, int]]], glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGlyph | TTFGlyph:
     if is_ttf:
         pen = TTFGlyphPen()
     else:
-        pen = OTFGlyphPen(glyph.advance_width * context.opentype_configs.px_to_units, None)
+        pen = OTFGlyphPen(glyph.advance_width * px_to_units, None)
     if len(outlines) > 0:
         for outline_index, outline in enumerate(outlines):
             for point_index, point in enumerate(outline):
 
                 # 转换左上角原点坐标系为左下角原点坐标系
                 x, y = point
-                x += glyph.offset_x * context.opentype_configs.px_to_units
-                y = (glyph.height + glyph.offset_y) * context.opentype_configs.px_to_units - y
+                x += glyph.offset_x * px_to_units
+                y = (glyph.height + glyph.offset_y) * px_to_units - y
                 point = x, y
 
                 if point_index == 0:
@@ -220,7 +219,12 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor) ->
     builder.setupGlyphOrder(glyph_order)
     builder.setupCharacterMap(context.character_mapping)
 
-    glyphs = {glyph_name: _create_glyph(context, glyph_name, is_ttf) for glyph_name in glyph_order}
+    glyphs = {}
+    for glyph_name in glyph_order:
+        glyph_context = context.get_glyph(glyph_name)
+        outlines = _create_outlines(glyph_context.data, context.opentype_configs.px_to_units)
+        glyph = _create_glyph(outlines, glyph_context, context.opentype_configs.px_to_units, is_ttf)
+        glyphs[glyph_name] = glyph
     if is_ttf:
         builder.setupGlyf(glyphs)
     else:
