@@ -1,3 +1,4 @@
+import logging
 from enum import StrEnum
 
 from fontTools.fontBuilder import FontBuilder
@@ -9,6 +10,8 @@ from fontTools.ttLib.tables._g_l_y_f import Glyph as TTFGlyph
 from pixel_font_builder import font
 from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.info import MetaInfos
+
+logger = logging.getLogger('pixel_font_builder.opentype')
 
 _CACHE_NAME_TAG = '_opentype_cache_tag'
 _CACHE_NAME_OUTLINES = '_opentype_cache_outlines'
@@ -209,45 +212,62 @@ def _create_glyph(outlines: list[list[tuple[int, int]]], glyph: Glyph, px_to_uni
 
 
 def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor) -> FontBuilder:
+    xtf_name = 'TTF' if is_ttf else 'OTF'
+
+    logger.debug("Create '%sBuilder': %s", xtf_name, context.meta_infos.family_name)
     context.check_ready()
 
     units_per_em = context.size * context.opentype_configs.px_to_units
     builder = FontBuilder(units_per_em, isTTF=is_ttf)
 
+    logger.debug("Setup 'Name Strings'")
     name_strings = _create_name_strings(context.meta_infos)
     builder.setupNameTable(name_strings)
 
+    logger.debug("Setup 'Glyph Order'")
     glyph_order = ['.notdef']
     for _, glyph_name in context.get_character_mapping_sequence():
         if glyph_name not in glyph_order:
             glyph_order.append(glyph_name)
     builder.setupGlyphOrder(glyph_order)
+    logger.debug("Setup 'Character Mapping'")
     builder.setupCharacterMap(context.character_mapping)
 
+    logger.debug("Setup 'Glyphs'")
     glyphs = {}
     for glyph_name in glyph_order:
         glyph_context = context.get_glyph(glyph_name)
+
         cache_tag = f'{glyph_context.advance_width}#{glyph_context.offset}#{glyph_context.data}'.replace(' ', '')
         if getattr(glyph_context, _CACHE_NAME_TAG, None) != cache_tag:
             setattr(glyph_context, _CACHE_NAME_OUTLINES, None)
             setattr(glyph_context, _CACHE_NAME_OTF_GLYPH, None)
             setattr(glyph_context, _CACHE_NAME_TTF_GLYPH, None)
             setattr(glyph_context, _CACHE_NAME_TAG, cache_tag)
+
         outlines = getattr(glyph_context, _CACHE_NAME_OUTLINES, None)
         if outlines is None:
+            logger.debug("Create 'Outlines': %s", glyph_context.name)
             outlines = _create_outlines(glyph_context.data, context.opentype_configs.px_to_units)
             setattr(glyph_context, _CACHE_NAME_OUTLINES, outlines)
+        else:
+            logger.debug("Use cached 'Outlines': %s", glyph_context.name)
+
         cache_name_xtf_glyph = _CACHE_NAME_TTF_GLYPH if is_ttf else _CACHE_NAME_OTF_GLYPH
         glyph = getattr(glyph_context, cache_name_xtf_glyph, None)
         if glyph is None:
+            logger.debug("Create '%sGlyph': %s", xtf_name, glyph_context.name)
             glyph = _create_glyph(outlines, glyph_context, context.opentype_configs.px_to_units, is_ttf)
             setattr(glyph_context, cache_name_xtf_glyph, glyph)
+        else:
+            logger.debug("Use cached '%sGlyph': %s", xtf_name, glyph_context.name)
         glyphs[glyph_name] = glyph
     if is_ttf:
         builder.setupGlyf(glyphs)
     else:
         builder.setupCFF(name_strings['psName'], {'FullName': name_strings['fullName']}, glyphs, {})
 
+    logger.debug("Setup 'Horizontal Metrics'")
     horizontal_metrics = {}
     for glyph_name in glyph_order:
         advance_width = context.get_glyph(glyph_name).advance_width * context.opentype_configs.px_to_units
@@ -262,10 +282,12 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor) ->
     descent = context.descent * context.opentype_configs.px_to_units
     x_height = context.x_height * context.opentype_configs.px_to_units if context.x_height is not None else None
     cap_height = context.cap_height * context.opentype_configs.px_to_units if context.cap_height is not None else None
+    logger.debug("Setup 'Horizontal Header'")
     builder.setupHorizontalHeader(
         ascent=ascent,
         descent=descent,
     )
+    logger.debug("Setup 'OS2'")
     builder.setupOS2(
         sTypoAscender=ascent,
         sTypoDescender=descent,
@@ -275,9 +297,12 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor) ->
         sCapHeight=cap_height,
     )
 
+    logger.debug("Setup 'Post'")
     builder.setupPost()
 
     if flavor is not None:
+        logger.debug("Setup 'Flavor': %s", flavor)
         builder.font.flavor = flavor
 
+    logger.debug("Create '%sBuilder' finished", xtf_name)
     return builder

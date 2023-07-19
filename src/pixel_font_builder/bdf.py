@@ -1,9 +1,12 @@
+import logging
 import math
 
 from bdffont import BdfFont, BdfGlyph, xlfd
 
 from pixel_font_builder import font
 from pixel_font_builder.info import SerifMode, WidthMode
+
+logger = logging.getLogger('pixel_font_builder.bdf')
 
 
 class Configs:
@@ -31,6 +34,7 @@ def _create_glyph(context: 'font.FontBuilder', code_point: int, glyph_name: str)
 
 
 def create_builder(context: 'font.FontBuilder') -> BdfFont:
+    logger.debug("Create 'BDFBuilder': %s", context.meta_infos.family_name)
     context.check_ready()
 
     builder = BdfFont(
@@ -40,10 +44,13 @@ def create_builder(context: 'font.FontBuilder') -> BdfFont:
         bounding_box_offset=(0, context.descent),
     )
 
+    logger.debug("Add 'Glyph': %s", '.notdef')
     builder.add_glyph(_create_glyph(context, -1, '.notdef'))
     for code_point, glyph_name in context.character_mapping.items():
+        logger.debug("Add 'Glyph': %s", glyph_name)
         builder.add_glyph(_create_glyph(context, code_point, glyph_name))
 
+    logger.debug("Setup 'Properties'")
     builder.properties.foundry = context.meta_infos.manufacturer
     builder.properties.family_name = context.meta_infos.family_name
     builder.properties.weight_name = context.meta_infos.style_name
@@ -81,4 +88,5 @@ def create_builder(context: 'font.FontBuilder') -> BdfFont:
 
     builder.generate_xlfd_font_name()
 
+    logger.debug("Create 'BDFBuilder' finished")
     return builder
