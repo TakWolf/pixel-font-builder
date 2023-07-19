@@ -10,6 +10,11 @@ from pixel_font_builder import font
 from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.info import MetaInfos
 
+_CACHE_NAME_TAG = '_opentype_cache_tag'
+_CACHE_NAME_OUTLINES = '_opentype_cache_outlines'
+_CACHE_NAME_OTF_GLYPH = '_opentype_cache_otf_glyph'
+_CACHE_NAME_TTF_GLYPH = '_opentype_cache_ttf_glyph'
+
 
 class Configs:
     def __init__(
@@ -222,8 +227,21 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor) ->
     glyphs = {}
     for glyph_name in glyph_order:
         glyph_context = context.get_glyph(glyph_name)
-        outlines = _create_outlines(glyph_context.data, context.opentype_configs.px_to_units)
-        glyph = _create_glyph(outlines, glyph_context, context.opentype_configs.px_to_units, is_ttf)
+        cache_tag = f'{glyph_context.advance_width}#{glyph_context.offset}#{glyph_context.data}'.replace(' ', '')
+        if getattr(glyph_context, _CACHE_NAME_TAG, None) != cache_tag:
+            setattr(glyph_context, _CACHE_NAME_OUTLINES, None)
+            setattr(glyph_context, _CACHE_NAME_OTF_GLYPH, None)
+            setattr(glyph_context, _CACHE_NAME_TTF_GLYPH, None)
+            setattr(glyph_context, _CACHE_NAME_TAG, cache_tag)
+        outlines = getattr(glyph_context, _CACHE_NAME_OUTLINES, None)
+        if outlines is None:
+            outlines = _create_outlines(glyph_context.data, context.opentype_configs.px_to_units)
+            setattr(glyph_context, _CACHE_NAME_OUTLINES, outlines)
+        cache_name_xtf_glyph = _CACHE_NAME_TTF_GLYPH if is_ttf else _CACHE_NAME_OTF_GLYPH
+        glyph = getattr(glyph_context, cache_name_xtf_glyph, None)
+        if glyph is None:
+            glyph = _create_glyph(outlines, glyph_context, context.opentype_configs.px_to_units, is_ttf)
+            setattr(glyph_context, cache_name_xtf_glyph, glyph)
         glyphs[glyph_name] = glyph
     if is_ttf:
         builder.setupGlyf(glyphs)
