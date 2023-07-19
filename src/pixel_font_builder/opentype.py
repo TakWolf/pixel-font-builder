@@ -7,6 +7,7 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen as TTFGlyphPen
 from fontTools.ttLib.tables._g_l_y_f import Glyph as TTFGlyph
 
 from pixel_font_builder import font
+from pixel_font_builder.info import MetaInfos
 
 
 class Configs:
@@ -22,7 +23,7 @@ class Flavor(StrEnum):
     WOFF2 = 'woff2'
 
 
-def _create_name_strings(context: 'font.FontBuilder') -> dict[str, str]:
+def _create_name_strings(meta_infos: MetaInfos) -> dict[str, str]:
     """
     https://learn.microsoft.com/en-us/typography/opentype/spec/name#name-ids
     copyright (nameID 0)
@@ -51,33 +52,33 @@ def _create_name_strings(context: 'font.FontBuilder') -> dict[str, str]:
     darkBackgroundPalette (nameID 24)
     variationsPostScriptNamePrefix (nameID 25)
     """
-    unique_name = context.meta_infos.family_name.replace(' ', '-')
+    unique_name = meta_infos.family_name.replace(' ', '-')
     name_strings = {
-        'familyName': context.meta_infos.family_name,
-        'styleName': context.meta_infos.style_name,
-        'uniqueFontIdentifier': f'{unique_name}-{context.meta_infos.style_name};{context.meta_infos.version}',
-        'fullName': context.meta_infos.family_name,
-        'version': context.meta_infos.version,
-        'psName': f'{unique_name}-{context.meta_infos.style_name}',
+        'familyName': meta_infos.family_name,
+        'styleName': meta_infos.style_name,
+        'uniqueFontIdentifier': f'{unique_name}-{meta_infos.style_name};{meta_infos.version}',
+        'fullName': meta_infos.family_name,
+        'version': meta_infos.version,
+        'psName': f'{unique_name}-{meta_infos.style_name}',
     }
-    if context.meta_infos.copyright_info is not None:
-        name_strings['copyright'] = context.meta_infos.copyright_info
-    if context.meta_infos.manufacturer is not None:
-        name_strings['manufacturer'] = context.meta_infos.manufacturer
-    if context.meta_infos.designer is not None:
-        name_strings['designer'] = context.meta_infos.designer
-    if context.meta_infos.description is not None:
-        name_strings['description'] = context.meta_infos.description
-    if context.meta_infos.vendor_url is not None:
-        name_strings['vendorURL'] = context.meta_infos.vendor_url
-    if context.meta_infos.designer_url is not None:
-        name_strings['designerURL'] = context.meta_infos.designer_url
-    if context.meta_infos.license_info is not None:
-        name_strings['licenseDescription'] = context.meta_infos.license_info
-    if context.meta_infos.license_url is not None:
-        name_strings['licenseInfoURL'] = context.meta_infos.license_url
-    if context.meta_infos.sample_text is not None:
-        name_strings['sampleText'] = context.meta_infos.sample_text
+    if meta_infos.copyright_info is not None:
+        name_strings['copyright'] = meta_infos.copyright_info
+    if meta_infos.manufacturer is not None:
+        name_strings['manufacturer'] = meta_infos.manufacturer
+    if meta_infos.designer is not None:
+        name_strings['designer'] = meta_infos.designer
+    if meta_infos.description is not None:
+        name_strings['description'] = meta_infos.description
+    if meta_infos.vendor_url is not None:
+        name_strings['vendorURL'] = meta_infos.vendor_url
+    if meta_infos.designer_url is not None:
+        name_strings['designerURL'] = meta_infos.designer_url
+    if meta_infos.license_info is not None:
+        name_strings['licenseDescription'] = meta_infos.license_info
+    if meta_infos.license_url is not None:
+        name_strings['licenseInfoURL'] = meta_infos.license_url
+    if meta_infos.sample_text is not None:
+        name_strings['sampleText'] = meta_infos.sample_text
     return name_strings
 
 
@@ -209,7 +210,7 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor) ->
     units_per_em = context.size * context.opentype_configs.px_to_units
     builder = FontBuilder(units_per_em, isTTF=is_ttf)
 
-    name_strings = _create_name_strings(context)
+    name_strings = _create_name_strings(context.meta_infos)
     builder.setupNameTable(name_strings)
 
     glyph_order = ['.notdef']
