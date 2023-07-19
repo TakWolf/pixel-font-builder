@@ -81,7 +81,7 @@ def _create_name_strings(context: 'font.FontBuilder') -> dict[str, str]:
     return name_strings
 
 
-def _get_outlines(glyph_data: list[list[int]], px_to_units: int) -> list[list[tuple[int, int]]]:
+def _create_outlines(glyph_data: list[list[int]], px_to_units: int) -> list[list[tuple[int, int]]]:
     """
     将字形数据转换为轮廓数据，左上角原点坐标系
     """
@@ -171,7 +171,7 @@ def _get_outlines(glyph_data: list[list[int]], px_to_units: int) -> list[list[tu
 
 def _create_glyph(context: 'font.FontBuilder', glyph_name: str, is_ttf: bool) -> T2CharString | Glyph:
     glyph = context.get_glyph(glyph_name)
-    outlines = _get_outlines(glyph.data, context.opentype_configs.px_to_units)
+    outlines = _create_outlines(glyph.data, context.opentype_configs.px_to_units)
     if is_ttf:
         pen = TTGlyphPen()
     else:
