@@ -1,10 +1,10 @@
 from enum import StrEnum
 
 from fontTools.fontBuilder import FontBuilder
-from fontTools.misc.psCharStrings import T2CharString
-from fontTools.pens.t2CharStringPen import T2CharStringPen
-from fontTools.pens.ttGlyphPen import TTGlyphPen
-from fontTools.ttLib.tables._g_l_y_f import Glyph
+from fontTools.misc.psCharStrings import T2CharString as OTFGlyph
+from fontTools.pens.t2CharStringPen import T2CharStringPen as OTFGlyphPen
+from fontTools.pens.ttGlyphPen import TTGlyphPen as TTFGlyphPen
+from fontTools.ttLib.tables._g_l_y_f import Glyph as TTFGlyph
 
 from pixel_font_builder import font
 
@@ -169,13 +169,13 @@ def _create_outlines(glyph_data: list[list[int]], px_to_units: int) -> list[list
     return outlines
 
 
-def _create_glyph(context: 'font.FontBuilder', glyph_name: str, is_ttf: bool) -> T2CharString | Glyph:
+def _create_glyph(context: 'font.FontBuilder', glyph_name: str, is_ttf: bool) -> OTFGlyph | TTFGlyph:
     glyph = context.get_glyph(glyph_name)
     outlines = _create_outlines(glyph.data, context.opentype_configs.px_to_units)
     if is_ttf:
-        pen = TTGlyphPen()
+        pen = TTFGlyphPen()
     else:
-        pen = T2CharStringPen(glyph.advance_width * context.opentype_configs.px_to_units, None)
+        pen = OTFGlyphPen(glyph.advance_width * context.opentype_configs.px_to_units, None)
     if len(outlines) > 0:
         for outline_index, outline in enumerate(outlines):
             for point_index, point in enumerate(outline):
