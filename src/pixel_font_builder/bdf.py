@@ -44,7 +44,7 @@ def create_builder(context: 'font.FontBuilder') -> BdfFont:
         bounding_box_offset=(0, context.descent),
     )
 
-    logger.debug("Add 'Glyph': %s", '.notdef')
+    logger.debug("Add 'Glyph': .notdef")
     builder.add_glyph(_create_glyph(context, -1, '.notdef'))
     for code_point, glyph_name in context.character_mapping.items():
         logger.debug("Add 'Glyph': %s", glyph_name)
