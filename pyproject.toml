@@ -19,7 +19,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "fonttools>=4.41.0",
+    "fonttools>=4.41.1",
     "Brotli>=1.0.9",
     "bdffont>=0.0.13",
 ]
