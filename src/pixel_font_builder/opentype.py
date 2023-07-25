@@ -24,8 +24,10 @@ class Configs:
     def __init__(
             self,
             px_to_units: int = 100,
+            cff_family_name: str = None,
     ):
         self.px_to_units = px_to_units
+        self.cff_family_name = cff_family_name
 
 
 class Flavor(StrEnum):
@@ -264,7 +266,19 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = N
     if is_ttf:
         builder.setupGlyf(glyphs)
     else:
-        builder.setupCFF(name_strings['psName'], {'FullName': name_strings['fullName']}, glyphs, {})
+        if context.opentype_configs.cff_family_name is not None:
+            cff_family_name = context.opentype_configs.cff_family_name
+        else:
+            cff_family_name = context.meta_infos.family_name
+        cff_ps_name = f'{cff_family_name.replace(" ", "-")}-{context.meta_infos.style_name}'
+        cff_font_infos = {
+            'FamilyName': cff_family_name,
+            'FullName': f'{cff_family_name} {context.meta_infos.style_name}',
+            'Weight': context.meta_infos.style_name,
+        }
+        if context.meta_infos.copyright_info is not None:
+            cff_font_infos['Notice'] = context.meta_infos.copyright_info
+        builder.setupCFF(cff_ps_name, cff_font_infos, glyphs, {})
 
     logger.debug("Setup 'Horizontal Metrics'")
     horizontal_metrics = {}
