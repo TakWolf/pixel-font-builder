@@ -164,10 +164,9 @@ def main():
     builder.save_ttf(os.path.join(outputs_dir, 'cute.ttf'))
     builder.save_bdf(os.path.join(outputs_dir, 'cute.bdf'))
 
-    collection_builder = FontCollectionBuilder([
-        builder,
-        _create_builder(font_config, glyph_cacher, 'Cute Pixel 2', character_mapping, glyph_file_paths)
-    ])
+    collection_builder = FontCollectionBuilder()
+    for index in range(1000):
+        collection_builder.font_builders.append(_create_builder(font_config, glyph_cacher, f'Cute Pixel {index}', character_mapping, glyph_file_paths))
     collection_builder.save_otc(os.path.join(outputs_dir, 'cute.otc'))
     collection_builder.save_ttc(os.path.join(outputs_dir, 'cute.ttc'))
 
