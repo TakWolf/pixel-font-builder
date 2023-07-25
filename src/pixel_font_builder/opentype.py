@@ -236,9 +236,7 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = N
 
     logger.debug("Setup 'Glyphs'")
     glyphs = {}
-    for glyph_name in glyph_order:
-        glyph_context = context.get_glyph(glyph_name)
-
+    for glyph_context in context.get_glyphs():
         cache_tag = f'{glyph_context.advance_width}#{glyph_context.offset}#{glyph_context.data}'.replace(' ', '')
         if getattr(glyph_context, _CACHE_NAME_TAG, None) != cache_tag:
             setattr(glyph_context, _CACHE_NAME_OUTLINES, None)
@@ -262,7 +260,7 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = N
             setattr(glyph_context, cache_name_xtf_glyph, glyph)
         else:
             logger.debug("Use cached '%sGlyph': %s", xtf_name, glyph_context.name)
-        glyphs[glyph_name] = glyph
+        glyphs[glyph_context.name] = glyph
     if is_ttf:
         builder.setupGlyf(glyphs)
     else:
