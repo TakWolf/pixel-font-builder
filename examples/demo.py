@@ -6,7 +6,7 @@ import tomllib
 import png
 
 from examples import glyphs_dir, outputs_dir
-from pixel_font_builder import FontBuilder, Glyph, StyleName, SerifMode, WidthMode, opentype
+from pixel_font_builder import FontBuilder, FontCollectionBuilder, Glyph, StyleName, SerifMode, WidthMode, opentype
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -95,6 +95,8 @@ def _collect_glyph_files(font_config: FontConfig) -> tuple[dict[int, str], dict[
 
 def _create_builder(
         font_config: FontConfig,
+        glyph_cacher: dict[str, Glyph],
+        family_name: str,
         character_mapping: dict[int, str],
         glyph_file_paths: dict[str, str],
 ) -> FontBuilder:
@@ -118,17 +120,22 @@ def _create_builder(
         builder.character_mapping[fallback_code_point] = _get_glyph_name(code_point)
 
     for glyph_name, glyph_file_path in glyph_file_paths.items():
-        glyph_data, glyph_width, glyph_height = _load_glyph_data_from_png(glyph_file_path)
-        offset_y = font_config.box_origin_y + math.ceil((glyph_height - font_config.size) / 2) - glyph_height
-        builder.add_glyph(Glyph(
-            name=glyph_name,
-            advance_width=glyph_width,
-            offset=(0, offset_y),
-            data=glyph_data,
-        ))
+        if glyph_file_path in glyph_cacher:
+            glyph = glyph_cacher[glyph_file_path]
+        else:
+            glyph_data, glyph_width, glyph_height = _load_glyph_data_from_png(glyph_file_path)
+            offset_y = font_config.box_origin_y + math.ceil((glyph_height - font_config.size) / 2) - glyph_height
+            glyph = Glyph(
+                name=glyph_name,
+                advance_width=glyph_width,
+                offset=(0, offset_y),
+                data=glyph_data,
+            )
+            glyph_cacher[glyph_file_path] = glyph
+        builder.add_glyph(glyph)
 
     builder.meta_infos.version = '1.0.0'
-    builder.meta_infos.family_name = 'Cute Pixel'
+    builder.meta_infos.family_name = family_name
     builder.meta_infos.style_name = StyleName.REGULAR
     builder.meta_infos.serif_mode = SerifMode.SANS_SERIF
     builder.meta_infos.width_mode = WidthMode.PROPORTIONAL
@@ -149,11 +156,20 @@ def main():
     font_config = FontConfig(glyphs_dir)
     _format_glyph_files(font_config)
     character_mapping, glyph_file_paths = _collect_glyph_files(font_config)
-    builder = _create_builder(font_config, character_mapping, glyph_file_paths)
+    glyph_cacher = {}
+
+    builder = _create_builder(font_config, glyph_cacher, 'Cute Pixel', character_mapping, glyph_file_paths)
     builder.save_otf(os.path.join(outputs_dir, 'cute.otf'))
     builder.save_otf(os.path.join(outputs_dir, 'cute.woff2'), flavor=opentype.Flavor.WOFF2)
     builder.save_ttf(os.path.join(outputs_dir, 'cute.ttf'))
     builder.save_bdf(os.path.join(outputs_dir, 'cute.bdf'))
+
+    collection_builder = FontCollectionBuilder([
+        builder,
+        _create_builder(font_config, glyph_cacher, 'Cute Pixel 2', character_mapping, glyph_file_paths)
+    ])
+    collection_builder.save_otc(os.path.join(outputs_dir, 'cute.otc'))
+    collection_builder.save_ttc(os.path.join(outputs_dir, 'cute.ttc'))
 
 
 if __name__ == '__main__':
