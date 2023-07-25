@@ -5,6 +5,7 @@ from fontTools.fontBuilder import FontBuilder
 from fontTools.misc.psCharStrings import T2CharString as OTFGlyph
 from fontTools.pens.t2CharStringPen import T2CharStringPen as OTFGlyphPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen as TTFGlyphPen
+from fontTools.ttLib import TTCollection
 from fontTools.ttLib.tables._g_l_y_f import Glyph as TTFGlyph
 
 from pixel_font_builder import font
@@ -211,7 +212,7 @@ def _create_glyph(outlines: list[list[tuple[int, int]]], glyph: Glyph, px_to_uni
         return pen.getCharString()
 
 
-def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor) -> FontBuilder:
+def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = None) -> FontBuilder:
     xtf_name = 'TTF' if is_ttf else 'OTF'
 
     logger.debug("Create '%sBuilder': %s", xtf_name, context.meta_infos.family_name)
@@ -306,3 +307,10 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor) ->
 
     logger.debug("Create '%sBuilder' finished", xtf_name)
     return builder
+
+
+def create_collection_builder(context: 'font.FontCollectionBuilder', is_ttf: bool) -> TTCollection:
+    collection_builder = TTCollection()
+    for font_context in context.font_builders:
+        collection_builder.fonts.append(create_builder(font_context, is_ttf).font)
+    return collection_builder

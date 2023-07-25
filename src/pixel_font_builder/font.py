@@ -2,6 +2,7 @@ import os
 
 import bdffont
 import fontTools.fontBuilder
+import fontTools.ttLib
 
 from pixel_font_builder import opentype, bdf
 from pixel_font_builder.glyph import Glyph
@@ -109,3 +110,30 @@ class FontBuilder:
             optimize_bitmap: bool = True,
     ):
         self.to_bdf_builder().save(file_path, optimize_bitmap)
+
+
+class FontCollectionBuilder:
+    def __init__(self, font_builders: list[FontBuilder] = None):
+        if font_builders is None:
+            font_builders = list[FontBuilder]()
+        self.font_builders = font_builders
+
+    def to_otc_builder(self) -> fontTools.ttLib.TTCollection:
+        return opentype.create_collection_builder(self, False)
+
+    def save_otc(
+            self,
+            file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes],
+            share_tables: bool = True,
+    ):
+        self.to_otc_builder().save(file_path, share_tables)
+
+    def to_ttc_builder(self) -> fontTools.ttLib.TTCollection:
+        return opentype.create_collection_builder(self, True)
+
+    def save_ttc(
+            self,
+            file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes],
+            share_tables: bool = True,
+    ):
+        self.to_ttc_builder().save(file_path, share_tables)
