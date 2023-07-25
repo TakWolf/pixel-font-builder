@@ -67,7 +67,7 @@ def _create_name_strings(meta_infos: MetaInfos) -> dict[str, str]:
         'familyName': meta_infos.family_name,
         'styleName': meta_infos.style_name,
         'uniqueFontIdentifier': f'{unique_name}-{meta_infos.style_name};{meta_infos.version}',
-        'fullName': meta_infos.family_name,
+        'fullName': f'{meta_infos.family_name} {meta_infos.style_name}',
         'version': meta_infos.version,
         'psName': f'{unique_name}-{meta_infos.style_name}',
     }
