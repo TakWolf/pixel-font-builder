@@ -214,10 +214,35 @@ def _create_glyph(outlines: list[list[tuple[int, int]]], glyph_context: Glyph, p
         return pen.getCharString()
 
 
-def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = None) -> FontBuilder:
-    xtf_name = 'TTF' if is_ttf else 'OTF'
+def _get_glyph_with_cache(glyph_context: Glyph, px_to_units: int, is_ttf: bool) -> OTFGlyph | TTFGlyph:
+    cache_tag = f'{glyph_context.advance_width}#{glyph_context.offset}#{glyph_context.data}'.replace(' ', '')
+    if getattr(glyph_context, _CACHE_NAME_TAG, None) != cache_tag:
+        setattr(glyph_context, _CACHE_NAME_OUTLINES, None)
+        setattr(glyph_context, _CACHE_NAME_OTF_GLYPH, None)
+        setattr(glyph_context, _CACHE_NAME_TTF_GLYPH, None)
+        setattr(glyph_context, _CACHE_NAME_TAG, cache_tag)
 
-    logger.debug("Create '%sBuilder': %s", xtf_name, context.meta_infos.family_name)
+    outlines = getattr(glyph_context, _CACHE_NAME_OUTLINES, None)
+    if outlines is None:
+        logger.debug("Create 'Outlines': %s", glyph_context.name)
+        outlines = _create_outlines(glyph_context.data, px_to_units)
+        setattr(glyph_context, _CACHE_NAME_OUTLINES, outlines)
+    else:
+        logger.debug("Use cached 'Outlines': %s", glyph_context.name)
+
+    cache_name_xtf_glyph = _CACHE_NAME_TTF_GLYPH if is_ttf else _CACHE_NAME_OTF_GLYPH
+    glyph = getattr(glyph_context, cache_name_xtf_glyph, None)
+    if glyph is None:
+        logger.debug("Create '%sGlyph': %s", 'TTF' if is_ttf else 'OTF', glyph_context.name)
+        glyph = _create_glyph(outlines, glyph_context, px_to_units, is_ttf)
+        setattr(glyph_context, cache_name_xtf_glyph, glyph)
+    else:
+        logger.debug("Use cached '%sGlyph': %s", 'TTF' if is_ttf else 'OTF', glyph_context.name)
+    return glyph
+
+
+def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = None) -> FontBuilder:
+    logger.debug("Create '%sBuilder': %s", 'TTF' if is_ttf else 'OTF', context.meta_infos.family_name)
     context.check_ready()
 
     units_per_em = context.size * context.opentype_configs.px_to_units
@@ -233,31 +258,7 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = N
     for glyph_context in context.get_glyphs():
         if glyph_context.name != '.notdef':
             glyph_order.append(glyph_context.name)
-
-        cache_tag = f'{glyph_context.advance_width}#{glyph_context.offset}#{glyph_context.data}'.replace(' ', '')
-        if getattr(glyph_context, _CACHE_NAME_TAG, None) != cache_tag:
-            setattr(glyph_context, _CACHE_NAME_OUTLINES, None)
-            setattr(glyph_context, _CACHE_NAME_OTF_GLYPH, None)
-            setattr(glyph_context, _CACHE_NAME_TTF_GLYPH, None)
-            setattr(glyph_context, _CACHE_NAME_TAG, cache_tag)
-
-        outlines = getattr(glyph_context, _CACHE_NAME_OUTLINES, None)
-        if outlines is None:
-            logger.debug("Create 'Outlines': %s", glyph_context.name)
-            outlines = _create_outlines(glyph_context.data, context.opentype_configs.px_to_units)
-            setattr(glyph_context, _CACHE_NAME_OUTLINES, outlines)
-        else:
-            logger.debug("Use cached 'Outlines': %s", glyph_context.name)
-
-        cache_name_xtf_glyph = _CACHE_NAME_TTF_GLYPH if is_ttf else _CACHE_NAME_OTF_GLYPH
-        glyph = getattr(glyph_context, cache_name_xtf_glyph, None)
-        if glyph is None:
-            logger.debug("Create '%sGlyph': %s", xtf_name, glyph_context.name)
-            glyph = _create_glyph(outlines, glyph_context, context.opentype_configs.px_to_units, is_ttf)
-            setattr(glyph_context, cache_name_xtf_glyph, glyph)
-        else:
-            logger.debug("Use cached '%sGlyph': %s", xtf_name, glyph_context.name)
-        glyphs[glyph_context.name] = glyph
+        glyphs[glyph_context.name] = _get_glyph_with_cache(glyph_context, context.opentype_configs.px_to_units, is_ttf)
     builder.setupGlyphOrder(glyph_order)
     if is_ttf:
         builder.setupGlyf(glyphs)
@@ -316,7 +317,7 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = N
         logger.debug("Setup 'Flavor': %s", flavor)
         builder.font.flavor = flavor
 
-    logger.debug("Create '%sBuilder' finished", xtf_name)
+    logger.debug("Create '%sBuilder' finished", 'TTF' if is_ttf else 'OTF')
     return builder
 
 
