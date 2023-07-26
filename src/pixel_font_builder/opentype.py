@@ -227,18 +227,13 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = N
     name_strings = _create_name_strings(context.meta_infos)
     builder.setupNameTable(name_strings)
 
-    logger.debug("Setup 'Glyph Order'")
+    logger.debug("Setup 'Glyph Order' and 'Glyphs'")
     glyph_order = ['.notdef']
-    for _, glyph_name in context.get_character_mapping_sequence():
-        if glyph_name not in glyph_order:
-            glyph_order.append(glyph_name)
-    builder.setupGlyphOrder(glyph_order)
-    logger.debug("Setup 'Character Mapping'")
-    builder.setupCharacterMap(context.character_mapping)
-
-    logger.debug("Setup 'Glyphs'")
     glyphs = {}
     for glyph_context in context.get_glyphs():
+        if glyph_context.name != '.notdef':
+            glyph_order.append(glyph_context.name)
+
         cache_tag = f'{glyph_context.advance_width}#{glyph_context.offset}#{glyph_context.data}'.replace(' ', '')
         if getattr(glyph_context, _CACHE_NAME_TAG, None) != cache_tag:
             setattr(glyph_context, _CACHE_NAME_OUTLINES, None)
@@ -263,6 +258,7 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = N
         else:
             logger.debug("Use cached '%sGlyph': %s", xtf_name, glyph_context.name)
         glyphs[glyph_context.name] = glyph
+    builder.setupGlyphOrder(glyph_order)
     if is_ttf:
         builder.setupGlyf(glyphs)
     else:
@@ -279,6 +275,9 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = N
         if context.meta_infos.copyright_info is not None:
             cff_font_infos['Notice'] = context.meta_infos.copyright_info
         builder.setupCFF(cff_ps_name, cff_font_infos, glyphs, {})
+
+    logger.debug("Setup 'Character Mapping'")
+    builder.setupCharacterMap(context.character_mapping)
 
     logger.debug("Setup 'Horizontal Metrics'")
     horizontal_metrics = {}

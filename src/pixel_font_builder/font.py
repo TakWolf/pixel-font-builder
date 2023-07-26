@@ -35,11 +35,6 @@ class FontBuilder:
     def line_height(self) -> int:
         return self.ascent - self.descent
 
-    def get_character_mapping_sequence(self) -> list[tuple[int, str]]:
-        sequence = list(self.character_mapping.items())
-        sequence.sort()
-        return sequence
-
     def get_glyph(self, name: str) -> Glyph | None:
         return self._name_to_glyph.get(name, None)
 
