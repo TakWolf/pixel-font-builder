@@ -278,7 +278,7 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = N
         builder.setupCFF(cff_ps_name, cff_font_infos, glyphs, {})
 
     logger.debug("Setup 'Character Mapping'")
-    builder.setupCharacterMap(context.character_mapping, allowFallback=True)
+    builder.setupCharacterMap(context.character_mapping)
 
     logger.debug("Setup 'Horizontal Metrics'")
     horizontal_metrics = {}
