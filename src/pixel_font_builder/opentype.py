@@ -94,6 +94,22 @@ def _create_name_strings(meta_infos: MetaInfos) -> dict[str, str]:
     return name_strings
 
 
+def _create_cff_font_infos(meta_infos: MetaInfos, configs: Configs) -> tuple[str, dict[str, str]]:
+    if configs.cff_family_name is not None:
+        cff_family_name = configs.cff_family_name
+    else:
+        cff_family_name = meta_infos.family_name
+    cff_ps_name = f'{cff_family_name.replace(" ", "-")}-{meta_infos.style_name}'
+    cff_font_infos = {
+        'FamilyName': cff_family_name,
+        'FullName': f'{cff_family_name} {meta_infos.style_name}',
+        'Weight': meta_infos.style_name,
+    }
+    if meta_infos.copyright_info is not None:
+        cff_font_infos['Notice'] = meta_infos.copyright_info
+    return cff_ps_name, cff_font_infos
+
+
 def _create_outlines(glyph_data: list[list[int]], px_to_units: int) -> list[list[tuple[int, int]]]:
     """
     将字形数据转换为轮廓数据，左上角原点坐标系
@@ -270,18 +286,7 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = N
         builder.setupGlyf(glyphs)
     else:
         logger.debug("Setup 'CFF'")
-        if context.opentype_configs.cff_family_name is not None:
-            cff_family_name = context.opentype_configs.cff_family_name
-        else:
-            cff_family_name = context.meta_infos.family_name
-        cff_ps_name = f'{cff_family_name.replace(" ", "-")}-{context.meta_infos.style_name}'
-        cff_font_infos = {
-            'FamilyName': cff_family_name,
-            'FullName': f'{cff_family_name} {context.meta_infos.style_name}',
-            'Weight': context.meta_infos.style_name,
-        }
-        if context.meta_infos.copyright_info is not None:
-            cff_font_infos['Notice'] = context.meta_infos.copyright_info
+        cff_ps_name, cff_font_infos = _create_cff_font_infos(context.meta_infos, context.opentype_configs)
         builder.setupCFF(cff_ps_name, cff_font_infos, glyphs, {})
 
     logger.debug("Setup 'Character Mapping'")
