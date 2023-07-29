@@ -252,7 +252,7 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = N
     name_strings = _create_name_strings(context.meta_infos)
     builder.setupNameTable(name_strings)
 
-    logger.debug("Setup 'Glyph Order' and 'Glyphs'")
+    logger.debug("Create 'Glyphs'")
     glyph_order = []
     glyphs = {}
     for glyph_context in context.get_glyphs():
@@ -261,10 +261,15 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = N
         glyphs[glyph_context.name] = _get_glyph_with_cache(glyph_context, context.opentype_configs.px_to_units, is_ttf)
     glyph_order.sort()
     glyph_order.insert(0, '.notdef')
+
+    logger.debug("Setup 'Glyph Order'")
     builder.setupGlyphOrder(glyph_order)
+
     if is_ttf:
+        logger.debug("Setup 'Glyf'")
         builder.setupGlyf(glyphs)
     else:
+        logger.debug("Setup 'CFF'")
         if context.opentype_configs.cff_family_name is not None:
             cff_family_name = context.opentype_configs.cff_family_name
         else:
@@ -297,11 +302,13 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = N
     descent = context.descent * context.opentype_configs.px_to_units
     x_height = context.x_height * context.opentype_configs.px_to_units if context.x_height is not None else None
     cap_height = context.cap_height * context.opentype_configs.px_to_units if context.cap_height is not None else None
+
     logger.debug("Setup 'Horizontal Header'")
     builder.setupHorizontalHeader(
         ascent=ascent,
         descent=descent,
     )
+
     logger.debug("Setup 'OS2'")
     builder.setupOS2(
         sTypoAscender=ascent,
