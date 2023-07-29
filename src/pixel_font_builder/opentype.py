@@ -253,12 +253,14 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = N
     builder.setupNameTable(name_strings)
 
     logger.debug("Setup 'Glyph Order' and 'Glyphs'")
-    glyph_order = ['.notdef']
+    glyph_order = []
     glyphs = {}
     for glyph_context in context.get_glyphs():
         if glyph_context.name != '.notdef':
             glyph_order.append(glyph_context.name)
         glyphs[glyph_context.name] = _get_glyph_with_cache(glyph_context, context.opentype_configs.px_to_units, is_ttf)
+    glyph_order.sort()
+    glyph_order.insert(0, '.notdef')
     builder.setupGlyphOrder(glyph_order)
     if is_ttf:
         builder.setupGlyf(glyphs)
