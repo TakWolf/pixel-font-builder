@@ -30,10 +30,6 @@ class FontConfig:
         self.cap_height: int = config_data['cap_height']
 
 
-def _get_glyph_name(code_point: int) -> str:
-    return f'uni{code_point:04X}'
-
-
 def _load_glyph_data_from_png(file_path: str) -> tuple[list[list[int]], int, int]:
     width, height, bitmap, _ = png.Reader(filename=file_path).read()
     data = []
@@ -87,7 +83,7 @@ def _collect_glyph_files(font_config: FontConfig) -> tuple[dict[int, str], dict[
                 glyph_file_paths['.notdef'] = glyph_file_path
             else:
                 code_point = int(glyph_file_name.removesuffix('.png'), 16)
-                glyph_name = _get_glyph_name(code_point)
+                glyph_name = f'uni{code_point:04X}'
                 character_mapping[code_point] = glyph_name
                 glyph_file_paths[glyph_name] = glyph_file_path
     return character_mapping, glyph_file_paths
@@ -111,13 +107,13 @@ def _create_builder(
     builder.character_mapping.update(character_mapping)
     for code_point in range(ord('A'), ord('Z') + 1):
         fallback_code_point = code_point + ord('Ａ') - ord('A')
-        builder.character_mapping[fallback_code_point] = _get_glyph_name(code_point)
+        builder.character_mapping[fallback_code_point] = builder.character_mapping[code_point]
     for code_point in range(ord('a'), ord('z') + 1):
         fallback_code_point = code_point + ord('ａ') - ord('a')
-        builder.character_mapping[fallback_code_point] = _get_glyph_name(code_point)
+        builder.character_mapping[fallback_code_point] = builder.character_mapping[code_point]
     for code_point in range(ord('0'), ord('9') + 1):
         fallback_code_point = code_point + ord('０') - ord('0')
-        builder.character_mapping[fallback_code_point] = _get_glyph_name(code_point)
+        builder.character_mapping[fallback_code_point] = builder.character_mapping[code_point]
 
     for glyph_name, glyph_file_path in glyph_file_paths.items():
         if glyph_file_path in glyph_cacher:
