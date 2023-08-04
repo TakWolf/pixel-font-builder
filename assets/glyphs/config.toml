@@ -1,6 +1,21 @@
 [font]
 size = 11
-line_height = 15
-box_origin_y = 9
+ascent = 11
+descent = -4
 x_height = 5
 cap_height = 7
+
+version = "1.0.0"
+family_name = "Demo Pixel"
+style_name = "Regular"
+serif_mode = "Sans-Serif"
+width_mode = "Proportional"
+manufacturer = "Pixel Font Studio"
+designer = "TakWolf"
+description = "A demo pixel font."
+copyright_info = "Copyright (c) TakWolf"
+license_info = "This Font Software is licensed under the SIL Open Font License, Version 1.1."
+vendor_url = "https://github.com/TakWolf/pixel-font-builder"
+designer_url = "https://takwolf.com"
+license_url = "https://scripts.sil.org/OFL"
+sample_text = "Hello World!"
