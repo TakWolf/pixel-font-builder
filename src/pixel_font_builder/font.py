@@ -24,8 +24,8 @@ class FontBuilder:
         self.x_height = x_height
         self.cap_height = cap_height
 
-        self.character_mapping = dict[int, str]()
-        self._name_to_glyph = dict[str, Glyph]()
+        self.character_mapping: dict[int, str] = {}
+        self._name_to_glyph: dict[str, Glyph] = {}
 
         self.meta_infos = MetaInfos()
         self.opentype_configs = opentype.Configs()
@@ -110,7 +110,7 @@ class FontBuilder:
 class FontCollectionBuilder:
     def __init__(self, font_builders: list[FontBuilder] = None):
         if font_builders is None:
-            font_builders = list[FontBuilder]()
+            font_builders = []
         self.font_builders = font_builders
 
     def to_otc_builder(self) -> fontTools.ttLib.TTCollection:
