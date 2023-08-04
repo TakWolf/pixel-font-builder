@@ -139,7 +139,7 @@ def _create_builder(
     builder.meta_infos.style_name = StyleName.REGULAR
     builder.meta_infos.serif_mode = SerifMode.SANS_SERIF
     builder.meta_infos.width_mode = WidthMode.PROPORTIONAL
-    builder.meta_infos.manufacturer = 'TakWolf Studio'
+    builder.meta_infos.manufacturer = 'Pixel Font Studio'
     builder.meta_infos.designer = 'TakWolf'
     builder.meta_infos.description = 'A demo pixel font.'
     builder.meta_infos.copyright_info = 'Copyright (c) TakWolf'
@@ -158,19 +158,19 @@ def main():
     character_mapping, glyph_file_paths = _collect_glyph_files(font_config)
     glyph_cacher = {}
 
-    builder = _create_builder(font_config, glyph_cacher, 'Cute Pixel', character_mapping, glyph_file_paths)
-    builder.save_otf(os.path.join(outputs_dir, 'cute.otf'))
-    builder.save_otf(os.path.join(outputs_dir, 'cute.woff2'), flavor=opentype.Flavor.WOFF2)
-    builder.save_ttf(os.path.join(outputs_dir, 'cute.ttf'))
-    builder.save_bdf(os.path.join(outputs_dir, 'cute.bdf'))
+    builder = _create_builder(font_config, glyph_cacher, 'Demo Pixel', character_mapping, glyph_file_paths)
+    builder.save_otf(os.path.join(outputs_dir, 'demo.otf'))
+    builder.save_otf(os.path.join(outputs_dir, 'demo.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_ttf(os.path.join(outputs_dir, 'demo.ttf'))
+    builder.save_bdf(os.path.join(outputs_dir, 'demo.bdf'))
 
     collection_builder = FontCollectionBuilder()
     for index in range(1000):
-        builder = _create_builder(font_config, glyph_cacher, f'Cute Pixel {index}', character_mapping, glyph_file_paths)
-        builder.opentype_configs.cff_family_name = 'Cute Pixel'
+        builder = _create_builder(font_config, glyph_cacher, f'Demo Pixel {index}', character_mapping, glyph_file_paths)
+        builder.opentype_configs.cff_family_name = 'Demo Pixel'
         collection_builder.font_builders.append(builder)
-    collection_builder.save_otc(os.path.join(outputs_dir, 'cute.otc'))
-    collection_builder.save_ttc(os.path.join(outputs_dir, 'cute.ttc'))
+    collection_builder.save_otc(os.path.join(outputs_dir, 'demo.otc'))
+    collection_builder.save_ttc(os.path.join(outputs_dir, 'demo.ttc'))
 
 
 if __name__ == '__main__':
