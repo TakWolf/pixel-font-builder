@@ -12,10 +12,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 class FontConfig:
-    def __init__(self, root_dir: str):
-        self.root_dir = root_dir
-
-        config_file_path = os.path.join(root_dir, 'config.toml')
+    def __init__(self, config_file_path: str):
         with open(config_file_path, 'rb') as file:
             config_data: dict = tomllib.load(file)['font']
 
@@ -72,8 +69,8 @@ def _save_glyph_data_to_png(data: list[list[int]], file_path: str):
     png.from_array(bitmap, 'RGBA').save(file_path)
 
 
-def _format_glyph_files(font_config: FontConfig):
-    for glyph_file_dir, _, glyph_file_names in os.walk(font_config.root_dir):
+def _format_glyph_files(root_dir: str):
+    for glyph_file_dir, _, glyph_file_names in os.walk(root_dir):
         for glyph_file_name in glyph_file_names:
             if not glyph_file_name.endswith('.png'):
                 continue
@@ -82,10 +79,10 @@ def _format_glyph_files(font_config: FontConfig):
             _save_glyph_data_to_png(glyph_data, glyph_file_path)
 
 
-def _collect_glyph_files(font_config: FontConfig) -> tuple[dict[int, str], dict[str, str]]:
+def _collect_glyph_files(root_dir: str) -> tuple[dict[int, str], dict[str, str]]:
     character_mapping = {}
     glyph_file_paths = {}
-    for glyph_file_dir, _, glyph_file_names in os.walk(font_config.root_dir):
+    for glyph_file_dir, _, glyph_file_names in os.walk(root_dir):
         for glyph_file_name in glyph_file_names:
             if not glyph_file_name.endswith('.png'):
                 continue
@@ -162,9 +159,9 @@ def _create_builder(
 
 
 def main():
-    font_config = FontConfig(glyphs_dir)
-    _format_glyph_files(font_config)
-    character_mapping, glyph_file_paths = _collect_glyph_files(font_config)
+    font_config = FontConfig(os.path.join(glyphs_dir, 'config.toml'))
+    _format_glyph_files(glyphs_dir)
+    character_mapping, glyph_file_paths = _collect_glyph_files(glyphs_dir)
     glyph_cacher = {}
 
     builder = _create_builder(font_config, glyph_cacher, character_mapping, glyph_file_paths)
