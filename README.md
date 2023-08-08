@@ -51,7 +51,7 @@ def main():
         ord('A'): 'CAP_LETTER_A',
     })
 
-    builder.add_glyph(Glyph(
+    builder.glyphs.append(Glyph(
         name='.notdef',
         advance_width=8,
         offset=(0, -2),
@@ -70,7 +70,7 @@ def main():
             [1, 1, 1, 1, 1, 1, 1, 1],
         ],
     ))
-    builder.add_glyph(Glyph(
+    builder.glyphs.append(Glyph(
         name='CAP_LETTER_A',
         advance_width=8,
         offset=(0, -2),

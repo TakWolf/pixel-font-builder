@@ -15,65 +15,44 @@ class FontBuilder:
         self.meta_infos = MetaInfos()
 
         self.character_mapping: dict[int, str] = {}
-        self._name_to_glyph: dict[str, Glyph] = {}
+        self.glyphs: list[Glyph] = []
 
         self.opentype_configs = opentype.Configs()
         self.bdf_configs = bdf.Configs()
 
-    def get_glyph(self, name: str) -> Glyph | None:
-        return self._name_to_glyph.get(name, None)
-
-    def get_glyphs(self) -> list[Glyph]:
-        return list(self._name_to_glyph.values())
-
-    def get_glyphs_count(self) -> int:
-        return len(self._name_to_glyph)
-
-    def set_glyph(self, glyph: Glyph):
-        self._name_to_glyph[glyph.name] = glyph
-
-    def add_glyph(self, glyph: Glyph):
-        if glyph.name in self._name_to_glyph:
-            raise Exception(f"Glyph '{glyph.name}' already exists")
-        self._name_to_glyph[glyph.name] = glyph
-
-    def add_glyphs(self, glyphs: list[Glyph]):
-        for glyph in glyphs:
-            self.add_glyph(glyph)
-
-    def remove_glyph(self, name: str) -> Glyph | None:
-        return self._name_to_glyph.pop(name, None)
-
-    def check_ready(self):
+    def _check_ready_and_prepare_glyphs(self) -> tuple[list[str], dict[str, Glyph]]:
         self.metrics.check_ready()
         self.meta_infos.check_ready()
-        if '.notdef' not in self._name_to_glyph:
+
+        glyph_order = ['.notdef']
+        name_to_glyph = {}
+        for glyph in self.glyphs:
+            if glyph.name in name_to_glyph:
+                raise Exception(f"Duplicate glyphs: '{glyph.name}'")
+            glyph.check_ready()
+            if glyph.name != '.notdef':
+                glyph_order.append(glyph.name)
+            name_to_glyph[glyph.name] = glyph
+        if '.notdef' not in name_to_glyph:
             raise Exception("Need to provide a glyph named '.notdef'")
+
         for code_point, glyph_name in self.character_mapping.items():
             if code_point < 0:
                 raise Exception('Code points must >= 0')
-            if glyph_name not in self._name_to_glyph:
+            if glyph_name not in name_to_glyph:
                 raise Exception(f"Missing glyph: '{glyph_name}'")
-        for glyph in self._name_to_glyph.values():
-            glyph.check_ready()
+
+        return glyph_order, name_to_glyph
 
     def to_xtf_builder(self, is_ttf: bool, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
-        self.check_ready()
-
-        glyph_order = []
-        for glyph_name in self._name_to_glyph:
-            if glyph_name != '.notdef':
-                glyph_order.append(glyph_name)
-        glyph_order.sort()
-        glyph_order.insert(0, '.notdef')
-
+        glyph_order, name_to_glyph = self._check_ready_and_prepare_glyphs()
         return opentype.create_builder(
             self.opentype_configs,
             self.metrics,
             self.meta_infos,
             self.character_mapping,
             glyph_order,
-            self._name_to_glyph,
+            name_to_glyph,
             is_ttf,
             flavor,
         )
@@ -99,13 +78,13 @@ class FontBuilder:
         self.to_ttf_builder(flavor).save(file_path)
 
     def to_bdf_builder(self) -> bdffont.BdfFont:
-        self.check_ready()
+        name_to_glyph = self._check_ready_and_prepare_glyphs()[1]
         return bdf.create_builder(
             self.bdf_configs,
             self.metrics,
             self.meta_infos,
             self.character_mapping,
-            self._name_to_glyph,
+            name_to_glyph,
         )
 
     def save_bdf(

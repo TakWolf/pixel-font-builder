@@ -139,7 +139,7 @@ def _create_builder(
                 data=glyph_data,
             )
             glyph_cacher[glyph_file_path] = glyph
-        builder.add_glyph(glyph)
+        builder.glyphs.append(glyph)
 
     return builder
 
