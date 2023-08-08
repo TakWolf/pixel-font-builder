@@ -337,8 +337,8 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = N
     return builder
 
 
-def create_collection_builder(context: 'font.FontCollectionBuilder', is_ttf: bool) -> TTCollection:
+def create_collection_builder(builders: list[FontBuilder]) -> TTCollection:
     collection_builder = TTCollection()
-    for font_context in context.font_builders:
-        collection_builder.fonts.append(create_builder(font_context, is_ttf).font)
+    for builder in builders:
+        collection_builder.fonts.append(builder.font)
     return collection_builder
