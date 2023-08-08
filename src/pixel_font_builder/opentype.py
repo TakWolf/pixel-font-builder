@@ -261,10 +261,7 @@ def _get_glyph_with_cache(glyph_context: Glyph, px_to_units: int, is_ttf: bool) 
 
 def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = None) -> FontBuilder:
     logger.debug("Create '%sBuilder': %s", 'TTF' if is_ttf else 'OTF', context.meta_infos.family_name)
-    context.check_ready()
-
-    units_per_em = context.metrics.size * context.opentype_configs.px_to_units
-    builder = FontBuilder(units_per_em, isTTF=is_ttf)
+    builder = FontBuilder(context.metrics.size * context.opentype_configs.px_to_units, isTTF=is_ttf)
 
     logger.debug("Setup 'Name Strings'")
     name_strings = _create_name_strings(context.meta_infos)

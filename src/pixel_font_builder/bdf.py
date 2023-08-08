@@ -35,8 +35,6 @@ def _create_glyph(context: 'font.FontBuilder', code_point: int, glyph_name: str)
 
 def create_builder(context: 'font.FontBuilder') -> BdfFont:
     logger.debug("Create 'BDFBuilder': %s", context.meta_infos.family_name)
-    context.check_ready()
-
     builder = BdfFont(
         point_size=context.metrics.size,
         resolution_xy=(context.bdf_configs.resolution_x, context.bdf_configs.resolution_y),

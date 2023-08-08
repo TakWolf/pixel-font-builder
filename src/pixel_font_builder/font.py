@@ -58,6 +58,7 @@ class FontBuilder:
             glyph.check_ready()
 
     def to_xtf_builder(self, is_ttf: bool, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
+        self.check_ready()
         return opentype.create_builder(self, is_ttf, flavor)
 
     def to_otf_builder(self, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
@@ -81,6 +82,7 @@ class FontBuilder:
         self.to_ttf_builder(flavor).save(file_path)
 
     def to_bdf_builder(self) -> bdffont.BdfFont:
+        self.check_ready()
         return bdf.create_builder(self)
 
     def save_bdf(
