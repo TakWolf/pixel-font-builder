@@ -83,22 +83,42 @@ def _format_glyph_files(root_dir: str):
             _save_glyph_data_to_png(glyph_data, glyph_file_path)
 
 
-def _collect_glyph_files(root_dir: str) -> tuple[dict[int, str], dict[str, str]]:
-    character_mapping = {}
-    glyph_file_paths = {}
+def _collect_glyph_files(root_dir: str) -> tuple[dict[int, str], list[tuple[str, str]]]:
+    registry = {}
     for glyph_file_dir, _, glyph_file_names in os.walk(root_dir):
         for glyph_file_name in glyph_file_names:
             if not glyph_file_name.endswith('.png'):
                 continue
             glyph_file_path = os.path.join(glyph_file_dir, glyph_file_name)
             if glyph_file_name == 'notdef.png':
-                glyph_file_paths['.notdef'] = glyph_file_path
+                registry[-1] = glyph_file_path
             else:
                 code_point = int(glyph_file_name.removesuffix('.png'), 16)
-                glyph_name = f'uni{code_point:04X}'
-                character_mapping[code_point] = glyph_name
-                glyph_file_paths[glyph_name] = glyph_file_path
-    return character_mapping, glyph_file_paths
+                registry[code_point] = glyph_file_path
+
+    sequence = list(registry.keys())
+    sequence.sort()
+
+    character_mapping = {}
+    glyph_file_infos = [('.notdef', registry[-1])]
+    for code_point in sequence:
+        if code_point == -1:
+            continue
+        glyph_name = f'uni{code_point:04X}'
+        character_mapping[code_point] = glyph_name
+        glyph_file_infos.append((glyph_name, registry[code_point]))
+
+    for code_point in range(ord('A'), ord('Z') + 1):
+        fallback_code_point = code_point + ord('Ａ') - ord('A')
+        character_mapping[fallback_code_point] = character_mapping[code_point]
+    for code_point in range(ord('a'), ord('z') + 1):
+        fallback_code_point = code_point + ord('ａ') - ord('a')
+        character_mapping[fallback_code_point] = character_mapping[code_point]
+    for code_point in range(ord('0'), ord('9') + 1):
+        fallback_code_point = code_point + ord('０') - ord('0')
+        character_mapping[fallback_code_point] = character_mapping[code_point]
+
+    return character_mapping, glyph_file_infos
 
 
 def _create_builder(
@@ -106,27 +126,20 @@ def _create_builder(
         meta_infos: MetaInfos,
         glyph_cacher: dict[str, Glyph],
         character_mapping: dict[int, str],
-        glyph_file_paths: dict[str, str],
+        glyph_file_infos: list[tuple[str, str]],
         name_num: int = None,
 ) -> FontBuilder:
     builder = FontBuilder()
+
     builder.metrics = metrics
+
     builder.meta_infos = copy(meta_infos)
     if name_num is not None:
         builder.meta_infos.family_name += f' {name_num}'
 
     builder.character_mapping.update(character_mapping)
-    for code_point in range(ord('A'), ord('Z') + 1):
-        fallback_code_point = code_point + ord('Ａ') - ord('A')
-        builder.character_mapping[fallback_code_point] = builder.character_mapping[code_point]
-    for code_point in range(ord('a'), ord('z') + 1):
-        fallback_code_point = code_point + ord('ａ') - ord('a')
-        builder.character_mapping[fallback_code_point] = builder.character_mapping[code_point]
-    for code_point in range(ord('0'), ord('9') + 1):
-        fallback_code_point = code_point + ord('０') - ord('0')
-        builder.character_mapping[fallback_code_point] = builder.character_mapping[code_point]
 
-    for glyph_name, glyph_file_path in glyph_file_paths.items():
+    for glyph_name, glyph_file_path in glyph_file_infos:
         if glyph_file_path in glyph_cacher:
             glyph = glyph_cacher[glyph_file_path]
         else:
@@ -147,10 +160,10 @@ def _create_builder(
 def main():
     metrics, meta_infos = _load_config(os.path.join(glyphs_dir, 'config.toml'))
     _format_glyph_files(glyphs_dir)
-    character_mapping, glyph_file_paths = _collect_glyph_files(glyphs_dir)
+    character_mapping, glyph_file_infos = _collect_glyph_files(glyphs_dir)
     glyph_cacher = {}
 
-    builder = _create_builder(metrics, meta_infos, glyph_cacher, character_mapping, glyph_file_paths)
+    builder = _create_builder(metrics, meta_infos, glyph_cacher, character_mapping, glyph_file_infos)
     builder.save_otf(os.path.join(outputs_dir, 'demo.otf'))
     builder.save_otf(os.path.join(outputs_dir, 'demo.woff2'), flavor=opentype.Flavor.WOFF2)
     builder.save_ttf(os.path.join(outputs_dir, 'demo.ttf'))
@@ -158,7 +171,7 @@ def main():
 
     collection_builder = FontCollectionBuilder()
     for index in range(100):
-        builder = _create_builder(metrics, meta_infos, glyph_cacher, character_mapping, glyph_file_paths, index)
+        builder = _create_builder(metrics, meta_infos, glyph_cacher, character_mapping, glyph_file_infos, index)
         builder.opentype_configs.cff_family_name = meta_infos.family_name
         collection_builder.font_builders.append(builder)
     collection_builder.save_otc(os.path.join(outputs_dir, 'demo.otc'))
