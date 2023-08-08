@@ -2,40 +2,44 @@ import logging
 import math
 import os
 import tomllib
+from copy import copy
 
 import png
 
 from examples import glyphs_dir, outputs_dir
-from pixel_font_builder import FontBuilder, FontCollectionBuilder, Glyph, opentype
+from pixel_font_builder import FontBuilder, FontCollectionBuilder, Metrics, MetaInfos, Glyph, opentype
 
 logging.basicConfig(level=logging.DEBUG)
 
 
-class FontConfig:
-    def __init__(self, config_file_path: str):
-        with open(config_file_path, 'rb') as file:
-            config_data: dict = tomllib.load(file)['font']
+def _load_config(file_path: str) -> tuple[Metrics, MetaInfos]:
+    with open(file_path, 'rb') as file:
+        config_data: dict = tomllib.load(file)['font']
 
-        self.size: int = config_data['size']
-        self.ascent: int = config_data['ascent']
-        self.descent: int = config_data['descent']
-        self.x_height: int = config_data['x_height']
-        self.cap_height: int = config_data['cap_height']
+    metrics = Metrics()
+    metrics.size = config_data['size']
+    metrics.ascent = config_data['ascent']
+    metrics.descent = config_data['descent']
+    metrics.x_height = config_data['x_height']
+    metrics.cap_height = config_data['cap_height']
 
-        self.version: str = config_data['version']
-        self.family_name: str = config_data['family_name']
-        self.style_name: str = config_data['style_name']
-        self.serif_mode: str = config_data['serif_mode']
-        self.width_mode: str = config_data['width_mode']
-        self.manufacturer: str = config_data['manufacturer']
-        self.designer: str = config_data['designer']
-        self.description: str = config_data['description']
-        self.copyright_info: str = config_data['copyright_info']
-        self.license_info: str = config_data['license_info']
-        self.vendor_url: str = config_data['vendor_url']
-        self.designer_url: str = config_data['designer_url']
-        self.license_url: str = config_data['license_url']
-        self.sample_text: str = config_data['sample_text']
+    meta_infos = MetaInfos()
+    meta_infos.version = config_data['version']
+    meta_infos.family_name = config_data['family_name']
+    meta_infos.style_name = config_data['style_name']
+    meta_infos.serif_mode = config_data['serif_mode']
+    meta_infos.width_mode = config_data['width_mode']
+    meta_infos.manufacturer = config_data['manufacturer']
+    meta_infos.designer = config_data['designer']
+    meta_infos.description = config_data['description']
+    meta_infos.copyright_info = config_data['copyright_info']
+    meta_infos.license_info = config_data['license_info']
+    meta_infos.vendor_url = config_data['vendor_url']
+    meta_infos.designer_url = config_data['designer_url']
+    meta_infos.license_url = config_data['license_url']
+    meta_infos.sample_text = config_data['sample_text']
+
+    return metrics, meta_infos
 
 
 def _load_glyph_data_from_png(file_path: str) -> tuple[list[list[int]], int, int]:
@@ -98,19 +102,18 @@ def _collect_glyph_files(root_dir: str) -> tuple[dict[int, str], dict[str, str]]
 
 
 def _create_builder(
-        font_config: FontConfig,
+        metrics: Metrics,
+        meta_infos: MetaInfos,
         glyph_cacher: dict[str, Glyph],
         character_mapping: dict[int, str],
         glyph_file_paths: dict[str, str],
         name_num: int = None,
 ) -> FontBuilder:
-    builder = FontBuilder(
-        font_config.size,
-        font_config.ascent,
-        font_config.descent,
-        font_config.x_height,
-        font_config.cap_height,
-    )
+    builder = FontBuilder()
+    builder.metrics = metrics
+    builder.meta_infos = copy(meta_infos)
+    if name_num is not None:
+        builder.meta_infos.family_name += f' {name_num}'
 
     builder.character_mapping.update(character_mapping)
     for code_point in range(ord('A'), ord('Z') + 1):
@@ -128,7 +131,7 @@ def _create_builder(
             glyph = glyph_cacher[glyph_file_path]
         else:
             glyph_data, glyph_width, glyph_height = _load_glyph_data_from_png(glyph_file_path)
-            offset_y = math.floor((font_config.ascent + font_config.descent - glyph_height) / 2)
+            offset_y = math.floor((metrics.ascent + metrics.descent - glyph_height) / 2)
             glyph = Glyph(
                 name=glyph_name,
                 advance_width=glyph_width,
@@ -138,33 +141,16 @@ def _create_builder(
             glyph_cacher[glyph_file_path] = glyph
         builder.add_glyph(glyph)
 
-    builder.meta_infos.version = font_config.version
-    builder.meta_infos.family_name = font_config.family_name
-    if name_num is not None:
-        builder.meta_infos.family_name += f' {name_num}'
-    builder.meta_infos.style_name = font_config.style_name
-    builder.meta_infos.serif_mode = font_config.serif_mode
-    builder.meta_infos.width_mode = font_config.width_mode
-    builder.meta_infos.manufacturer = font_config.manufacturer
-    builder.meta_infos.designer = font_config.designer
-    builder.meta_infos.description = font_config.description
-    builder.meta_infos.copyright_info = font_config.copyright_info
-    builder.meta_infos.license_info = font_config.license_info
-    builder.meta_infos.vendor_url = font_config.vendor_url
-    builder.meta_infos.designer_url = font_config.designer_url
-    builder.meta_infos.license_url = font_config.license_url
-    builder.meta_infos.sample_text = font_config.sample_text
-
     return builder
 
 
 def main():
-    font_config = FontConfig(os.path.join(glyphs_dir, 'config.toml'))
+    metrics, meta_infos = _load_config(os.path.join(glyphs_dir, 'config.toml'))
     _format_glyph_files(glyphs_dir)
     character_mapping, glyph_file_paths = _collect_glyph_files(glyphs_dir)
     glyph_cacher = {}
 
-    builder = _create_builder(font_config, glyph_cacher, character_mapping, glyph_file_paths)
+    builder = _create_builder(metrics, meta_infos, glyph_cacher, character_mapping, glyph_file_paths)
     builder.save_otf(os.path.join(outputs_dir, 'demo.otf'))
     builder.save_otf(os.path.join(outputs_dir, 'demo.woff2'), flavor=opentype.Flavor.WOFF2)
     builder.save_ttf(os.path.join(outputs_dir, 'demo.ttf'))
@@ -172,8 +158,8 @@ def main():
 
     collection_builder = FontCollectionBuilder()
     for index in range(100):
-        builder = _create_builder(font_config, glyph_cacher, character_mapping, glyph_file_paths, index)
-        builder.opentype_configs.cff_family_name = font_config.family_name
+        builder = _create_builder(metrics, meta_infos, glyph_cacher, character_mapping, glyph_file_paths, index)
+        builder.opentype_configs.cff_family_name = meta_infos.family_name
         collection_builder.font_builders.append(builder)
     collection_builder.save_otc(os.path.join(outputs_dir, 'demo.otc'))
     collection_builder.save_ttc(os.path.join(outputs_dir, 'demo.ttc'))

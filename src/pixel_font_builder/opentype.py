@@ -263,7 +263,7 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = N
     logger.debug("Create '%sBuilder': %s", 'TTF' if is_ttf else 'OTF', context.meta_infos.family_name)
     context.check_ready()
 
-    units_per_em = context.size * context.opentype_configs.px_to_units
+    units_per_em = context.metrics.size * context.opentype_configs.px_to_units
     builder = FontBuilder(units_per_em, isTTF=is_ttf)
 
     logger.debug("Setup 'Name Strings'")
@@ -305,10 +305,10 @@ def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = N
         horizontal_metrics[glyph_name] = advance_width, lsb
     builder.setupHorizontalMetrics(horizontal_metrics)
 
-    ascent = context.ascent * context.opentype_configs.px_to_units
-    descent = context.descent * context.opentype_configs.px_to_units
-    x_height = context.x_height * context.opentype_configs.px_to_units if context.x_height is not None else None
-    cap_height = context.cap_height * context.opentype_configs.px_to_units if context.cap_height is not None else None
+    ascent = context.metrics.ascent * context.opentype_configs.px_to_units
+    descent = context.metrics.descent * context.opentype_configs.px_to_units
+    x_height = context.metrics.x_height * context.opentype_configs.px_to_units if context.metrics.x_height is not None else None
+    cap_height = context.metrics.cap_height * context.opentype_configs.px_to_units if context.metrics.cap_height is not None else None
 
     logger.debug("Setup 'Horizontal Header'")
     builder.setupHorizontalHeader(

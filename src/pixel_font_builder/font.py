@@ -6,34 +6,19 @@ import fontTools.ttLib
 
 from pixel_font_builder import opentype, bdf
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.info import MetaInfos
+from pixel_font_builder.info import Metrics, MetaInfos
 
 
 class FontBuilder:
-    def __init__(
-            self,
-            size: int,
-            ascent: int,
-            descent: int,
-            x_height: int = None,
-            cap_height: int = None,
-    ):
-        self.size = size
-        self.ascent = ascent
-        self.descent = descent
-        self.x_height = x_height
-        self.cap_height = cap_height
+    def __init__(self):
+        self.metrics = Metrics()
+        self.meta_infos = MetaInfos()
 
         self.character_mapping: dict[int, str] = {}
         self._name_to_glyph: dict[str, Glyph] = {}
 
-        self.meta_infos = MetaInfos()
         self.opentype_configs = opentype.Configs()
         self.bdf_configs = bdf.Configs()
-
-    @property
-    def line_height(self) -> int:
-        return self.ascent - self.descent
 
     def get_glyph(self, name: str) -> Glyph | None:
         return self._name_to_glyph.get(name, None)
@@ -60,6 +45,8 @@ class FontBuilder:
         return self._name_to_glyph.pop(name, None)
 
     def check_ready(self):
+        self.metrics.check_ready()
+        self.meta_infos.check_ready()
         if '.notdef' not in self._name_to_glyph:
             raise Exception("Need to provide a glyph named '.notdef'")
         for code_point, glyph_name in self.character_mapping.items():
@@ -69,12 +56,6 @@ class FontBuilder:
                 raise Exception(f"Missing glyph: '{glyph_name}'")
         for glyph in self._name_to_glyph.values():
             glyph.check_ready()
-        if self.meta_infos.version is None:
-            raise Exception("Missing meta infos: 'version'")
-        if self.meta_infos.family_name is None:
-            raise Exception("Missing meta infos: 'family_name'")
-        if self.meta_infos.style_name is None:
-            raise Exception("Missing meta infos: 'style_name'")
 
     def to_otf_builder(self, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
         return opentype.create_builder(self, False, flavor)

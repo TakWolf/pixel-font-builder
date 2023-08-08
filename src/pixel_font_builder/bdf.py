@@ -21,7 +21,7 @@ class Configs:
 
 def _create_glyph(context: 'font.FontBuilder', code_point: int, glyph_name: str) -> BdfGlyph:
     glyph = context.get_glyph(glyph_name)
-    scalable_width_x = math.ceil((glyph.advance_width / context.size) * (72 / context.bdf_configs.resolution_x) * 1000)
+    scalable_width_x = math.ceil((glyph.advance_width / context.metrics.size) * (72 / context.bdf_configs.resolution_x) * 1000)
     return BdfGlyph(
         name=glyph.name,
         code_point=code_point,
@@ -38,10 +38,10 @@ def create_builder(context: 'font.FontBuilder') -> BdfFont:
     context.check_ready()
 
     builder = BdfFont(
-        point_size=context.size,
+        point_size=context.metrics.size,
         resolution_xy=(context.bdf_configs.resolution_x, context.bdf_configs.resolution_y),
-        bounding_box_size=(context.size, context.line_height),
-        bounding_box_offset=(0, context.descent),
+        bounding_box_size=(context.metrics.size, context.metrics.line_height),
+        bounding_box_offset=(0, context.metrics.descent),
     )
 
     logger.debug("Add 'Glyph': .notdef")
@@ -62,8 +62,8 @@ def create_builder(context: 'font.FontBuilder') -> BdfFont:
         builder.properties.add_style_name = xlfd.AddStyleName.SANS_SERIF
     else:
         builder.properties.add_style_name = context.meta_infos.serif_mode
-    builder.properties.pixel_size = context.size
-    builder.properties.point_size = context.size * 10
+    builder.properties.pixel_size = context.metrics.size
+    builder.properties.point_size = context.metrics.size * 10
     builder.properties.resolution_x = context.bdf_configs.resolution_x
     builder.properties.resolution_y = context.bdf_configs.resolution_y
     if context.meta_infos.width_mode == WidthMode.MONOSPACED:
@@ -77,10 +77,10 @@ def create_builder(context: 'font.FontBuilder') -> BdfFont:
     builder.properties.charset_encoding = '1'
 
     builder.properties.default_char = -1
-    builder.properties.font_ascent = context.ascent
-    builder.properties.font_descent = context.descent
-    builder.properties.x_height = context.x_height
-    builder.properties.cap_height = context.cap_height
+    builder.properties.font_ascent = context.metrics.ascent
+    builder.properties.font_descent = context.metrics.descent
+    builder.properties.x_height = context.metrics.x_height
+    builder.properties.cap_height = context.metrics.cap_height
 
     builder.properties.font_version = context.meta_infos.version
     builder.properties.copyright = context.meta_infos.copyright_info
