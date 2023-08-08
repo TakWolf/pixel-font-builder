@@ -59,7 +59,24 @@ class FontBuilder:
 
     def to_xtf_builder(self, is_ttf: bool, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
         self.check_ready()
-        return opentype.create_builder(self, is_ttf, flavor)
+
+        glyph_order = []
+        for glyph_name in self._name_to_glyph:
+            if glyph_name != '.notdef':
+                glyph_order.append(glyph_name)
+        glyph_order.sort()
+        glyph_order.insert(0, '.notdef')
+
+        return opentype.create_builder(
+            self.opentype_configs,
+            self.metrics,
+            self.meta_infos,
+            self.character_mapping,
+            glyph_order,
+            self._name_to_glyph,
+            is_ttf,
+            flavor,
+        )
 
     def to_otf_builder(self, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
         return self.to_xtf_builder(False, flavor)

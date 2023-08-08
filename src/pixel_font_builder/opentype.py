@@ -8,9 +8,8 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen as TTFGlyphPen
 from fontTools.ttLib import TTCollection
 from fontTools.ttLib.tables._g_l_y_f import Glyph as TTFGlyph
 
-from pixel_font_builder import font
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.info import MetaInfos
+from pixel_font_builder.info import Metrics, MetaInfos
 
 logger = logging.getLogger('pixel_font_builder.opentype')
 
@@ -96,7 +95,7 @@ def _create_name_strings(meta_infos: MetaInfos) -> dict[str, str]:
     return name_strings
 
 
-def _create_cff_font_infos(meta_infos: MetaInfos, configs: Configs) -> tuple[str, dict[str, str]]:
+def _create_cff_font_infos(configs: Configs, meta_infos: MetaInfos) -> tuple[str, dict[str, str]]:
     if configs.cff_family_name is not None:
         cff_family_name = configs.cff_family_name
     else:
@@ -200,19 +199,19 @@ def _create_outlines(glyph_data: list[list[int]], px_to_units: int) -> list[list
     return outlines
 
 
-def _create_glyph(outlines: list[list[tuple[int, int]]], glyph_context: Glyph, px_to_units: int, is_ttf: bool) -> OTFGlyph | TTFGlyph:
+def _create_glyph(glyph: Glyph, outlines: list[list[tuple[int, int]]], px_to_units: int, is_ttf: bool) -> OTFGlyph | TTFGlyph:
     if is_ttf:
         pen = TTFGlyphPen()
     else:
-        pen = OTFGlyphPen(glyph_context.advance_width * px_to_units, None)
+        pen = OTFGlyphPen(glyph.advance_width * px_to_units, None)
     if len(outlines) > 0:
         for outline_index, outline in enumerate(outlines):
             for point_index, point in enumerate(outline):
 
                 # 转换左上角原点坐标系为左下角原点坐标系
                 x, y = point
-                x += glyph_context.offset_x * px_to_units
-                y = (glyph_context.height + glyph_context.offset_y) * px_to_units - y
+                x += glyph.offset_x * px_to_units
+                y = (glyph.height + glyph.offset_y) * px_to_units - y
                 point = x, y
 
                 if point_index == 0:
@@ -232,80 +231,83 @@ def _create_glyph(outlines: list[list[tuple[int, int]]], glyph_context: Glyph, p
         return pen.getCharString()
 
 
-def _get_glyph_with_cache(glyph_context: Glyph, px_to_units: int, is_ttf: bool) -> OTFGlyph | TTFGlyph:
-    cache_tag = f'{glyph_context.advance_width}#{glyph_context.offset}#{glyph_context.data}'.replace(' ', '')
-    if getattr(glyph_context, _CACHE_NAME_TAG, None) != cache_tag:
-        setattr(glyph_context, _CACHE_NAME_OUTLINES, None)
-        setattr(glyph_context, _CACHE_NAME_OTF_GLYPH, None)
-        setattr(glyph_context, _CACHE_NAME_TTF_GLYPH, None)
-        setattr(glyph_context, _CACHE_NAME_TAG, cache_tag)
+def _get_glyph_with_cache(glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGlyph | TTFGlyph:
+    cache_tag = f'{glyph.advance_width}#{glyph.offset}#{glyph.data}'.replace(' ', '')
+    if getattr(glyph, _CACHE_NAME_TAG, None) != cache_tag:
+        setattr(glyph, _CACHE_NAME_OUTLINES, None)
+        setattr(glyph, _CACHE_NAME_OTF_GLYPH, None)
+        setattr(glyph, _CACHE_NAME_TTF_GLYPH, None)
+        setattr(glyph, _CACHE_NAME_TAG, cache_tag)
 
-    outlines = getattr(glyph_context, _CACHE_NAME_OUTLINES, None)
+    outlines = getattr(glyph, _CACHE_NAME_OUTLINES, None)
     if outlines is None:
-        logger.debug("Create 'Outlines': %s", glyph_context.name)
-        outlines = _create_outlines(glyph_context.data, px_to_units)
-        setattr(glyph_context, _CACHE_NAME_OUTLINES, outlines)
+        logger.debug("Create 'Outlines': %s", glyph.name)
+        outlines = _create_outlines(glyph.data, px_to_units)
+        setattr(glyph, _CACHE_NAME_OUTLINES, outlines)
     else:
-        logger.debug("Use cached 'Outlines': %s", glyph_context.name)
+        logger.debug("Use cached 'Outlines': %s", glyph.name)
 
     cache_name_xtf_glyph = _CACHE_NAME_TTF_GLYPH if is_ttf else _CACHE_NAME_OTF_GLYPH
-    glyph = getattr(glyph_context, cache_name_xtf_glyph, None)
-    if glyph is None:
-        logger.debug("Create '%sGlyph': %s", 'TTF' if is_ttf else 'OTF', glyph_context.name)
-        glyph = _create_glyph(outlines, glyph_context, px_to_units, is_ttf)
-        setattr(glyph_context, cache_name_xtf_glyph, glyph)
+    xtf_glyph = getattr(glyph, cache_name_xtf_glyph, None)
+    if xtf_glyph is None:
+        logger.debug("Create '%sGlyph': %s", 'TTF' if is_ttf else 'OTF', glyph.name)
+        xtf_glyph = _create_glyph(glyph, outlines, px_to_units, is_ttf)
+        setattr(glyph, cache_name_xtf_glyph, xtf_glyph)
     else:
-        logger.debug("Use cached '%sGlyph': %s", 'TTF' if is_ttf else 'OTF', glyph_context.name)
-    return glyph
+        logger.debug("Use cached '%sGlyph': %s", 'TTF' if is_ttf else 'OTF', glyph.name)
+    return xtf_glyph
 
 
-def create_builder(context: 'font.FontBuilder', is_ttf: bool, flavor: Flavor = None) -> FontBuilder:
-    logger.debug("Create '%sBuilder': %s", 'TTF' if is_ttf else 'OTF', context.meta_infos.family_name)
-    builder = FontBuilder(context.metrics.size * context.opentype_configs.px_to_units, isTTF=is_ttf)
+def create_builder(
+        configs: Configs,
+        metrics: Metrics,
+        meta_infos: MetaInfos,
+        character_mapping: dict[int, str],
+        glyph_order: list[str],
+        name_to_glyph: dict[str, Glyph],
+        is_ttf: bool,
+        flavor: Flavor = None,
+) -> FontBuilder:
+    logger.debug("Create '%sBuilder': %s", 'TTF' if is_ttf else 'OTF', meta_infos.family_name)
+    builder = FontBuilder(metrics.size * configs.px_to_units, isTTF=is_ttf)
 
     logger.debug("Setup 'Name Strings'")
-    name_strings = _create_name_strings(context.meta_infos)
+    name_strings = _create_name_strings(meta_infos)
     builder.setupNameTable(name_strings)
-
-    logger.debug("Create 'Glyphs'")
-    glyph_order = []
-    glyphs = {}
-    for glyph_context in context.get_glyphs():
-        if glyph_context.name != '.notdef':
-            glyph_order.append(glyph_context.name)
-        glyphs[glyph_context.name] = _get_glyph_with_cache(glyph_context, context.opentype_configs.px_to_units, is_ttf)
-    glyph_order.sort()
-    glyph_order.insert(0, '.notdef')
 
     logger.debug("Setup 'Glyph Order'")
     builder.setupGlyphOrder(glyph_order)
 
+    logger.debug("Create 'Glyphs'")
+    xtf_glyphs = {}
+    for glyph_name, glyph in name_to_glyph.items():
+        xtf_glyphs[glyph_name] = _get_glyph_with_cache(glyph, configs.px_to_units, is_ttf)
     if is_ttf:
         logger.debug("Setup 'Glyf'")
-        builder.setupGlyf(glyphs)
+        builder.setupGlyf(xtf_glyphs)
     else:
         logger.debug("Setup 'CFF'")
-        cff_ps_name, cff_font_infos = _create_cff_font_infos(context.meta_infos, context.opentype_configs)
-        builder.setupCFF(cff_ps_name, cff_font_infos, glyphs, {})
+        cff_ps_name, cff_font_infos = _create_cff_font_infos(configs, meta_infos)
+        builder.setupCFF(cff_ps_name, cff_font_infos, xtf_glyphs, {})
 
     logger.debug("Setup 'Character Mapping'")
-    builder.setupCharacterMap(context.character_mapping, allowFallback=context.opentype_configs.allow_fallback_cmap)
+    builder.setupCharacterMap(character_mapping, allowFallback=configs.allow_fallback_cmap)
 
     logger.debug("Setup 'Horizontal Metrics'")
     horizontal_metrics = {}
     for glyph_name in glyph_order:
-        advance_width = context.get_glyph(glyph_name).advance_width * context.opentype_configs.px_to_units
+        advance_width = name_to_glyph[glyph_name].advance_width * configs.px_to_units
         if is_ttf:
-            lsb = glyphs[glyph_name].xMin
+            lsb = xtf_glyphs[glyph_name].xMin
         else:
-            lsb = glyphs[glyph_name].calcBounds(None)[0]
+            lsb = xtf_glyphs[glyph_name].calcBounds(None)[0]
         horizontal_metrics[glyph_name] = advance_width, lsb
     builder.setupHorizontalMetrics(horizontal_metrics)
 
-    ascent = context.metrics.ascent * context.opentype_configs.px_to_units
-    descent = context.metrics.descent * context.opentype_configs.px_to_units
-    x_height = context.metrics.x_height * context.opentype_configs.px_to_units if context.metrics.x_height is not None else None
-    cap_height = context.metrics.cap_height * context.opentype_configs.px_to_units if context.metrics.cap_height is not None else None
+    ascent = metrics.ascent * configs.px_to_units
+    descent = metrics.descent * configs.px_to_units
+    x_height = metrics.x_height * configs.px_to_units if metrics.x_height is not None else None
+    cap_height = metrics.cap_height * configs.px_to_units if metrics.cap_height is not None else None
 
     logger.debug("Setup 'Horizontal Header'")
     builder.setupHorizontalHeader(
