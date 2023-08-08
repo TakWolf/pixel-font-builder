@@ -83,7 +83,13 @@ class FontBuilder:
 
     def to_bdf_builder(self) -> bdffont.BdfFont:
         self.check_ready()
-        return bdf.create_builder(self)
+        return bdf.create_builder(
+            self.bdf_configs,
+            self.metrics,
+            self.meta_infos,
+            self.character_mapping,
+            self._name_to_glyph,
+        )
 
     def save_bdf(
             self,

@@ -3,8 +3,8 @@ import math
 
 from bdffont import BdfFont, BdfGlyph, xlfd
 
-from pixel_font_builder import font
-from pixel_font_builder.info import SerifMode, WidthMode
+from pixel_font_builder.glyph import Glyph
+from pixel_font_builder.info import Metrics, MetaInfos, SerifMode, WidthMode
 
 logger = logging.getLogger('pixel_font_builder.bdf')
 
@@ -19,9 +19,13 @@ class Configs:
         self.resolution_y = resolution_y
 
 
-def _create_glyph(context: 'font.FontBuilder', code_point: int, glyph_name: str) -> BdfGlyph:
-    glyph = context.get_glyph(glyph_name)
-    scalable_width_x = math.ceil((glyph.advance_width / context.metrics.size) * (72 / context.bdf_configs.resolution_x) * 1000)
+def _create_glyph(
+        configs: Configs,
+        metrics: Metrics,
+        code_point: int,
+        glyph: Glyph,
+) -> BdfGlyph:
+    scalable_width_x = math.ceil((glyph.advance_width / metrics.size) * (72 / configs.resolution_x) * 1000)
     return BdfGlyph(
         name=glyph.name,
         code_point=code_point,
@@ -33,56 +37,62 @@ def _create_glyph(context: 'font.FontBuilder', code_point: int, glyph_name: str)
     )
 
 
-def create_builder(context: 'font.FontBuilder') -> BdfFont:
-    logger.debug("Create 'BDFBuilder': %s", context.meta_infos.family_name)
+def create_builder(
+        configs: Configs,
+        metrics: Metrics,
+        meta_infos: MetaInfos,
+        character_mapping: dict[int, str],
+        name_to_glyph: dict[str, Glyph],
+) -> BdfFont:
+    logger.debug("Create 'BDFBuilder': %s", meta_infos.family_name)
     builder = BdfFont(
-        point_size=context.metrics.size,
-        resolution_xy=(context.bdf_configs.resolution_x, context.bdf_configs.resolution_y),
-        bounding_box_size=(context.metrics.size, context.metrics.line_height),
-        bounding_box_offset=(0, context.metrics.descent),
+        point_size=metrics.size,
+        resolution_xy=(configs.resolution_x, configs.resolution_y),
+        bounding_box_size=(metrics.size, metrics.line_height),
+        bounding_box_offset=(0, metrics.descent),
     )
 
     logger.debug("Add 'Glyph': .notdef")
-    builder.add_glyph(_create_glyph(context, -1, '.notdef'))
-    for code_point, glyph_name in context.character_mapping.items():
+    builder.add_glyph(_create_glyph(configs, metrics, -1, name_to_glyph['.notdef']))
+    for code_point, glyph_name in character_mapping.items():
         logger.debug("Add 'Glyph': %s", glyph_name)
-        builder.add_glyph(_create_glyph(context, code_point, glyph_name))
+        builder.add_glyph(_create_glyph(configs, metrics, code_point, name_to_glyph[glyph_name]))
 
     logger.debug("Setup 'Properties'")
-    builder.properties.foundry = context.meta_infos.manufacturer
-    builder.properties.family_name = context.meta_infos.family_name
-    builder.properties.weight_name = context.meta_infos.style_name
+    builder.properties.foundry = meta_infos.manufacturer
+    builder.properties.family_name = meta_infos.family_name
+    builder.properties.weight_name = meta_infos.style_name
     builder.properties.slant = xlfd.Slant.ROMAN
     builder.properties.setwidth_name = xlfd.SetwidthName.NORMAL
-    if context.meta_infos.serif_mode == SerifMode.SERIF:
+    if meta_infos.serif_mode == SerifMode.SERIF:
         builder.properties.add_style_name = xlfd.AddStyleName.SERIF
-    elif context.meta_infos.serif_mode == SerifMode.SANS_SERIF:
+    elif meta_infos.serif_mode == SerifMode.SANS_SERIF:
         builder.properties.add_style_name = xlfd.AddStyleName.SANS_SERIF
     else:
-        builder.properties.add_style_name = context.meta_infos.serif_mode
-    builder.properties.pixel_size = context.metrics.size
-    builder.properties.point_size = context.metrics.size * 10
-    builder.properties.resolution_x = context.bdf_configs.resolution_x
-    builder.properties.resolution_y = context.bdf_configs.resolution_y
-    if context.meta_infos.width_mode == WidthMode.MONOSPACED:
+        builder.properties.add_style_name = meta_infos.serif_mode
+    builder.properties.pixel_size = metrics.size
+    builder.properties.point_size = metrics.size * 10
+    builder.properties.resolution_x = configs.resolution_x
+    builder.properties.resolution_y = configs.resolution_y
+    if meta_infos.width_mode == WidthMode.MONOSPACED:
         builder.properties.spacing = xlfd.Spacing.MONOSPACED
-    elif context.meta_infos.width_mode == WidthMode.PROPORTIONAL:
+    elif meta_infos.width_mode == WidthMode.PROPORTIONAL:
         builder.properties.spacing = xlfd.Spacing.PROPORTIONAL
     else:
-        builder.properties.spacing = context.meta_infos.width_mode
+        builder.properties.spacing = meta_infos.width_mode
     builder.properties.average_width = round(sum([glyph.device_width_x * 10 for glyph in builder.code_point_to_glyph.values()]) / builder.get_glyphs_count())
     builder.properties.charset_registry = xlfd.CharsetRegistry.ISO10646
     builder.properties.charset_encoding = '1'
 
     builder.properties.default_char = -1
-    builder.properties.font_ascent = context.metrics.ascent
-    builder.properties.font_descent = context.metrics.descent
-    builder.properties.x_height = context.metrics.x_height
-    builder.properties.cap_height = context.metrics.cap_height
+    builder.properties.font_ascent = metrics.ascent
+    builder.properties.font_descent = metrics.descent
+    builder.properties.x_height = metrics.x_height
+    builder.properties.cap_height = metrics.cap_height
 
-    builder.properties.font_version = context.meta_infos.version
-    builder.properties.copyright = context.meta_infos.copyright_info
-    builder.properties['LICENSE'] = context.meta_infos.license_info
+    builder.properties.font_version = meta_infos.version
+    builder.properties.copyright = meta_infos.copyright_info
+    builder.properties['LICENSE'] = meta_infos.license_info
 
     builder.generate_xlfd_font_name()
 
