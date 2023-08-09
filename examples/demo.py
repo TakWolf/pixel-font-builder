@@ -91,21 +91,22 @@ def _collect_glyph_files(root_dir: str) -> tuple[dict[int, str], list[tuple[str,
                 continue
             glyph_file_path = os.path.join(glyph_file_dir, glyph_file_name)
             if glyph_file_name == 'notdef.png':
-                registry[-1] = glyph_file_path
+                code_point = -1
             else:
                 code_point = int(glyph_file_name.removesuffix('.png'), 16)
-                registry[code_point] = glyph_file_path
+            registry[code_point] = glyph_file_path
 
     sequence = list(registry.keys())
     sequence.sort()
 
     character_mapping = {}
-    glyph_file_infos = [('.notdef', registry[-1])]
+    glyph_file_infos = []
     for code_point in sequence:
         if code_point == -1:
-            continue
-        glyph_name = f'uni{code_point:04X}'
-        character_mapping[code_point] = glyph_name
+            glyph_name = '.notdef'
+        else:
+            glyph_name = f'uni{code_point:04X}'
+            character_mapping[code_point] = glyph_name
         glyph_file_infos.append((glyph_name, registry[code_point]))
 
     for code_point in range(ord('A'), ord('Z') + 1):
