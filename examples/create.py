@@ -1,7 +1,7 @@
 import logging
 import os
 
-from examples import outputs_dir
+from examples import build_dir
 from pixel_font_builder import FontBuilder, Glyph, StyleName, SerifMode, WidthMode, opentype
 
 logging.basicConfig(level=logging.DEBUG)
@@ -74,10 +74,10 @@ def main():
         ],
     ))
 
-    builder.save_otf(os.path.join(outputs_dir, 'my-pixel.otf'))
-    builder.save_otf(os.path.join(outputs_dir, 'my-pixel.woff2'), flavor=opentype.Flavor.WOFF2)
-    builder.save_ttf(os.path.join(outputs_dir, 'my-font.ttf'))
-    builder.save_bdf(os.path.join(outputs_dir, 'my-font.bdf'))
+    builder.save_otf(os.path.join(build_dir, 'my-pixel.otf'))
+    builder.save_otf(os.path.join(build_dir, 'my-pixel.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_ttf(os.path.join(build_dir, 'my-font.ttf'))
+    builder.save_bdf(os.path.join(build_dir, 'my-font.bdf'))
 
 
 if __name__ == '__main__':

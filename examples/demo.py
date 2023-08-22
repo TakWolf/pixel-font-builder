@@ -6,7 +6,7 @@ from copy import copy
 
 import png
 
-from examples import glyphs_dir, outputs_dir
+from examples import glyphs_dir, build_dir
 from pixel_font_builder import FontBuilder, FontCollectionBuilder, Metrics, MetaInfos, Glyph, opentype
 
 logging.basicConfig(level=logging.DEBUG)
@@ -165,18 +165,18 @@ def main():
     glyph_cacher = {}
 
     builder = _create_builder(metrics, meta_infos, glyph_cacher, character_mapping, glyph_file_infos)
-    builder.save_otf(os.path.join(outputs_dir, 'demo.otf'))
-    builder.save_otf(os.path.join(outputs_dir, 'demo.woff2'), flavor=opentype.Flavor.WOFF2)
-    builder.save_ttf(os.path.join(outputs_dir, 'demo.ttf'))
-    builder.save_bdf(os.path.join(outputs_dir, 'demo.bdf'))
+    builder.save_otf(os.path.join(build_dir, 'demo.otf'))
+    builder.save_otf(os.path.join(build_dir, 'demo.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_ttf(os.path.join(build_dir, 'demo.ttf'))
+    builder.save_bdf(os.path.join(build_dir, 'demo.bdf'))
 
     collection_builder = FontCollectionBuilder()
     for index in range(100):
         builder = _create_builder(metrics, meta_infos, glyph_cacher, character_mapping, glyph_file_infos, index)
         builder.opentype_configs.cff_family_name = meta_infos.family_name
         collection_builder.font_builders.append(builder)
-    collection_builder.save_otc(os.path.join(outputs_dir, 'demo.otc'))
-    collection_builder.save_ttc(os.path.join(outputs_dir, 'demo.ttc'))
+    collection_builder.save_otc(os.path.join(build_dir, 'demo.otc'))
+    collection_builder.save_ttc(os.path.join(build_dir, 'demo.ttc'))
 
 
 if __name__ == '__main__':
