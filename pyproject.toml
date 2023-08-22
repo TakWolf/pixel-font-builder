@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "pixel-font-builder"
 version = "0.0.9"
@@ -30,6 +34,7 @@ source = "https://github.com/TakWolf/pixel-font-builder"
 issues = "https://github.com/TakWolf/pixel-font-builder/issues"
 
 [tool.pytest.ini_options]
-pythonpath = [
-    "src",
+pythonpath = "src"
+addopts = [
+    "--import-mode=importlib",
 ]
