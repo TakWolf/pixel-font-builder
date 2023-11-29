@@ -34,7 +34,10 @@ source = "https://github.com/TakWolf/pixel-font-builder"
 issues = "https://github.com/TakWolf/pixel-font-builder/issues"
 
 [tool.pytest.ini_options]
-pythonpath = "src"
+pythonpath = [
+    ".",
+    "src",
+]
 addopts = [
     "--import-mode=importlib",
 ]
