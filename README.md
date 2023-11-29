@@ -16,6 +16,7 @@ pip install pixel-font-builder
 ```python
 import logging
 import os
+import shutil
 
 from examples import build_dir
 from pixel_font_builder import FontBuilder, Glyph, StyleName, SerifMode, WidthMode, opentype
@@ -24,6 +25,11 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 def main():
+    outputs_dir = os.path.join(build_dir, 'create')
+    if os.path.exists(outputs_dir):
+        shutil.rmtree(outputs_dir)
+    os.makedirs(outputs_dir)
+
     builder = FontBuilder()
 
     builder.metrics.size = 12
@@ -90,10 +96,10 @@ def main():
         ],
     ))
 
-    builder.save_otf(os.path.join(build_dir, 'my-pixel.otf'))
-    builder.save_otf(os.path.join(build_dir, 'my-pixel.woff2'), flavor=opentype.Flavor.WOFF2)
-    builder.save_ttf(os.path.join(build_dir, 'my-font.ttf'))
-    builder.save_bdf(os.path.join(build_dir, 'my-font.bdf'))
+    builder.save_otf(os.path.join(outputs_dir, 'my-pixel.otf'))
+    builder.save_otf(os.path.join(outputs_dir, 'my-pixel.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_ttf(os.path.join(outputs_dir, 'my-font.ttf'))
+    builder.save_bdf(os.path.join(outputs_dir, 'my-font.bdf'))
 
 
 if __name__ == '__main__':
