@@ -19,7 +19,7 @@ import os
 import shutil
 
 from examples import build_dir
-from pixel_font_builder import FontBuilder, Glyph, StyleName, SerifMode, WidthMode, opentype
+from pixel_font_builder import FontBuilder, StyleName, SerifMode, WidthMode, Glyph, opentype
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -30,13 +30,7 @@ def main():
         shutil.rmtree(outputs_dir)
     os.makedirs(outputs_dir)
 
-    builder = FontBuilder()
-
-    builder.metrics.size = 12
-    builder.metrics.ascent = 10
-    builder.metrics.descent = -2
-    builder.metrics.x_height = 5
-    builder.metrics.cap_height = 7
+    builder = FontBuilder(12)
 
     builder.meta_infos.version = '1.0.0'
     builder.meta_infos.family_name = 'My Pixel'
@@ -52,6 +46,11 @@ def main():
     builder.meta_infos.designer_url = 'https://takwolf.com'
     builder.meta_infos.license_url = 'https://scripts.sil.org/OFL'
     builder.meta_infos.sample_text = 'Hello World!'
+
+    builder.horizontal_header.ascent = 10
+    builder.horizontal_header.descent = -2
+    builder.horizontal_header.x_height = 5
+    builder.horizontal_header.cap_height = 7
 
     builder.character_mapping.update({
         ord('A'): 'CAP_LETTER_A',
