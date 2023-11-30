@@ -10,7 +10,8 @@ from pixel_font_builder.info import MetaInfos, Metrics
 
 
 class FontBuilder:
-    def __init__(self):
+    def __init__(self, size: int):
+        self.size = size
         self.meta_infos = MetaInfos()
         self.metrics = Metrics()
         self.character_mapping: dict[int, str] = {}
@@ -45,6 +46,7 @@ class FontBuilder:
     def to_xtf_builder(self, is_ttf: bool, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
         glyph_order, name_to_glyph = self._check_ready_and_prepare_glyphs()
         return opentype.create_builder(
+            self.size,
             self.opentype_configs,
             self.meta_infos,
             self.metrics,
@@ -78,6 +80,7 @@ class FontBuilder:
     def to_bdf_builder(self) -> bdffont.BdfFont:
         name_to_glyph = self._check_ready_and_prepare_glyphs()[1]
         return bdf.create_builder(
+            self.size,
             self.bdf_configs,
             self.meta_infos,
             self.metrics,

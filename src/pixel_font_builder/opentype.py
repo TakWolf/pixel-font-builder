@@ -259,6 +259,7 @@ def _get_glyph_with_cache(glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGl
 
 
 def create_builder(
+        font_size: int,
         configs: Configs,
         meta_infos: MetaInfos,
         metrics: Metrics,
@@ -269,7 +270,7 @@ def create_builder(
         flavor: Flavor = None,
 ) -> FontBuilder:
     logger.debug("Create '%sBuilder': %s", 'TTF' if is_ttf else 'OTF', meta_infos.family_name)
-    builder = FontBuilder(metrics.size * configs.px_to_units, isTTF=is_ttf)
+    builder = FontBuilder(font_size * configs.px_to_units, isTTF=is_ttf)
 
     logger.debug("Setup 'Name Strings'")
     name_strings = _create_name_strings(meta_infos)

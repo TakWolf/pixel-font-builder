@@ -97,7 +97,7 @@ def _create_builder(
         glyph_file_infos: list[tuple[str, str]],
         name_num: int = None,
 ) -> FontBuilder:
-    builder = FontBuilder()
+    builder = FontBuilder(11)
 
     builder.meta_infos.version = "1.0.0"
     builder.meta_infos.family_name = "Demo Pixel"
@@ -117,7 +117,6 @@ def _create_builder(
     builder.meta_infos.license_url = "https://scripts.sil.org/OFL"
     builder.meta_infos.sample_text = "Hello World!"
 
-    builder.metrics.size = 11
     builder.metrics.ascent = 11
     builder.metrics.descent = -4
     builder.metrics.x_height = 5

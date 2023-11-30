@@ -20,12 +20,12 @@ class Configs:
 
 
 def _create_glyph(
+        font_size: int,
         configs: Configs,
-        metrics: Metrics,
         code_point: int,
         glyph: Glyph,
 ) -> BdfGlyph:
-    scalable_width_x = math.ceil((glyph.advance_width / metrics.size) * (72 / configs.resolution_x) * 1000)
+    scalable_width_x = math.ceil((glyph.advance_width / font_size) * (72 / configs.resolution_x) * 1000)
     return BdfGlyph(
         name=glyph.name,
         code_point=code_point,
@@ -38,6 +38,7 @@ def _create_glyph(
 
 
 def create_builder(
+        font_size: int,
         configs: Configs,
         meta_infos: MetaInfos,
         metrics: Metrics,
@@ -46,17 +47,17 @@ def create_builder(
 ) -> BdfFont:
     logger.debug("Create 'BdfFont': %s", meta_infos.family_name)
     font = BdfFont(
-        point_size=metrics.size,
+        point_size=font_size,
         resolution_xy=(configs.resolution_x, configs.resolution_y),
-        bounding_box_size=(metrics.size, metrics.line_height),
+        bounding_box_size=(font_size, metrics.line_height),
         bounding_box_offset=(0, metrics.descent),
     )
 
     logger.debug("Add 'Glyph': .notdef")
-    font.add_glyph(_create_glyph(configs, metrics, -1, name_to_glyph['.notdef']))
+    font.add_glyph(_create_glyph(font_size, configs, -1, name_to_glyph['.notdef']))
     for code_point, glyph_name in character_mapping.items():
         logger.debug("Add 'Glyph': %s", glyph_name)
-        font.add_glyph(_create_glyph(configs, metrics, code_point, name_to_glyph[glyph_name]))
+        font.add_glyph(_create_glyph(font_size, configs, code_point, name_to_glyph[glyph_name]))
 
     logger.debug("Setup 'Properties'")
     font.properties.foundry = meta_infos.manufacturer
@@ -70,8 +71,8 @@ def create_builder(
         font.properties.add_style_name = xlfd.AddStyleName.SANS_SERIF
     else:
         font.properties.add_style_name = meta_infos.serif_mode
-    font.properties.pixel_size = metrics.size
-    font.properties.point_size = metrics.size * 10
+    font.properties.pixel_size = font_size
+    font.properties.point_size = font_size * 10
     font.properties.resolution_x = configs.resolution_x
     font.properties.resolution_y = configs.resolution_y
     if meta_infos.width_mode == WidthMode.MONOSPACED:

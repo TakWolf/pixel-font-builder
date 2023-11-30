@@ -65,13 +65,11 @@ class MetaInfos:
 class Metrics:
     def __init__(
             self,
-            size: int = None,
             ascent: int = None,
             descent: int = None,
             x_height: int = None,
             cap_height: int = None,
     ):
-        self.size = size
         self.ascent = ascent
         self.descent = descent
         self.x_height = x_height
@@ -82,8 +80,6 @@ class Metrics:
         return self.ascent - self.descent
 
     def check_ready(self):
-        if self.size is None:
-            raise Exception("Missing metrics: 'size'")
         if self.ascent is None:
             raise Exception("Missing metrics: 'ascent'")
         if self.descent is None:

@@ -14,7 +14,7 @@ def main():
         shutil.rmtree(outputs_dir)
     os.makedirs(outputs_dir)
 
-    builder = FontBuilder()
+    builder = FontBuilder(12)
 
     builder.meta_infos.version = '1.0.0'
     builder.meta_infos.family_name = 'My Pixel'
@@ -31,7 +31,6 @@ def main():
     builder.meta_infos.license_url = 'https://scripts.sil.org/OFL'
     builder.meta_infos.sample_text = 'Hello World!'
 
-    builder.metrics.size = 12
     builder.metrics.ascent = 10
     builder.metrics.descent = -2
     builder.metrics.x_height = 5
