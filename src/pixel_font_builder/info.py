@@ -62,7 +62,7 @@ class MetaInfos:
             raise Exception("Missing meta infos: 'style_name'")
 
 
-class Metrics:
+class HorizontalHeader:
     def __init__(
             self,
             ascent: int = None,

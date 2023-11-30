@@ -117,10 +117,10 @@ def _create_builder(
     builder.meta_infos.license_url = "https://scripts.sil.org/OFL"
     builder.meta_infos.sample_text = "Hello World!"
 
-    builder.metrics.ascent = 11
-    builder.metrics.descent = -4
-    builder.metrics.x_height = 5
-    builder.metrics.cap_height = 7
+    builder.horizontal_header.ascent = 11
+    builder.horizontal_header.descent = -4
+    builder.horizontal_header.x_height = 5
+    builder.horizontal_header.cap_height = 7
 
     builder.character_mapping.update(character_mapping)
 
@@ -129,7 +129,7 @@ def _create_builder(
             glyph = glyph_cacher[glyph_file_path]
         else:
             glyph_data, glyph_width, glyph_height = _load_glyph_data_from_png(glyph_file_path)
-            offset_y = math.floor((builder.metrics.ascent + builder.metrics.descent - glyph_height) / 2)
+            offset_y = math.floor((builder.horizontal_header.ascent + builder.horizontal_header.descent - glyph_height) / 2)
             glyph = Glyph(
                 name=glyph_name,
                 advance_width=glyph_width,

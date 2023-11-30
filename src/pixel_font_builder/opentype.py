@@ -9,7 +9,7 @@ from fontTools.ttLib import TTCollection
 from fontTools.ttLib.tables._g_l_y_f import Glyph as TTFGlyph
 
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.info import MetaInfos, Metrics
+from pixel_font_builder.info import MetaInfos, HorizontalHeader
 
 logger = logging.getLogger('pixel_font_builder.opentype')
 
@@ -262,7 +262,7 @@ def create_builder(
         font_size: int,
         configs: Configs,
         meta_infos: MetaInfos,
-        metrics: Metrics,
+        horizontal_header: HorizontalHeader,
         character_mapping: dict[int, str],
         glyph_order: list[str],
         name_to_glyph: dict[str, Glyph],
@@ -305,10 +305,10 @@ def create_builder(
         horizontal_metrics[glyph_name] = advance_width, lsb
     builder.setupHorizontalMetrics(horizontal_metrics)
 
-    ascent = metrics.ascent * configs.px_to_units
-    descent = metrics.descent * configs.px_to_units
-    x_height = metrics.x_height * configs.px_to_units if metrics.x_height is not None else None
-    cap_height = metrics.cap_height * configs.px_to_units if metrics.cap_height is not None else None
+    ascent = horizontal_header.ascent * configs.px_to_units
+    descent = horizontal_header.descent * configs.px_to_units
+    x_height = horizontal_header.x_height * configs.px_to_units if horizontal_header.x_height is not None else None
+    cap_height = horizontal_header.cap_height * configs.px_to_units if horizontal_header.cap_height is not None else None
 
     logger.debug("Setup 'Horizontal Header'")
     builder.setupHorizontalHeader(

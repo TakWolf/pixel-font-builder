@@ -4,7 +4,7 @@ import math
 from bdffont import BdfFont, BdfGlyph, xlfd
 
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.info import SerifMode, WidthMode, MetaInfos, Metrics
+from pixel_font_builder.info import SerifMode, WidthMode, MetaInfos, HorizontalHeader
 
 logger = logging.getLogger('pixel_font_builder.bdf')
 
@@ -41,7 +41,7 @@ def create_builder(
         font_size: int,
         configs: Configs,
         meta_infos: MetaInfos,
-        metrics: Metrics,
+        horizontal_header: HorizontalHeader,
         character_mapping: dict[int, str],
         name_to_glyph: dict[str, Glyph],
 ) -> BdfFont:
@@ -49,8 +49,8 @@ def create_builder(
     font = BdfFont(
         point_size=font_size,
         resolution_xy=(configs.resolution_x, configs.resolution_y),
-        bounding_box_size=(font_size, metrics.line_height),
-        bounding_box_offset=(0, metrics.descent),
+        bounding_box_size=(font_size, horizontal_header.line_height),
+        bounding_box_offset=(0, horizontal_header.descent),
     )
 
     logger.debug("Add 'Glyph': .notdef")
@@ -86,10 +86,10 @@ def create_builder(
     font.properties.charset_encoding = '1'
 
     font.properties.default_char = -1
-    font.properties.font_ascent = metrics.ascent
-    font.properties.font_descent = metrics.descent
-    font.properties.x_height = metrics.x_height
-    font.properties.cap_height = metrics.cap_height
+    font.properties.font_ascent = horizontal_header.ascent
+    font.properties.font_descent = horizontal_header.descent
+    font.properties.x_height = horizontal_header.x_height
+    font.properties.cap_height = horizontal_header.cap_height
 
     font.properties.font_version = meta_infos.version
     font.properties.copyright = meta_infos.copyright_info

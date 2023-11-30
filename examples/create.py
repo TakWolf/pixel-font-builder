@@ -31,10 +31,10 @@ def main():
     builder.meta_infos.license_url = 'https://scripts.sil.org/OFL'
     builder.meta_infos.sample_text = 'Hello World!'
 
-    builder.metrics.ascent = 10
-    builder.metrics.descent = -2
-    builder.metrics.x_height = 5
-    builder.metrics.cap_height = 7
+    builder.horizontal_header.ascent = 10
+    builder.horizontal_header.descent = -2
+    builder.horizontal_header.x_height = 5
+    builder.horizontal_header.cap_height = 7
 
     builder.character_mapping.update({
         ord('A'): 'CAP_LETTER_A',
