@@ -55,11 +55,11 @@ class MetaInfos:
 
     def check_ready(self):
         if self.version is None:
-            raise Exception("Missing meta infos: 'version'")
+            raise Exception("Missing Meta Infos: 'version'")
         if self.family_name is None:
-            raise Exception("Missing meta infos: 'family_name'")
+            raise Exception("Missing Meta Infos: 'family_name'")
         if self.style_name is None:
-            raise Exception("Missing meta infos: 'style_name'")
+            raise Exception("Missing Meta Infos: 'style_name'")
 
 
 class HorizontalHeader:
@@ -81,6 +81,6 @@ class HorizontalHeader:
 
     def check_ready(self):
         if self.ascent is None:
-            raise Exception("Missing metrics: 'ascent'")
+            raise Exception("Missing Horizontal Header: 'ascent'")
         if self.descent is None:
-            raise Exception("Missing metrics: 'descent'")
+            raise Exception("Missing Horizontal Header: 'descent'")
