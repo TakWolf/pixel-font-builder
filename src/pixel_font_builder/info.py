@@ -79,6 +79,14 @@ class HorizontalHeader:
     def line_height(self) -> int:
         return self.ascent - self.descent
 
+    def __mul__(self, other: int) -> 'HorizontalHeader':
+        return HorizontalHeader(
+            self.ascent * other if self.ascent is not None else None,
+            self.descent * other if self.descent is not None else None,
+            self.x_height * other if self.x_height is not None else None,
+            self.cap_height * other if self.cap_height is not None else None,
+        )
+
     def check_ready(self):
         if self.ascent is None:
             raise Exception("Missing Horizontal Header: 'ascent'")

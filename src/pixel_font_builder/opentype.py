@@ -305,25 +305,22 @@ def create_builder(
         horizontal_metrics[glyph_name] = advance_width, lsb
     builder.setupHorizontalMetrics(horizontal_metrics)
 
-    ascent = horizontal_header.ascent * configs.px_to_units
-    descent = horizontal_header.descent * configs.px_to_units
-    x_height = horizontal_header.x_height * configs.px_to_units if horizontal_header.x_height is not None else None
-    cap_height = horizontal_header.cap_height * configs.px_to_units if horizontal_header.cap_height is not None else None
+    scale_horizontal_header = horizontal_header * configs.px_to_units
 
     logger.debug("Setup 'Horizontal Header'")
     builder.setupHorizontalHeader(
-        ascent=ascent,
-        descent=descent,
+        ascent=scale_horizontal_header.ascent,
+        descent=scale_horizontal_header.descent,
     )
 
     logger.debug("Setup 'OS2'")
     builder.setupOS2(
-        sTypoAscender=ascent,
-        sTypoDescender=descent,
-        usWinAscent=ascent,
-        usWinDescent=-descent,
-        sxHeight=x_height,
-        sCapHeight=cap_height,
+        sTypoAscender=scale_horizontal_header.ascent,
+        sTypoDescender=scale_horizontal_header.descent,
+        usWinAscent=scale_horizontal_header.ascent,
+        usWinDescent=-scale_horizontal_header.descent,
+        sxHeight=scale_horizontal_header.x_height,
+        sCapHeight=scale_horizontal_header.cap_height,
     )
 
     logger.debug("Setup 'Post'")
