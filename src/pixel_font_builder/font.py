@@ -6,23 +6,21 @@ import fontTools.ttLib
 
 from pixel_font_builder import opentype, bdf
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.info import Metrics, MetaInfos
+from pixel_font_builder.info import MetaInfos, Metrics
 
 
 class FontBuilder:
     def __init__(self):
-        self.metrics = Metrics()
         self.meta_infos = MetaInfos()
-
+        self.metrics = Metrics()
         self.character_mapping: dict[int, str] = {}
         self.glyphs: list[Glyph] = []
-
         self.opentype_configs = opentype.Configs()
         self.bdf_configs = bdf.Configs()
 
     def _check_ready_and_prepare_glyphs(self) -> tuple[list[str], dict[str, Glyph]]:
-        self.metrics.check_ready()
         self.meta_infos.check_ready()
+        self.metrics.check_ready()
 
         glyph_order = ['.notdef']
         name_to_glyph = {}
@@ -48,8 +46,8 @@ class FontBuilder:
         glyph_order, name_to_glyph = self._check_ready_and_prepare_glyphs()
         return opentype.create_builder(
             self.opentype_configs,
-            self.metrics,
             self.meta_infos,
+            self.metrics,
             self.character_mapping,
             glyph_order,
             name_to_glyph,
@@ -81,8 +79,8 @@ class FontBuilder:
         name_to_glyph = self._check_ready_and_prepare_glyphs()[1]
         return bdf.create_builder(
             self.bdf_configs,
-            self.metrics,
             self.meta_infos,
+            self.metrics,
             self.character_mapping,
             name_to_glyph,
         )

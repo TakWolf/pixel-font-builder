@@ -9,7 +9,7 @@ from fontTools.ttLib import TTCollection
 from fontTools.ttLib.tables._g_l_y_f import Glyph as TTFGlyph
 
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.info import Metrics, MetaInfos
+from pixel_font_builder.info import MetaInfos, Metrics
 
 logger = logging.getLogger('pixel_font_builder.opentype')
 
@@ -260,8 +260,8 @@ def _get_glyph_with_cache(glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGl
 
 def create_builder(
         configs: Configs,
-        metrics: Metrics,
         meta_infos: MetaInfos,
+        metrics: Metrics,
         character_mapping: dict[int, str],
         glyph_order: list[str],
         name_to_glyph: dict[str, Glyph],
