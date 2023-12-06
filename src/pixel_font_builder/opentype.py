@@ -307,12 +307,14 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     builder.setupHorizontalHeader(
         ascent=horizontal_header.ascent,
         descent=horizontal_header.descent,
+        lineGap=horizontal_header.line_gap,
     )
 
     logger.debug("Setup 'OS2'")
     builder.setupOS2(
         sTypoAscender=horizontal_header.ascent,
         sTypoDescender=horizontal_header.descent,
+        sTypoLineGap=horizontal_header.line_gap,
         usWinAscent=horizontal_header.ascent,
         usWinDescent=-horizontal_header.descent,
         sxHeight=horizontal_header.x_height,

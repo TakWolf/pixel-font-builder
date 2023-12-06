@@ -59,11 +59,13 @@ class HorizontalHeader:
             self,
             ascent: int = 0,
             descent: int = 0,
+            line_gap: int = 0,
             x_height: int = 0,
             cap_height: int = 0,
     ):
         self.ascent = ascent
         self.descent = descent
+        self.line_gap = line_gap
         self.x_height = x_height
         self.cap_height = cap_height
 
@@ -75,6 +77,7 @@ class HorizontalHeader:
         return HorizontalHeader(
             self.ascent * other,
             self.descent * other,
+            self.line_gap * other,
             self.x_height * other,
             self.cap_height * other,
         )
