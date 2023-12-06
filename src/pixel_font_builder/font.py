@@ -43,18 +43,7 @@ class FontBuilder:
         return glyph_order, name_to_glyph
 
     def to_xtf_builder(self, is_ttf: bool, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
-        glyph_order, name_to_glyph = self.prepare_glyphs()
-        return opentype.create_builder(
-            self.size,
-            self.opentype_configs,
-            self.meta_infos,
-            self.horizontal_header,
-            self.character_mapping,
-            glyph_order,
-            name_to_glyph,
-            is_ttf,
-            flavor,
-        )
+        return opentype.create_builder(self, is_ttf, flavor)
 
     def to_otf_builder(self, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
         return self.to_xtf_builder(False, flavor)
@@ -77,15 +66,7 @@ class FontBuilder:
         self.to_ttf_builder(flavor).save(file_path)
 
     def to_bdf_builder(self) -> bdffont.BdfFont:
-        name_to_glyph = self.prepare_glyphs()[1]
-        return bdf.create_builder(
-            self.size,
-            self.bdf_configs,
-            self.meta_infos,
-            self.horizontal_header,
-            self.character_mapping,
-            name_to_glyph,
-        )
+        return bdf.create_font(self)
 
     def save_bdf(
             self,

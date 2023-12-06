@@ -8,8 +8,9 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen as TTFGlyphPen
 from fontTools.ttLib import TTCollection
 from fontTools.ttLib.tables._g_l_y_f import Glyph as TTFGlyph
 
+import pixel_font_builder
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.info import MetaInfos, HorizontalHeader
+from pixel_font_builder.info import MetaInfos
 
 logger = logging.getLogger('pixel_font_builder.opentype')
 
@@ -258,19 +259,16 @@ def _get_glyph_with_cache(glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGl
     return xtf_glyph
 
 
-def create_builder(
-        font_size: int,
-        configs: Configs,
-        meta_infos: MetaInfos,
-        horizontal_header: HorizontalHeader,
-        character_mapping: dict[int, str],
-        glyph_order: list[str],
-        name_to_glyph: dict[str, Glyph],
-        is_ttf: bool,
-        flavor: Flavor = None,
-) -> FontBuilder:
+def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flavor: Flavor = None) -> FontBuilder:
+    configs = context.opentype_configs
+    units_per_em = context.size * configs.px_to_units
+    meta_infos = context.meta_infos
+    horizontal_header = context.horizontal_header * configs.px_to_units
+    character_mapping = context.character_mapping
+    glyph_order, name_to_glyph = context.prepare_glyphs()
+
     logger.debug("Create '%sBuilder': %s", 'TTF' if is_ttf else 'OTF', meta_infos.family_name)
-    builder = FontBuilder(font_size * configs.px_to_units, isTTF=is_ttf)
+    builder = FontBuilder(units_per_em, isTTF=is_ttf)
 
     logger.debug("Setup 'Name Strings'")
     name_strings = _create_name_strings(meta_infos)
@@ -305,22 +303,20 @@ def create_builder(
         horizontal_metrics[glyph_name] = advance_width, lsb
     builder.setupHorizontalMetrics(horizontal_metrics)
 
-    scale_horizontal_header = horizontal_header * configs.px_to_units
-
     logger.debug("Setup 'Horizontal Header'")
     builder.setupHorizontalHeader(
-        ascent=scale_horizontal_header.ascent,
-        descent=scale_horizontal_header.descent,
+        ascent=horizontal_header.ascent,
+        descent=horizontal_header.descent,
     )
 
     logger.debug("Setup 'OS2'")
     builder.setupOS2(
-        sTypoAscender=scale_horizontal_header.ascent,
-        sTypoDescender=scale_horizontal_header.descent,
-        usWinAscent=scale_horizontal_header.ascent,
-        usWinDescent=-scale_horizontal_header.descent,
-        sxHeight=scale_horizontal_header.x_height,
-        sCapHeight=scale_horizontal_header.cap_height,
+        sTypoAscender=horizontal_header.ascent,
+        sTypoDescender=horizontal_header.descent,
+        usWinAscent=horizontal_header.ascent,
+        usWinDescent=-horizontal_header.descent,
+        sxHeight=horizontal_header.x_height,
+        sCapHeight=horizontal_header.cap_height,
     )
 
     logger.debug("Setup 'Post'")

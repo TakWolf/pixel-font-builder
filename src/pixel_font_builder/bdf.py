@@ -3,8 +3,9 @@ import math
 
 from bdffont import BdfFont, BdfGlyph, xlfd
 
+import pixel_font_builder
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.info import SerifMode, WidthMode, MetaInfos, HorizontalHeader
+from pixel_font_builder.info import SerifMode, WidthMode
 
 logger = logging.getLogger('pixel_font_builder.bdf')
 
@@ -37,14 +38,14 @@ def _create_glyph(
     )
 
 
-def create_builder(
-        font_size: int,
-        configs: Configs,
-        meta_infos: MetaInfos,
-        horizontal_header: HorizontalHeader,
-        character_mapping: dict[int, str],
-        name_to_glyph: dict[str, Glyph],
-) -> BdfFont:
+def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
+    configs = context.bdf_configs
+    font_size = context.size
+    meta_infos = context.meta_infos
+    horizontal_header = context.horizontal_header
+    character_mapping = context.character_mapping
+    name_to_glyph = context.prepare_glyphs()[1]
+
     logger.debug("Create 'BdfFont': %s", meta_infos.family_name)
     font = BdfFont(
         point_size=font_size,
