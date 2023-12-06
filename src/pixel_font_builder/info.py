@@ -53,22 +53,14 @@ class MetaInfos:
         self.license_url = license_url
         self.sample_text = sample_text
 
-    def check_ready(self):
-        if self.version is None:
-            raise Exception("Missing Meta Infos: 'version'")
-        if self.family_name is None:
-            raise Exception("Missing Meta Infos: 'family_name'")
-        if self.style_name is None:
-            raise Exception("Missing Meta Infos: 'style_name'")
-
 
 class HorizontalHeader:
     def __init__(
             self,
-            ascent: int = None,
-            descent: int = None,
-            x_height: int = None,
-            cap_height: int = None,
+            ascent: int = 0,
+            descent: int = 0,
+            x_height: int = 0,
+            cap_height: int = 0,
     ):
         self.ascent = ascent
         self.descent = descent
@@ -81,14 +73,8 @@ class HorizontalHeader:
 
     def __mul__(self, other: int) -> 'HorizontalHeader':
         return HorizontalHeader(
-            self.ascent * other if self.ascent is not None else None,
-            self.descent * other if self.descent is not None else None,
-            self.x_height * other if self.x_height is not None else None,
-            self.cap_height * other if self.cap_height is not None else None,
+            self.ascent * other,
+            self.descent * other,
+            self.x_height * other,
+            self.cap_height * other,
         )
-
-    def check_ready(self):
-        if self.ascent is None:
-            raise Exception("Missing Horizontal Header: 'ascent'")
-        if self.descent is None:
-            raise Exception("Missing Horizontal Header: 'descent'")

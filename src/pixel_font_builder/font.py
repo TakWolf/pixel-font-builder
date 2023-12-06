@@ -19,12 +19,10 @@ class FontBuilder:
         self.opentype_configs = opentype.Configs()
         self.bdf_configs = bdf.Configs()
 
-    def _check_ready_and_prepare_glyphs(self) -> tuple[list[str], dict[str, Glyph]]:
-        self.meta_infos.check_ready()
-        self.horizontal_header.check_ready()
-
+    def prepare_glyphs(self) -> tuple[list[str], dict[str, Glyph]]:
         glyph_order = ['.notdef']
         name_to_glyph = {}
+
         for glyph in self.glyphs:
             if glyph.name in name_to_glyph:
                 raise Exception(f"Duplicate glyphs: '{glyph.name}'")
@@ -32,6 +30,7 @@ class FontBuilder:
             if glyph.name != '.notdef':
                 glyph_order.append(glyph.name)
             name_to_glyph[glyph.name] = glyph
+
         if '.notdef' not in name_to_glyph:
             raise Exception("Need to provide a glyph named '.notdef'")
 
@@ -44,7 +43,7 @@ class FontBuilder:
         return glyph_order, name_to_glyph
 
     def to_xtf_builder(self, is_ttf: bool, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
-        glyph_order, name_to_glyph = self._check_ready_and_prepare_glyphs()
+        glyph_order, name_to_glyph = self.prepare_glyphs()
         return opentype.create_builder(
             self.size,
             self.opentype_configs,
@@ -78,7 +77,7 @@ class FontBuilder:
         self.to_ttf_builder(flavor).save(file_path)
 
     def to_bdf_builder(self) -> bdffont.BdfFont:
-        name_to_glyph = self._check_ready_and_prepare_glyphs()[1]
+        name_to_glyph = self.prepare_glyphs()[1]
         return bdf.create_builder(
             self.size,
             self.bdf_configs,
