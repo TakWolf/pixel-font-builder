@@ -6,7 +6,7 @@ import fontTools.ttLib
 
 from pixel_font_builder import opentype, bdf
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.info import MetaInfos, HorizontalHeader
+from pixel_font_builder.info import MetaInfos, HorizontalHeader, VerticalHeader
 
 
 class FontBuilder:
@@ -14,6 +14,7 @@ class FontBuilder:
         self.size = size
         self.meta_infos = MetaInfos()
         self.horizontal_header = HorizontalHeader()
+        self.vertical_header = VerticalHeader()
         self.character_mapping: dict[int, str] = {}
         self.glyphs: list[Glyph] = []
         self.opentype_configs = opentype.Configs()

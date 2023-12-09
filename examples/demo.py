@@ -122,6 +122,9 @@ def _create_builder(
     builder.horizontal_header.x_height = 5
     builder.horizontal_header.cap_height = 7
 
+    builder.vertical_header.ascent = 11
+    builder.vertical_header.descent = -4
+
     builder.character_mapping.update(character_mapping)
 
     for glyph_name, glyph_file_path in glyph_file_infos:

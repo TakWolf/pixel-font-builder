@@ -264,6 +264,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     units_per_em = context.size * configs.px_to_units
     meta_infos = context.meta_infos
     horizontal_header = context.horizontal_header * configs.px_to_units
+    vertical_header = context.vertical_header * configs.px_to_units
     character_mapping = context.character_mapping
     glyph_order, name_to_glyph = context.prepare_glyphs()
 
@@ -308,6 +309,13 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
         ascent=horizontal_header.ascent,
         descent=horizontal_header.descent,
         lineGap=horizontal_header.line_gap,
+    )
+
+    logger.debug("Setup 'Vertical Header'")
+    builder.setupVerticalHeader(
+        ascent=vertical_header.ascent,
+        descent=vertical_header.descent,
+        lineGap=vertical_header.line_gap,
     )
 
     logger.debug("Setup 'OS2'")

@@ -81,3 +81,26 @@ class HorizontalHeader:
             self.x_height * other,
             self.cap_height * other,
         )
+
+
+class VerticalHeader:
+    def __init__(
+            self,
+            ascent: int = 0,
+            descent: int = 0,
+            line_gap: int = 0,
+    ):
+        self.ascent = ascent
+        self.descent = descent
+        self.line_gap = line_gap
+
+    @property
+    def line_height(self) -> int:
+        return self.ascent - self.descent
+
+    def __mul__(self, other: int) -> 'HorizontalHeader':
+        return HorizontalHeader(
+            self.ascent * other,
+            self.descent * other,
+            self.line_gap * other,
+        )
