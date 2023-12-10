@@ -46,7 +46,9 @@ def main():
     builder.glyphs.append(Glyph(
         name='.notdef',
         advance_width=8,
+        advance_height=12,
         horizontal_origin=(0, -2),
+        vertical_origin_y=0,
         data=[
             [1, 1, 1, 1, 1, 1, 1, 1],
             [1, 0, 0, 0, 0, 0, 0, 1],
@@ -65,7 +67,9 @@ def main():
     builder.glyphs.append(Glyph(
         name='CAP_LETTER_A',
         advance_width=8,
+        advance_height=12,
         horizontal_origin=(0, -2),
+        vertical_origin_y=0,
         data=[
             [0, 0, 0, 1, 1, 0, 0, 0],
             [0, 0, 1, 0, 0, 1, 0, 0],

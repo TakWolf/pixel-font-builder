@@ -293,16 +293,22 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     logger.debug("Setup 'Character Mapping'")
     builder.setupCharacterMap(character_mapping, allowFallback=configs.allow_fallback_cmap)
 
-    logger.debug("Setup 'Horizontal Metrics'")
+    logger.debug("Setup 'Horizontal Metrics' and 'Vertical Metrics'")
     horizontal_metrics = {}
+    vertical_metrics = {}
     for glyph_name in glyph_order:
-        advance_width = name_to_glyph[glyph_name].advance_width * configs.px_to_units
+        glyph = name_to_glyph[glyph_name]
+        advance_width = glyph.advance_width * configs.px_to_units
+        advance_height = glyph.advance_height * configs.px_to_units
         if is_ttf:
             lsb = xtf_glyphs[glyph_name].xMin
         else:
             lsb = xtf_glyphs[glyph_name].calcBounds(None)[0]
+        tsb = glyph.calculate_top_side_bearing() * configs.px_to_units
         horizontal_metrics[glyph_name] = advance_width, lsb
+        vertical_metrics[glyph_name] = advance_height, tsb
     builder.setupHorizontalMetrics(horizontal_metrics)
+    builder.setupVerticalMetrics(vertical_metrics)
 
     logger.debug("Setup 'Horizontal Header'")
     builder.setupHorizontalHeader(

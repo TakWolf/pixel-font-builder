@@ -136,7 +136,9 @@ def _create_builder(
             glyph = Glyph(
                 name=glyph_name,
                 advance_width=glyph_width,
+                advance_height=glyph_height,
                 horizontal_origin=(0, horizontal_origin_y),
+                vertical_origin_y=0,
                 data=glyph_data,
             )
             glyph_cacher[glyph_file_path] = glyph
