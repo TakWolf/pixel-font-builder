@@ -33,7 +33,7 @@ def _create_glyph(
         scalable_width=(scalable_width_x, 0),
         device_width=(glyph.advance_width, 0),
         bounding_box_size=glyph.size,
-        bounding_box_offset=glyph.offset,
+        bounding_box_offset=glyph.horizontal_origin,
         bitmap=glyph.data,
     )
 

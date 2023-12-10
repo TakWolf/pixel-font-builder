@@ -4,23 +4,23 @@ class Glyph:
             self,
             name: str,
             advance_width: int = 0,
-            offset: tuple[int, int] = (0, 0),
+            horizontal_origin: tuple[int, int] = (0, 0),
             data: list[list[int]] = None,
     ):
         self.name = name
         self.advance_width = advance_width
-        self.offset_x, self.offset_y = offset
+        self.horizontal_origin_x, self.horizontal_origin_y = horizontal_origin
         if data is None:
             data = []
         self.data = data
 
     @property
-    def offset(self) -> tuple[int, int]:
-        return self.offset_x, self.offset_y
+    def horizontal_origin(self) -> tuple[int, int]:
+        return self.horizontal_origin_x, self.horizontal_origin_y
 
-    @offset.setter
-    def offset(self, value: tuple[int, int]):
-        self.offset_x, self.offset_y = value
+    @horizontal_origin.setter
+    def horizontal_origin(self, value: tuple[int, int]):
+        self.horizontal_origin_x, self.horizontal_origin_y = value
 
     @property
     def width(self) -> int:

@@ -211,8 +211,8 @@ def _create_glyph(glyph: Glyph, outlines: list[list[tuple[int, int]]], px_to_uni
 
                 # 转换左上角原点坐标系为左下角原点坐标系
                 x, y = point
-                x += glyph.offset_x * px_to_units
-                y = (glyph.height + glyph.offset_y) * px_to_units - y
+                x += glyph.horizontal_origin_x * px_to_units
+                y = (glyph.height + glyph.horizontal_origin_y) * px_to_units - y
                 point = x, y
 
                 if point_index == 0:
@@ -233,7 +233,7 @@ def _create_glyph(glyph: Glyph, outlines: list[list[tuple[int, int]]], px_to_uni
 
 
 def _get_glyph_with_cache(glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGlyph | TTFGlyph:
-    cache_tag = f'{glyph.advance_width}#{glyph.offset}#{glyph.data}'.replace(' ', '')
+    cache_tag = f'{glyph.advance_width}#{glyph.horizontal_origin}#{glyph.data}'.replace(' ', '')
     if getattr(glyph, _CACHE_NAME_TAG, None) != cache_tag:
         setattr(glyph, _CACHE_NAME_OUTLINES, None)
         setattr(glyph, _CACHE_NAME_OTF_GLYPH, None)
