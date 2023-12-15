@@ -133,12 +133,13 @@ def _create_builder(
         else:
             glyph_data, glyph_width, glyph_height = _load_glyph_data_from_png(glyph_file_path)
             horizontal_origin_y = math.floor((builder.horizontal_header.ascent + builder.horizontal_header.descent - glyph_height) / 2)
+            vertical_origin_y = (glyph_height - builder.size) // 2
             glyph = Glyph(
                 name=glyph_name,
                 advance_width=glyph_width,
-                advance_height=glyph_height,
+                advance_height=builder.size,
                 horizontal_origin=(0, horizontal_origin_y),
-                vertical_origin_y=0,
+                vertical_origin_y=vertical_origin_y,
                 data=glyph_data,
             )
             glyph_cacher[glyph_file_path] = glyph
