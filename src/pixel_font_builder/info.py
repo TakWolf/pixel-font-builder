@@ -54,53 +54,40 @@ class MetaInfos:
         self.sample_text = sample_text
 
 
-class HorizontalHeader:
+class LayoutHeader:
     def __init__(
             self,
             ascent: int = 0,
             descent: int = 0,
             line_gap: int = 0,
-            x_height: int = 0,
-            cap_height: int = 0,
     ):
         self.ascent = ascent
         self.descent = descent
         self.line_gap = line_gap
-        self.x_height = x_height
-        self.cap_height = cap_height
 
     @property
     def line_height(self) -> int:
         return self.ascent - self.descent
 
-    def __mul__(self, other: int) -> 'HorizontalHeader':
-        return HorizontalHeader(
+    def __mul__(self, other: int) -> 'LayoutHeader':
+        return LayoutHeader(
             self.ascent * other,
             self.descent * other,
             self.line_gap * other,
-            self.x_height * other,
-            self.cap_height * other,
         )
 
 
-class VerticalHeader:
+class Properties:
     def __init__(
             self,
-            ascent: int = 0,
-            descent: int = 0,
-            line_gap: int = 0,
+            x_height: int = 0,
+            cap_height: int = 0,
     ):
-        self.ascent = ascent
-        self.descent = descent
-        self.line_gap = line_gap
+        self.x_height = x_height
+        self.cap_height = cap_height
 
-    @property
-    def line_height(self) -> int:
-        return self.ascent - self.descent
-
-    def __mul__(self, other: int) -> 'HorizontalHeader':
-        return HorizontalHeader(
-            self.ascent * other,
-            self.descent * other,
-            self.line_gap * other,
+    def __mul__(self, other: int) -> 'Properties':
+        return Properties(
+            self.x_height * other,
+            self.cap_height * other,
         )

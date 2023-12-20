@@ -49,11 +49,12 @@ def main():
 
     builder.horizontal_header.ascent = 10
     builder.horizontal_header.descent = -2
-    builder.horizontal_header.x_height = 5
-    builder.horizontal_header.cap_height = 7
 
     builder.vertical_header.ascent = 10
     builder.vertical_header.descent = -2
+
+    builder.properties.x_height = 5
+    builder.properties.cap_height = 7
 
     builder.character_mapping.update({
         ord('A'): 'CAP_LETTER_A',

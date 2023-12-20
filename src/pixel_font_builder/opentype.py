@@ -265,6 +265,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     meta_infos = context.meta_infos
     horizontal_header = context.horizontal_header * configs.px_to_units
     vertical_header = context.vertical_header * configs.px_to_units
+    properties = context.properties * configs.px_to_units
     character_mapping = context.character_mapping
     glyph_order, name_to_glyph = context.prepare_glyphs()
 
@@ -331,8 +332,8 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
         sTypoLineGap=horizontal_header.line_gap,
         usWinAscent=horizontal_header.ascent,
         usWinDescent=-horizontal_header.descent,
-        sxHeight=horizontal_header.x_height,
-        sCapHeight=horizontal_header.cap_height,
+        sxHeight=properties.x_height,
+        sCapHeight=properties.cap_height,
     )
 
     logger.debug("Setup 'Post'")

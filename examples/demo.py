@@ -119,11 +119,12 @@ def _create_builder(
 
     builder.horizontal_header.ascent = 11
     builder.horizontal_header.descent = -4
-    builder.horizontal_header.x_height = 5
-    builder.horizontal_header.cap_height = 7
 
     builder.vertical_header.ascent = 11
     builder.vertical_header.descent = -4
+
+    builder.properties.x_height = 5
+    builder.properties.cap_height = 7
 
     builder.character_mapping.update(character_mapping)
 

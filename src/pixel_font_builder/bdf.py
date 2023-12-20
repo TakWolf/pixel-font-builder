@@ -43,6 +43,7 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     font_size = context.size
     meta_infos = context.meta_infos
     horizontal_header = context.horizontal_header
+    properties = context.properties
     character_mapping = context.character_mapping
     name_to_glyph = context.prepare_glyphs()[1]
 
@@ -89,8 +90,8 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     font.properties.default_char = -1
     font.properties.font_ascent = horizontal_header.ascent
     font.properties.font_descent = horizontal_header.descent
-    font.properties.x_height = horizontal_header.x_height
-    font.properties.cap_height = horizontal_header.cap_height
+    font.properties.x_height = properties.x_height
+    font.properties.cap_height = properties.cap_height
 
     font.properties.font_version = meta_infos.version
     font.properties.copyright = meta_infos.copyright_info
