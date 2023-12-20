@@ -17,6 +17,7 @@ class SerifMode(StrEnum):
 
 class WidthMode(StrEnum):
     MONOSPACED = 'Monospaced'
+    DUOSPACED = 'Duospaced'
     PROPORTIONAL = 'Proportional'
 
 

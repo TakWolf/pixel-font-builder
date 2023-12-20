@@ -79,6 +79,8 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     font.properties.resolution_y = configs.resolution_y
     if meta_infos.width_mode == WidthMode.MONOSPACED:
         font.properties.spacing = xlfd.Spacing.MONOSPACED
+    elif meta_infos.width_mode == WidthMode.DUOSPACED:
+        font.properties.spacing = 'D'
     elif meta_infos.width_mode == WidthMode.PROPORTIONAL:
         font.properties.spacing = xlfd.Spacing.PROPORTIONAL
     else:
