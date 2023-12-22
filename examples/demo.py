@@ -43,40 +43,40 @@ def _save_glyph_data_to_png(data: list[list[int]], file_path: str):
 
 
 def _format_glyph_files(root_dir: str):
-    for glyph_file_dir, _, glyph_file_names in os.walk(root_dir):
-        for glyph_file_name in glyph_file_names:
-            if not glyph_file_name.endswith('.png'):
+    for file_dir, _, file_names in os.walk(root_dir):
+        for file_name in file_names:
+            if not file_name.endswith('.png'):
                 continue
-            glyph_file_path = os.path.join(glyph_file_dir, glyph_file_name)
-            glyph_data = _load_glyph_data_from_png(glyph_file_path)[0]
-            _save_glyph_data_to_png(glyph_data, glyph_file_path)
+            file_path = os.path.join(file_dir, file_name)
+            glyph_data = _load_glyph_data_from_png(file_path)[0]
+            _save_glyph_data_to_png(glyph_data, file_path)
 
 
 def _collect_glyph_files(root_dir: str) -> tuple[dict[int, str], list[tuple[str, str]]]:
     registry = {}
-    for glyph_file_dir, _, glyph_file_names in os.walk(root_dir):
-        for glyph_file_name in glyph_file_names:
-            if not glyph_file_name.endswith('.png'):
+    for file_dir, _, file_names in os.walk(root_dir):
+        for file_name in file_names:
+            if not file_name.endswith('.png'):
                 continue
-            glyph_file_path = os.path.join(glyph_file_dir, glyph_file_name)
-            if glyph_file_name == 'notdef.png':
+            file_path = os.path.join(file_dir, file_name)
+            if file_name == 'notdef.png':
                 code_point = -1
             else:
-                code_point = int(glyph_file_name.removesuffix('.png'), 16)
-            registry[code_point] = glyph_file_path
+                code_point = int(file_name.removesuffix('.png'), 16)
+            registry[code_point] = file_path
 
     sequence = list(registry.keys())
     sequence.sort()
 
     character_mapping = {}
-    glyph_file_infos = []
+    file_infos = []
     for code_point in sequence:
         if code_point == -1:
             glyph_name = '.notdef'
         else:
             glyph_name = f'uni{code_point:04X}'
             character_mapping[code_point] = glyph_name
-        glyph_file_infos.append((glyph_name, registry[code_point]))
+        file_infos.append((glyph_name, registry[code_point]))
 
     for code_point in range(ord('A'), ord('Z') + 1):
         fallback_code_point = code_point + ord('Ａ') - ord('A')
@@ -88,13 +88,13 @@ def _collect_glyph_files(root_dir: str) -> tuple[dict[int, str], list[tuple[str,
         fallback_code_point = code_point + ord('０') - ord('0')
         character_mapping[fallback_code_point] = character_mapping[code_point]
 
-    return character_mapping, glyph_file_infos
+    return character_mapping, file_infos
 
 
 def _create_builder(
         glyph_cacher: dict[str, Glyph],
         character_mapping: dict[int, str],
-        glyph_file_infos: list[tuple[str, str]],
+        file_infos: list[tuple[str, str]],
         name_num: int = None,
 ) -> FontBuilder:
     builder = FontBuilder(11)
@@ -128,11 +128,11 @@ def _create_builder(
 
     builder.character_mapping.update(character_mapping)
 
-    for glyph_name, glyph_file_path in glyph_file_infos:
-        if glyph_file_path in glyph_cacher:
-            glyph = glyph_cacher[glyph_file_path]
+    for glyph_name, file_path in file_infos:
+        if file_path in glyph_cacher:
+            glyph = glyph_cacher[file_path]
         else:
-            glyph_data, glyph_width, glyph_height = _load_glyph_data_from_png(glyph_file_path)
+            glyph_data, glyph_width, glyph_height = _load_glyph_data_from_png(file_path)
             horizontal_origin_y = math.floor((builder.horizontal_header.ascent + builder.horizontal_header.descent - glyph_height) / 2)
             vertical_origin_y = (glyph_height - builder.size) // 2
             glyph = Glyph(
@@ -143,7 +143,7 @@ def _create_builder(
                 vertical_origin_y=vertical_origin_y,
                 data=glyph_data,
             )
-            glyph_cacher[glyph_file_path] = glyph
+            glyph_cacher[file_path] = glyph
         builder.glyphs.append(glyph)
 
     return builder
@@ -156,10 +156,10 @@ def main():
     os.makedirs(outputs_dir)
 
     _format_glyph_files(glyphs_dir)
-    character_mapping, glyph_file_infos = _collect_glyph_files(glyphs_dir)
+    character_mapping, file_infos = _collect_glyph_files(glyphs_dir)
     glyph_cacher = {}
 
-    builder = _create_builder(glyph_cacher, character_mapping, glyph_file_infos)
+    builder = _create_builder(glyph_cacher, character_mapping, file_infos)
     builder.save_otf(os.path.join(outputs_dir, 'demo.otf'))
     builder.save_otf(os.path.join(outputs_dir, 'demo.woff2'), flavor=opentype.Flavor.WOFF2)
     builder.save_ttf(os.path.join(outputs_dir, 'demo.ttf'))
@@ -167,7 +167,7 @@ def main():
 
     collection_builder = FontCollectionBuilder()
     for index in range(100):
-        builder = _create_builder(glyph_cacher, character_mapping, glyph_file_infos, index)
+        builder = _create_builder(glyph_cacher, character_mapping, file_infos, index)
         collection_builder.font_builders.append(builder)
     collection_builder.save_otc(os.path.join(outputs_dir, 'demo.otc'))
     collection_builder.save_ttc(os.path.join(outputs_dir, 'demo.ttc'))
