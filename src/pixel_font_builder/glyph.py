@@ -38,7 +38,7 @@ class Glyph:
         return len(self.data)
 
     @property
-    def size(self) -> tuple[int, int]:
+    def dimensions(self) -> tuple[int, int]:
         return self.width, self.height
 
     def calculate_top_side_bearing(self) -> int:
