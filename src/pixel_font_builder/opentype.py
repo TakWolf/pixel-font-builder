@@ -25,11 +25,9 @@ class Configs:
             self,
             px_to_units: int = 100,
             cff_family_name: str = None,
-            allow_fallback_cmap: bool = False,
     ):
         self.px_to_units = px_to_units
         self.cff_family_name = cff_family_name
-        self.allow_fallback_cmap = allow_fallback_cmap
 
 
 class Flavor(StrEnum):
@@ -292,7 +290,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
         builder.setupCFF(cff_ps_name, cff_font_infos, xtf_glyphs, {})
 
     logger.debug("Setup 'Character Mapping'")
-    builder.setupCharacterMap(character_mapping, allowFallback=configs.allow_fallback_cmap)
+    builder.setupCharacterMap(character_mapping)
 
     logger.debug("Setup 'Horizontal Metrics' and 'Vertical Metrics'")
     horizontal_metrics = {}
