@@ -42,49 +42,52 @@ def _save_glyph_data_to_png(data: list[list[int]], file_path: str):
     png.from_array(bitmap, 'RGBA').save(file_path)
 
 
-class GlyphFileInfo:
+class GlyphFile:
     @staticmethod
-    def load(file_dir: str, file_name: str) -> 'GlyphFileInfo':
-        file_path = os.path.join(file_dir, file_name)
-        if file_name == 'notdef.png':
+    def load(file_path: str) -> 'GlyphFile':
+        hex_name = os.path.basename(file_path).removesuffix('.png')
+        if hex_name == 'notdef':
             code_point = -1
         else:
-            code_point = int(file_name.removesuffix('.png'), 16)
-        return GlyphFileInfo(file_path, code_point)
+            code_point = int(hex_name, 16)
+        return GlyphFile(file_path, code_point)
 
     def __init__(self, file_path: str, code_point: int):
         self.file_path = file_path
         self.code_point = code_point
         self.glyph_data, self.glyph_width, self.glyph_height = _load_glyph_data_from_png(file_path)
 
-    @property
-    def glyph_name(self) -> str:
-        if self.code_point == -1:
-            glyph_name = '.notdef'
-        else:
-            glyph_name = f'uni{self.code_point:04X}'
-        return glyph_name
+    def save(self):
+        _save_glyph_data_to_png(self.glyph_data, self.file_path)
 
 
-def _collect_glyph_files(root_dir: str) -> tuple[dict[int, str], list[GlyphFileInfo]]:
+def get_glyph_name(code_point: int) -> str:
+    if code_point == -1:
+        glyph_name = '.notdef'
+    else:
+        glyph_name = f'uni{code_point:04X}'
+    return glyph_name
+
+
+def _collect_glyph_files(root_dir: str) -> tuple[dict[int, str], list[GlyphFile]]:
     registry = {}
     for file_dir, _, file_names in os.walk(root_dir):
         for file_name in file_names:
             if not file_name.endswith('.png'):
                 continue
-            file_info = GlyphFileInfo.load(file_dir, file_name)
-            registry[file_info.code_point] = file_info
+            file_path = os.path.join(file_dir, file_name)
+            glyph_file = GlyphFile.load(file_path)
+            registry[glyph_file.code_point] = glyph_file
 
     sequence = list(registry.keys())
     sequence.sort()
 
     character_mapping = {}
-    file_infos = []
+    glyph_files = []
     for code_point in sequence:
-        file_info = registry[code_point]
         if code_point != -1:
-            character_mapping[code_point] = file_info.glyph_name
-        file_infos.append(file_info)
+            character_mapping[code_point] = get_glyph_name(code_point)
+        glyph_files.append(registry[code_point])
 
     for code_point in range(ord('A'), ord('Z') + 1):
         fallback_code_point = code_point + ord('Ａ') - ord('A')
@@ -96,13 +99,13 @@ def _collect_glyph_files(root_dir: str) -> tuple[dict[int, str], list[GlyphFileI
         fallback_code_point = code_point + ord('０') - ord('0')
         character_mapping[fallback_code_point] = character_mapping[code_point]
 
-    return character_mapping, file_infos
+    return character_mapping, glyph_files
 
 
 def _create_builder(
         glyph_cacher: dict[str, Glyph],
         character_mapping: dict[int, str],
-        file_infos: list[GlyphFileInfo],
+        glyph_files: list[GlyphFile],
         name_num: int = None,
 ) -> FontBuilder:
     builder = FontBuilder(11)
@@ -136,21 +139,21 @@ def _create_builder(
 
     builder.character_mapping.update(character_mapping)
 
-    for file_info in file_infos:
-        if file_info.glyph_name in glyph_cacher:
-            glyph = glyph_cacher[file_info.glyph_name]
+    for glyph_file in glyph_files:
+        if glyph_file.file_path in glyph_cacher:
+            glyph = glyph_cacher[glyph_file.file_path]
         else:
-            horizontal_origin_y = math.floor((builder.horizontal_header.ascent + builder.horizontal_header.descent - file_info.glyph_height) / 2)
-            vertical_origin_y = (file_info.glyph_height - builder.size) // 2
+            horizontal_origin_y = math.floor((builder.horizontal_header.ascent + builder.horizontal_header.descent - glyph_file.glyph_height) / 2)
+            vertical_origin_y = (glyph_file.glyph_height - builder.size) // 2
             glyph = Glyph(
-                name=file_info.glyph_name,
-                advance_width=file_info.glyph_width,
+                name=get_glyph_name(glyph_file.code_point),
+                advance_width=glyph_file.glyph_width,
                 advance_height=builder.size,
                 horizontal_origin=(0, horizontal_origin_y),
                 vertical_origin_y=vertical_origin_y,
-                data=file_info.glyph_data,
+                data=glyph_file.glyph_data,
             )
-            glyph_cacher[file_info.glyph_name] = glyph
+            glyph_cacher[glyph_file.file_path] = glyph
         builder.glyphs.append(glyph)
 
     return builder
@@ -162,12 +165,12 @@ def main():
         shutil.rmtree(outputs_dir)
     os.makedirs(outputs_dir)
 
-    character_mapping, file_infos = _collect_glyph_files(glyphs_dir)
-    for file_info in file_infos:
-        _save_glyph_data_to_png(file_info.glyph_data, file_info.file_path)
+    character_mapping, glyph_files = _collect_glyph_files(glyphs_dir)
+    for glyph_file in glyph_files:
+        glyph_file.save()
     glyph_cacher = {}
 
-    builder = _create_builder(glyph_cacher, character_mapping, file_infos)
+    builder = _create_builder(glyph_cacher, character_mapping, glyph_files)
     builder.save_otf(os.path.join(outputs_dir, 'demo.otf'))
     builder.save_otf(os.path.join(outputs_dir, 'demo.woff2'), flavor=opentype.Flavor.WOFF2)
     builder.save_ttf(os.path.join(outputs_dir, 'demo.ttf'))
@@ -175,7 +178,7 @@ def main():
 
     collection_builder = FontCollectionBuilder()
     for index in range(100):
-        builder = _create_builder(glyph_cacher, character_mapping, file_infos, index)
+        builder = _create_builder(glyph_cacher, character_mapping, glyph_files, index)
         collection_builder.font_builders.append(builder)
     collection_builder.save_otc(os.path.join(outputs_dir, 'demo.otc'))
     collection_builder.save_ttc(os.path.join(outputs_dir, 'demo.ttc'))
