@@ -4,22 +4,22 @@ import bdffont
 import fontTools.fontBuilder
 import fontTools.ttLib
 
-from pixel_font_builder import opentype, bdf
+from pixel_font_builder import os2, opentype, bdf
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.info import MetaInfos, LayoutHeader, Properties
+from pixel_font_builder.info import MetaInfo, LayoutHeader
 
 
 class FontBuilder:
     def __init__(self, size: int):
         self.size = size
-        self.meta_infos = MetaInfos()
+        self.meta_info = MetaInfo()
         self.horizontal_header = LayoutHeader()
         self.vertical_header = LayoutHeader()
-        self.properties = Properties()
+        self.os2_config = os2.Config()
         self.character_mapping: dict[int, str] = {}
         self.glyphs: list[Glyph] = []
-        self.opentype_configs = opentype.Configs()
-        self.bdf_configs = bdf.Configs()
+        self.opentype_config = opentype.Config()
+        self.bdf_config = bdf.Config()
 
     def prepare_glyphs(self) -> tuple[list[str], dict[str, Glyph]]:
         glyph_order = ['.notdef']

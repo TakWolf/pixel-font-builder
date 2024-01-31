@@ -10,7 +10,7 @@ from fontTools.ttLib.tables._g_l_y_f import Glyph as TTFGlyph
 
 import pixel_font_builder
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.info import MetaInfos
+from pixel_font_builder.info import MetaInfo
 
 logger = logging.getLogger('pixel_font_builder.opentype')
 
@@ -20,7 +20,7 @@ _CACHE_NAME_OTF_GLYPH = '_opentype_cache_otf_glyph'
 _CACHE_NAME_TTF_GLYPH = '_opentype_cache_ttf_glyph'
 
 
-class Configs:
+class Config:
     def __init__(
             self,
             px_to_units: int = 100,
@@ -35,7 +35,7 @@ class Flavor(StrEnum):
     WOFF2 = 'woff2'
 
 
-def _create_name_strings(meta_infos: MetaInfos) -> dict[str, str]:
+def _create_name_strings(meta_info: MetaInfo) -> dict[str, str]:
     """
     https://learn.microsoft.com/en-us/typography/opentype/spec/name#name-ids
     copyright (nameID 0)
@@ -64,49 +64,49 @@ def _create_name_strings(meta_infos: MetaInfos) -> dict[str, str]:
     darkBackgroundPalette (nameID 24)
     variationsPostScriptNamePrefix (nameID 25)
     """
-    unique_name = meta_infos.family_name.replace(' ', '-')
+    unique_name = meta_info.family_name.replace(' ', '-')
     name_strings = {
-        'familyName': meta_infos.family_name,
-        'styleName': meta_infos.style_name,
-        'uniqueFontIdentifier': f'{unique_name}-{meta_infos.style_name};{meta_infos.version}',
-        'fullName': f'{meta_infos.family_name} {meta_infos.style_name}',
-        'version': meta_infos.version,
-        'psName': f'{unique_name}-{meta_infos.style_name}',
+        'familyName': meta_info.family_name,
+        'styleName': meta_info.style_name,
+        'uniqueFontIdentifier': f'{unique_name}-{meta_info.style_name};{meta_info.version}',
+        'fullName': f'{meta_info.family_name} {meta_info.style_name}',
+        'version': meta_info.version,
+        'psName': f'{unique_name}-{meta_info.style_name}',
     }
-    if meta_infos.copyright_info is not None:
-        name_strings['copyright'] = meta_infos.copyright_info
-    if meta_infos.manufacturer is not None:
-        name_strings['manufacturer'] = meta_infos.manufacturer
-    if meta_infos.designer is not None:
-        name_strings['designer'] = meta_infos.designer
-    if meta_infos.description is not None:
-        name_strings['description'] = meta_infos.description
-    if meta_infos.vendor_url is not None:
-        name_strings['vendorURL'] = meta_infos.vendor_url
-    if meta_infos.designer_url is not None:
-        name_strings['designerURL'] = meta_infos.designer_url
-    if meta_infos.license_info is not None:
-        name_strings['licenseDescription'] = meta_infos.license_info
-    if meta_infos.license_url is not None:
-        name_strings['licenseInfoURL'] = meta_infos.license_url
-    if meta_infos.sample_text is not None:
-        name_strings['sampleText'] = meta_infos.sample_text
+    if meta_info.copyright_info is not None:
+        name_strings['copyright'] = meta_info.copyright_info
+    if meta_info.manufacturer is not None:
+        name_strings['manufacturer'] = meta_info.manufacturer
+    if meta_info.designer is not None:
+        name_strings['designer'] = meta_info.designer
+    if meta_info.description is not None:
+        name_strings['description'] = meta_info.description
+    if meta_info.vendor_url is not None:
+        name_strings['vendorURL'] = meta_info.vendor_url
+    if meta_info.designer_url is not None:
+        name_strings['designerURL'] = meta_info.designer_url
+    if meta_info.license_info is not None:
+        name_strings['licenseDescription'] = meta_info.license_info
+    if meta_info.license_url is not None:
+        name_strings['licenseInfoURL'] = meta_info.license_url
+    if meta_info.sample_text is not None:
+        name_strings['sampleText'] = meta_info.sample_text
     return name_strings
 
 
-def _create_cff_strings(configs: Configs, meta_infos: MetaInfos) -> tuple[str, dict[str, str]]:
-    if configs.cff_family_name is not None:
-        cff_family_name = configs.cff_family_name
+def _create_cff_strings(config: Config, meta_info: MetaInfo) -> tuple[str, dict[str, str]]:
+    if config.cff_family_name is not None:
+        cff_family_name = config.cff_family_name
     else:
-        cff_family_name = meta_infos.family_name
-    cff_ps_name = f'{cff_family_name.replace(" ", "-")}-{meta_infos.style_name}'
+        cff_family_name = meta_info.family_name
+    cff_ps_name = f'{cff_family_name.replace(" ", "-")}-{meta_info.style_name}'
     cff_strings = {
         'FamilyName': cff_family_name,
-        'FullName': f'{cff_family_name} {meta_infos.style_name}',
-        'Weight': meta_infos.style_name,
+        'FullName': f'{cff_family_name} {meta_info.style_name}',
+        'Weight': meta_info.style_name,
     }
-    if meta_infos.copyright_info is not None:
-        cff_strings['Notice'] = meta_infos.copyright_info
+    if meta_info.copyright_info is not None:
+        cff_strings['Notice'] = meta_info.copyright_info
     return cff_ps_name, cff_strings
 
 
@@ -258,20 +258,20 @@ def _get_glyph_with_cache(glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGl
 
 
 def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flavor: Flavor = None) -> FontBuilder:
-    configs = context.opentype_configs
-    units_per_em = context.size * configs.px_to_units
-    meta_infos = context.meta_infos
-    horizontal_header = context.horizontal_header * configs.px_to_units
-    vertical_header = context.vertical_header * configs.px_to_units
-    properties = context.properties * configs.px_to_units
+    config = context.opentype_config
+    units_per_em = context.size * config.px_to_units
+    meta_info = context.meta_info
+    horizontal_header = context.horizontal_header * config.px_to_units
+    vertical_header = context.vertical_header * config.px_to_units
+    os2_config = context.os2_config * config.px_to_units
     character_mapping = context.character_mapping
     glyph_order, name_to_glyph = context.prepare_glyphs()
 
-    logger.debug("Create '%sBuilder': %s", 'TTF' if is_ttf else 'OTF', meta_infos.family_name)
+    logger.debug("Create '%sBuilder': %s", 'TTF' if is_ttf else 'OTF', meta_info.family_name)
     builder = FontBuilder(units_per_em, isTTF=is_ttf)
 
     logger.debug("Setup 'Name Strings'")
-    name_strings = _create_name_strings(meta_infos)
+    name_strings = _create_name_strings(meta_info)
     builder.setupNameTable(name_strings)
 
     logger.debug("Setup 'Glyph Order'")
@@ -280,13 +280,13 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     logger.debug("Create 'Glyphs'")
     xtf_glyphs = {}
     for glyph_name, glyph in name_to_glyph.items():
-        xtf_glyphs[glyph_name] = _get_glyph_with_cache(glyph, configs.px_to_units, is_ttf)
+        xtf_glyphs[glyph_name] = _get_glyph_with_cache(glyph, config.px_to_units, is_ttf)
     if is_ttf:
         logger.debug("Setup 'Glyf'")
         builder.setupGlyf(xtf_glyphs)
     else:
         logger.debug("Setup 'CFF'")
-        cff_ps_name, cff_strings = _create_cff_strings(configs, meta_infos)
+        cff_ps_name, cff_strings = _create_cff_strings(config, meta_info)
         builder.setupCFF(cff_ps_name, cff_strings, xtf_glyphs, {})
 
     logger.debug("Setup 'Character Mapping'")
@@ -297,13 +297,13 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     vertical_metrics = {}
     for glyph_name in glyph_order:
         glyph = name_to_glyph[glyph_name]
-        advance_width = glyph.advance_width * configs.px_to_units
-        advance_height = glyph.advance_height * configs.px_to_units
+        advance_width = glyph.advance_width * config.px_to_units
+        advance_height = glyph.advance_height * config.px_to_units
         if is_ttf:
             lsb = xtf_glyphs[glyph_name].xMin
         else:
             lsb = xtf_glyphs[glyph_name].calcBounds(None)[0]
-        tsb = glyph.calculate_top_side_bearing() * configs.px_to_units
+        tsb = glyph.calculate_top_side_bearing() * config.px_to_units
         horizontal_metrics[glyph_name] = advance_width, lsb
         vertical_metrics[glyph_name] = advance_height, tsb
     builder.setupHorizontalMetrics(horizontal_metrics)
@@ -330,8 +330,8 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
         sTypoLineGap=horizontal_header.line_gap,
         usWinAscent=horizontal_header.ascent,
         usWinDescent=-horizontal_header.descent,
-        sxHeight=properties.x_height,
-        sCapHeight=properties.cap_height,
+        sxHeight=os2_config.x_height,
+        sCapHeight=os2_config.cap_height,
     )
 
     logger.debug("Setup 'Post'")

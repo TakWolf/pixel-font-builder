@@ -21,7 +21,7 @@ class WidthMode(StrEnum):
     PROPORTIONAL = 'Proportional'
 
 
-class MetaInfos:
+class MetaInfo:
     def __init__(
             self,
             version: str = '0.0.0',
@@ -75,20 +75,4 @@ class LayoutHeader:
             self.ascent * other,
             self.descent * other,
             self.line_gap * other,
-        )
-
-
-class Properties:
-    def __init__(
-            self,
-            x_height: int = 0,
-            cap_height: int = 0,
-    ):
-        self.x_height = x_height
-        self.cap_height = cap_height
-
-    def __mul__(self, other: int) -> 'Properties':
-        return Properties(
-            self.x_height * other,
-            self.cap_height * other,
         )
