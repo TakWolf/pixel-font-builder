@@ -125,7 +125,7 @@ def _create_builder(
     builder.meta_info.license_info = "This Font Software is licensed under the SIL Open Font License, Version 1.1."
     builder.meta_info.vendor_url = "https://github.com/TakWolf/pixel-font-builder"
     builder.meta_info.designer_url = "https://takwolf.com"
-    builder.meta_info.license_url = "https://scripts.sil.org/OFL"
+    builder.meta_info.license_url = "https://openfontlicense.org"
     builder.meta_info.sample_text = "Hello World!"
 
     builder.horizontal_header.ascent = 11
