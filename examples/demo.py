@@ -1,4 +1,3 @@
-import logging
 import math
 import os
 import shutil
@@ -7,8 +6,6 @@ import png
 
 from examples import glyphs_dir, build_dir
 from pixel_font_builder import FontBuilder, FontCollectionBuilder, StyleName, SerifMode, WidthMode, Glyph, opentype
-
-logging.basicConfig(level=logging.DEBUG)
 
 
 def _load_glyph_data_from_png(file_path: str) -> tuple[list[list[int]], int, int]:

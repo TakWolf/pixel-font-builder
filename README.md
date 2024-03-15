@@ -14,14 +14,11 @@ pip install pixel-font-builder
 ## Usage
 
 ```python
-import logging
 import os
 import shutil
 
 from examples import build_dir
 from pixel_font_builder import FontBuilder, StyleName, SerifMode, WidthMode, Glyph, opentype
-
-logging.basicConfig(level=logging.DEBUG)
 
 
 def main():
