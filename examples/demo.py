@@ -100,7 +100,7 @@ def _collect_glyph_files(root_dir: str) -> tuple[dict[int, str], list[GlyphFile]
 
 
 def _create_builder(
-        glyph_cacher: dict[str, Glyph],
+        glyph_pool: dict[str, Glyph],
         character_mapping: dict[int, str],
         glyph_files: list[GlyphFile],
         name_num: int = None,
@@ -137,8 +137,8 @@ def _create_builder(
     builder.character_mapping.update(character_mapping)
 
     for glyph_file in glyph_files:
-        if glyph_file.file_path in glyph_cacher:
-            glyph = glyph_cacher[glyph_file.file_path]
+        if glyph_file.file_path in glyph_pool:
+            glyph = glyph_pool[glyph_file.file_path]
         else:
             horizontal_origin_y = math.floor((builder.horizontal_header.ascent + builder.horizontal_header.descent - glyph_file.glyph_height) / 2)
             vertical_origin_y = (glyph_file.glyph_height - builder.size) // 2
@@ -150,7 +150,7 @@ def _create_builder(
                 vertical_origin_y=vertical_origin_y,
                 data=glyph_file.glyph_data,
             )
-            glyph_cacher[glyph_file.file_path] = glyph
+            glyph_pool[glyph_file.file_path] = glyph
         builder.glyphs.append(glyph)
 
     return builder
@@ -165,9 +165,9 @@ def main():
     character_mapping, glyph_files = _collect_glyph_files(glyphs_dir)
     for glyph_file in glyph_files:
         glyph_file.save()
-    glyph_cacher = {}
+    glyph_pool = {}
 
-    builder = _create_builder(glyph_cacher, character_mapping, glyph_files)
+    builder = _create_builder(glyph_pool, character_mapping, glyph_files)
     builder.save_otf(os.path.join(outputs_dir, 'demo.otf'))
     builder.save_otf(os.path.join(outputs_dir, 'demo.woff2'), flavor=opentype.Flavor.WOFF2)
     builder.save_ttf(os.path.join(outputs_dir, 'demo.ttf'))
@@ -175,7 +175,7 @@ def main():
 
     collection_builder = FontCollectionBuilder()
     for index in range(100):
-        builder = _create_builder(glyph_cacher, character_mapping, glyph_files, index)
+        builder = _create_builder(glyph_pool, character_mapping, glyph_files, index)
         collection_builder.font_builders.append(builder)
     collection_builder.save_otc(os.path.join(outputs_dir, 'demo.otc'))
     collection_builder.save_ttc(os.path.join(outputs_dir, 'demo.ttc'))
