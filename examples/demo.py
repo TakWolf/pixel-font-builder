@@ -54,16 +54,15 @@ class GlyphFile:
         self.code_point = code_point
         self.glyph_data, self.glyph_width, self.glyph_height = _load_glyph_data_from_png(file_path)
 
+    @property
+    def glyph_name(self) -> str:
+        if self.code_point == -1:
+            return '.notdef'
+        else:
+            return f'uni{self.code_point:04X}'
+
     def save(self):
         _save_glyph_data_to_png(self.glyph_data, self.file_path)
-
-
-def get_glyph_name(code_point: int) -> str:
-    if code_point == -1:
-        glyph_name = '.notdef'
-    else:
-        glyph_name = f'uni{code_point:04X}'
-    return glyph_name
 
 
 def _collect_glyph_files(root_dir: str) -> tuple[dict[int, str], list[GlyphFile]]:
@@ -76,15 +75,13 @@ def _collect_glyph_files(root_dir: str) -> tuple[dict[int, str], list[GlyphFile]
             glyph_file = GlyphFile.load(file_path)
             registry[glyph_file.code_point] = glyph_file
 
-    sequence = list(registry.keys())
-    sequence.sort()
-
     character_mapping = {}
     glyph_files = []
-    for code_point in sequence:
-        if code_point != -1:
-            character_mapping[code_point] = get_glyph_name(code_point)
-        glyph_files.append(registry[code_point])
+    for glyph_file in registry.values():
+        if glyph_file.code_point != -1:
+            character_mapping[glyph_file.code_point] = glyph_file.glyph_name
+        glyph_files.append(glyph_file)
+    glyph_files.sort(key=lambda x: x.code_point)
 
     for code_point in range(ord('A'), ord('Z') + 1):
         fallback_code_point = code_point + ord('Ａ') - ord('A')
@@ -143,7 +140,7 @@ def _create_builder(
             horizontal_origin_y = math.floor((builder.horizontal_header.ascent + builder.horizontal_header.descent - glyph_file.glyph_height) / 2)
             vertical_origin_y = (glyph_file.glyph_height - builder.size) // 2
             glyph = Glyph(
-                name=get_glyph_name(glyph_file.code_point),
+                name=glyph_file.glyph_name,
                 advance_width=glyph_file.glyph_width,
                 advance_height=builder.size,
                 horizontal_origin=(0, horizontal_origin_y),
