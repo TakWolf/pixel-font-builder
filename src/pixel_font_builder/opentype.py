@@ -99,7 +99,7 @@ def _create_cff_strings(config: Config, meta_info: MetaInfo) -> tuple[str, dict[
         cff_family_name = config.cff_family_name
     else:
         cff_family_name = meta_info.family_name
-    cff_ps_name = f'{cff_family_name.replace(" ", "-")}-{meta_info.style_name}'
+    cff_ps_name = f"{cff_family_name.replace(' ', '-')}-{meta_info.style_name}"
     cff_strings = {
         'FamilyName': cff_family_name,
         'FullName': f'{cff_family_name} {meta_info.style_name}',

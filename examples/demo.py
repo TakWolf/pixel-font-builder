@@ -107,23 +107,23 @@ def _create_builder(
 ) -> FontBuilder:
     builder = FontBuilder(11)
 
-    builder.meta_info.version = "1.0.0"
-    builder.meta_info.family_name = "Demo Pixel"
+    builder.meta_info.version = '1.0.0'
+    builder.meta_info.family_name = 'Demo Pixel'
     if name_num is not None:
         builder.opentype_config.cff_family_name = builder.meta_info.family_name
         builder.meta_info.family_name += f' {name_num}'
     builder.meta_info.style_name = StyleName.REGULAR
     builder.meta_info.serif_mode = SerifMode.SANS_SERIF
     builder.meta_info.width_mode = WidthMode.PROPORTIONAL
-    builder.meta_info.manufacturer = "Pixel Font Studio"
-    builder.meta_info.designer = "TakWolf"
-    builder.meta_info.description = "A demo pixel font."
-    builder.meta_info.copyright_info = "Copyright (c) TakWolf"
-    builder.meta_info.license_info = "This Font Software is licensed under the SIL Open Font License, Version 1.1."
-    builder.meta_info.vendor_url = "https://github.com/TakWolf/pixel-font-builder"
-    builder.meta_info.designer_url = "https://takwolf.com"
-    builder.meta_info.license_url = "https://openfontlicense.org"
-    builder.meta_info.sample_text = "Hello World!"
+    builder.meta_info.manufacturer = 'Pixel Font Studio'
+    builder.meta_info.designer = 'TakWolf'
+    builder.meta_info.description = 'A demo pixel font.'
+    builder.meta_info.copyright_info = 'Copyright (c) TakWolf'
+    builder.meta_info.license_info = 'This Font Software is licensed under the SIL Open Font License, Version 1.1.'
+    builder.meta_info.vendor_url = 'https://github.com/TakWolf/pixel-font-builder'
+    builder.meta_info.designer_url = 'https://takwolf.com'
+    builder.meta_info.license_url = 'https://openfontlicense.org'
+    builder.meta_info.sample_text = 'Hello World!'
 
     builder.horizontal_header.ascent = 11
     builder.horizontal_header.descent = -4
