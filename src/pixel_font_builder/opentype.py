@@ -2,6 +2,7 @@ import logging
 from enum import StrEnum
 
 from fontTools.fontBuilder import FontBuilder
+from fontTools.misc import timeTools
 from fontTools.misc.psCharStrings import T2CharString as OTFGlyph
 from fontTools.pens.t2CharStringPen import T2CharStringPen as OTFGlyphPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen as TTFGlyphPen
@@ -269,6 +270,11 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
 
     logger.debug("Create '%sBuilder': %s", 'TTF' if is_ttf else 'OTF', meta_info.family_name)
     builder = FontBuilder(units_per_em, isTTF=is_ttf)
+
+    if context.created_time is not None:
+        setattr(builder.font['head'], 'created', timeTools.timestampSinceEpoch(context.created_time.timestamp()))
+    if context.modified_time is not None:
+        setattr(builder.font['head'], 'modified', timeTools.timestampSinceEpoch(context.modified_time.timestamp()))
 
     logger.debug("Setup 'Name Strings'")
     name_strings = _create_name_strings(meta_info)

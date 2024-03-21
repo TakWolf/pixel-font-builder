@@ -1,3 +1,4 @@
+import datetime
 import os
 
 import bdffont
@@ -12,6 +13,9 @@ from pixel_font_builder.info import MetaInfo, LayoutHeader
 class FontBuilder:
     def __init__(self, size: int):
         self.size = size
+        self.created_time: datetime.datetime | None = None
+        self.modified_time: datetime.datetime | None = None
+
         self.meta_info = MetaInfo()
         self.horizontal_header = LayoutHeader()
         self.vertical_header = LayoutHeader()

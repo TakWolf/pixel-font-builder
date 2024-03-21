@@ -1,3 +1,4 @@
+import datetime
 import math
 import os
 import shutil
@@ -103,6 +104,10 @@ def _create_builder(
         name_num: int = None,
 ) -> FontBuilder:
     builder = FontBuilder(11)
+
+    time = datetime.datetime.fromisoformat('2024-01-01T00:00:00Z')
+    builder.created_time = time
+    builder.modified_time = time
 
     builder.meta_info.version = '1.0.0'
     builder.meta_info.family_name = 'Demo Pixel'
