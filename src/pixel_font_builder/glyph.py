@@ -49,6 +49,5 @@ class Glyph:
             top_empty += 1
         return top_empty - self.vertical_origin_y
 
-    def check_ready(self):
-        if any(len(data_row) != len(self.data[0]) for data_row in self.data):
-            raise Exception(f"Glyph '{self.name}': lengths of data rows are not equals")
+    def check_data_validity(self):
+        assert all(len(data_row) == len(self.data[0]) for data_row in self.data), f"Glyph '{self.name}': lengths of data rows are not equals"

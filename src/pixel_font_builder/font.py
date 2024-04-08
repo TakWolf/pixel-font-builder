@@ -30,21 +30,17 @@ class FontBuilder:
         name_to_glyph = {}
 
         for glyph in self.glyphs:
-            if glyph.name in name_to_glyph:
-                raise Exception(f"Duplicate glyphs: '{glyph.name}'")
-            glyph.check_ready()
+            assert glyph.name not in name_to_glyph, f"Duplicate glyphs: '{glyph.name}'"
+            glyph.check_data_validity()
             if glyph.name != '.notdef':
                 glyph_order.append(glyph.name)
             name_to_glyph[glyph.name] = glyph
 
-        if '.notdef' not in name_to_glyph:
-            raise Exception("Need to provide a glyph named '.notdef'")
+        assert '.notdef' in name_to_glyph, "Need to provide a glyph named '.notdef'"
 
         for code_point, glyph_name in self.character_mapping.items():
-            if code_point < 0:
-                raise Exception('Code points must >= 0')
-            if glyph_name not in name_to_glyph:
-                raise Exception(f"Missing glyph: '{glyph_name}'")
+            assert code_point >= 0, 'Code points must >= 0'
+            assert glyph_name in name_to_glyph, f"Missing glyph: '{glyph_name}'"
 
         return glyph_order, name_to_glyph
 
