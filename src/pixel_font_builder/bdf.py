@@ -56,10 +56,10 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     )
 
     logger.debug("Add 'Glyph': .notdef")
-    font.add_glyph(_create_glyph(font_size, config, -1, name_to_glyph['.notdef']))
+    font.glyphs.append(_create_glyph(font_size, config, -1, name_to_glyph['.notdef']))
     for code_point, glyph_name in character_mapping.items():
         logger.debug("Add 'Glyph': %s", glyph_name)
-        font.add_glyph(_create_glyph(font_size, config, code_point, name_to_glyph[glyph_name]))
+        font.glyphs.append(_create_glyph(font_size, config, code_point, name_to_glyph[glyph_name]))
 
     logger.debug("Setup 'Properties'")
     font.properties.foundry = meta_info.manufacturer
@@ -85,7 +85,7 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
         font.properties.spacing = xlfd.Spacing.PROPORTIONAL
     else:
         font.properties.spacing = meta_info.width_mode
-    font.properties.average_width = round(sum([glyph.device_width_x * 10 for glyph in font.code_point_to_glyph.values()]) / font.get_glyphs_count())
+    font.properties.average_width = round(sum([glyph.device_width_x * 10 for glyph in font.glyphs]) / len(font.glyphs))
     font.properties.charset_registry = xlfd.CharsetRegistry.ISO10646
     font.properties.charset_encoding = '1'
 
