@@ -26,7 +26,7 @@ def _create_glyph(
         code_point: int,
         glyph: Glyph,
 ) -> BdfGlyph:
-    scalable_width_x = math.ceil((glyph.advance_width / font_size) * (72 / config.resolution_x) * 1000)
+    scalable_width_x = math.ceil((glyph.advance_width / font_size) * (75 / config.resolution_x) * 1000)
     return BdfGlyph(
         name=glyph.name,
         code_point=code_point,
