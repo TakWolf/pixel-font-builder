@@ -57,7 +57,7 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
 
     logger.debug("Add 'Glyph': .notdef")
     font.glyphs.append(_create_glyph(font_size, config, -1, name_to_glyph['.notdef']))
-    for code_point, glyph_name in character_mapping.items():
+    for code_point, glyph_name in sorted(character_mapping.items()):
         logger.debug("Add 'Glyph': %s", glyph_name)
         font.glyphs.append(_create_glyph(font_size, config, code_point, name_to_glyph[glyph_name]))
 
