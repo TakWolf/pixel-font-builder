@@ -174,6 +174,7 @@ def main():
     builder.save_otf(os.path.join(outputs_dir, 'demo.woff2'), flavor=opentype.Flavor.WOFF2)
     builder.save_ttf(os.path.join(outputs_dir, 'demo.ttf'))
     builder.save_bdf(os.path.join(outputs_dir, 'demo.bdf'))
+    builder.save_pcf(os.path.join(outputs_dir, 'demo.pcf'))
 
     collection_builder = FontCollectionBuilder()
     for index in range(100):

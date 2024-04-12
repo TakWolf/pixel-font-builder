@@ -4,8 +4,9 @@ import os
 import bdffont
 import fontTools.fontBuilder
 import fontTools.ttLib
+import pcffont
 
-from pixel_font_builder import os2, opentype, bdf
+from pixel_font_builder import os2, opentype, bdf, pcf
 from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.info import MetaInfo, LayoutHeader
 
@@ -24,6 +25,7 @@ class FontBuilder:
         self.glyphs: list[Glyph] = []
         self.opentype_config = opentype.Config()
         self.bdf_config = bdf.Config()
+        self.pcf_config = pcf.Config()
 
     def prepare_glyphs(self) -> tuple[list[str], dict[str, Glyph]]:
         glyph_order = ['.notdef']
@@ -76,6 +78,12 @@ class FontBuilder:
             optimize_bitmap: bool = True,
     ):
         self.to_bdf_builder().save(file_path, optimize_bitmap)
+
+    def to_pcf_builder(self) -> pcffont.PcfFont:
+        return pcf.create_font(self)
+
+    def save_pcf(self, file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes]):
+        self.to_pcf_builder().save(file_path)
 
 
 class FontCollectionBuilder:

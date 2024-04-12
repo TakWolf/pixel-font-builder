@@ -88,6 +88,7 @@ def main():
     builder.save_otf(os.path.join(outputs_dir, 'my-pixel.woff2'), flavor=opentype.Flavor.WOFF2)
     builder.save_ttf(os.path.join(outputs_dir, 'my-font.ttf'))
     builder.save_bdf(os.path.join(outputs_dir, 'my-font.bdf'))
+    builder.save_pcf(os.path.join(outputs_dir, 'my-font.pcf'))
 
 
 if __name__ == '__main__':
