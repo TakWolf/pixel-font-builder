@@ -15,9 +15,11 @@ class Config:
             self,
             resolution_x: int = 75,
             resolution_y: int = 75,
+            only_basic_plane: bool = True,
     ):
         self.resolution_x = resolution_x
         self.resolution_y = resolution_y
+        self.only_basic_plane = only_basic_plane
 
 
 def _create_glyph(
@@ -58,6 +60,8 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     logger.debug("Add 'Glyph': .notdef")
     font.glyphs.append(_create_glyph(font_size, config, -1, name_to_glyph['.notdef']))
     for code_point, glyph_name in sorted(character_mapping.items()):
+        if code_point > 0xFFFF and config.only_basic_plane:
+            break
         logger.debug("Add 'Glyph': %s", glyph_name)
         font.glyphs.append(_create_glyph(font_size, config, code_point, name_to_glyph[glyph_name]))
 
