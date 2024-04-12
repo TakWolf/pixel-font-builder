@@ -91,7 +91,7 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
 
     font.properties.default_char = -1
     font.properties.font_ascent = horizontal_header.ascent
-    font.properties.font_descent = horizontal_header.descent
+    font.properties.font_descent = -horizontal_header.descent
     font.properties.x_height = os2_config.x_height
     font.properties.cap_height = os2_config.cap_height
 
