@@ -45,7 +45,7 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     horizontal_header = context.horizontal_header
     os2_config = context.os2_config
     character_mapping = context.character_mapping
-    name_to_glyph = context.prepare_glyphs()[1]
+    _, name_to_glyph = context.prepare_glyphs()
 
     logger.debug("Create 'BdfFont': %s", meta_info.family_name)
     font = BdfFont(
