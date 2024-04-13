@@ -41,13 +41,5 @@ class Glyph:
     def dimensions(self) -> tuple[int, int]:
         return self.width, self.height
 
-    def calculate_top_side_bearing(self) -> int:
-        top_empty = 0
-        for data_row in self.data:
-            if any(data_row) != 0:
-                break
-            top_empty += 1
-        return top_empty - self.vertical_origin_y
-
     def check_validity(self):
         assert all(len(data_row) == len(self.data[0]) for data_row in self.data), f"Glyph '{self.name}': lengths of data rows are not equals"

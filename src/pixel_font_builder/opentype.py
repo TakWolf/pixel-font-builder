@@ -258,6 +258,28 @@ def _get_glyph_with_cache(glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGl
     return xtf_glyph
 
 
+def _get_left_side_bearing(glyph: Glyph) -> int:
+    left_padding = 0
+    for i in range(glyph.width):
+        if any([data_row[i] for data_row in glyph.data]) != 0:
+            break
+        left_padding += 1
+    if left_padding == glyph.width:
+        left_padding = 0
+    return left_padding + glyph.horizontal_origin_x
+
+
+def _get_top_side_bearing(glyph: Glyph) -> int:
+    top_padding = 0
+    for data_row in glyph.data:
+        if any(data_row) != 0:
+            break
+        top_padding += 1
+    if top_padding == glyph.height:
+        top_padding = 0
+    return top_padding + glyph.vertical_origin_y
+
+
 def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flavor: Flavor = None) -> FontBuilder:
     config = context.opentype_config
     units_per_em = context.size * config.px_to_units
@@ -303,15 +325,14 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     vertical_metrics = {}
     for glyph_name in glyph_order:
         glyph = name_to_glyph[glyph_name]
+
         advance_width = glyph.advance_width * config.px_to_units
+        left_side_bearing = _get_left_side_bearing(glyph) * config.px_to_units
+        horizontal_metrics[glyph_name] = advance_width, left_side_bearing
+
         advance_height = glyph.advance_height * config.px_to_units
-        if is_ttf:
-            lsb = xtf_glyphs[glyph_name].xMin
-        else:
-            lsb = xtf_glyphs[glyph_name].calcBounds(None)[0]
-        tsb = glyph.calculate_top_side_bearing() * config.px_to_units
-        horizontal_metrics[glyph_name] = advance_width, lsb
-        vertical_metrics[glyph_name] = advance_height, tsb
+        top_side_bearing = _get_top_side_bearing(glyph) * config.px_to_units
+        vertical_metrics[glyph_name] = advance_height, top_side_bearing
     builder.setupHorizontalMetrics(horizontal_metrics)
     builder.setupVerticalMetrics(vertical_metrics)
 
