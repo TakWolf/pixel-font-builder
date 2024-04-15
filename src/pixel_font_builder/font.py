@@ -72,12 +72,8 @@ class FontBuilder:
     def to_bdf_builder(self) -> bdffont.BdfFont:
         return bdf.create_font(self)
 
-    def save_bdf(
-            self,
-            file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes],
-            optimize_bitmap: bool = True,
-    ):
-        self.to_bdf_builder().save(file_path, optimize_bitmap)
+    def save_bdf(self, file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes]):
+        self.to_bdf_builder().save(file_path)
 
     def to_pcf_builder(self) -> pcffont.PcfFont:
         return pcf.create_font(self)

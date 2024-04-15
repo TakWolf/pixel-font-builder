@@ -1,7 +1,7 @@
 import logging
 import math
 
-from pcffont import PcfFont, PcfMetric, PcfProperties, PcfAccelerators, PcfMetrics, PcfBitmaps, PcfBdfEncodings, PcfScalableWidths, PcfGlyphNames, xlfd
+from pcffont import PcfFont, PcfMetric, PcfProperties, PcfAccelerators, PcfMetrics, PcfBitmaps, PcfBdfEncodings, PcfScalableWidths, PcfGlyphNames
 
 import pixel_font_builder
 from pixel_font_builder.info import SerifMode, WidthMode
@@ -38,7 +38,6 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> PcfFont:
     scalable_widths = PcfScalableWidths()
     bitmaps = PcfBitmaps()
 
-    total_advance_width = 0
     min_bounds = None
     max_bounds = None
     bdf_encodings.default_char = 0xFFFE
@@ -50,17 +49,16 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> PcfFont:
         logger.debug("Add 'Encoding': %04X", code_point)
         bdf_encodings[code_point] = len(glyph_names)
         glyph_names.append(f'U+{code_point:04X}')
-        total_advance_width += glyph.advance_width
         metric = PcfMetric(
-            left_sided_bearing=-glyph.horizontal_origin_x,
+            left_side_bearing=-glyph.horizontal_origin_x,
             right_side_bearing=glyph.width + glyph.horizontal_origin_x,
             character_width=glyph.advance_width,
-            character_ascent=glyph.height + glyph.horizontal_origin_y,
-            character_descent=-glyph.horizontal_origin_y,
+            ascent=glyph.height + glyph.horizontal_origin_y,
+            descent=-glyph.horizontal_origin_y,
         )
-        if min_bounds is None or (metric.left_sided_bearing + metric.right_side_bearing) < (min_bounds.left_sided_bearing + min_bounds.right_side_bearing):
+        if min_bounds is None or (metric.left_side_bearing + metric.right_side_bearing) < (min_bounds.left_side_bearing + min_bounds.right_side_bearing):
             min_bounds = metric
-        if max_bounds is None or (metric.left_sided_bearing + metric.right_side_bearing) > (max_bounds.left_sided_bearing + max_bounds.right_side_bearing):
+        if max_bounds is None or (metric.left_side_bearing + metric.right_side_bearing) > (max_bounds.left_side_bearing + max_bounds.right_side_bearing):
             max_bounds = metric
         metrics.append(metric)
         scalable_widths.append(math.ceil((glyph.advance_width / font_size) * (75 / config.resolution_x) * 1000))
@@ -75,7 +73,6 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> PcfFont:
 
     logger.debug("Setup 'Accelerators'")
     accelerators = PcfAccelerators()
-    accelerators.no_overlap = True
     accelerators.ink_inside = True
     accelerators.ink_metrics = True
     accelerators.font_ascent = horizontal_header.ascent
@@ -92,12 +89,12 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> PcfFont:
     properties.foundry = meta_info.manufacturer
     properties.family_name = meta_info.family_name
     properties.weight_name = meta_info.style_name
-    properties.slant = xlfd.Slant.ROMAN
-    properties.setwidth_name = xlfd.SetwidthName.NORMAL
+    properties.slant = 'R'
+    properties.setwidth_name = 'Normal'
     if meta_info.serif_mode == SerifMode.SERIF:
-        properties.add_style_name = xlfd.AddStyleName.SERIF
+        properties.add_style_name = 'Serif'
     elif meta_info.serif_mode == SerifMode.SANS_SERIF:
-        properties.add_style_name = xlfd.AddStyleName.SANS_SERIF
+        properties.add_style_name = 'Sans Serif'
     else:
         properties.add_style_name = meta_info.serif_mode
     properties.pixel_size = font_size
@@ -105,28 +102,22 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> PcfFont:
     properties.resolution_x = config.resolution_x
     properties.resolution_y = config.resolution_y
     if meta_info.width_mode == WidthMode.MONOSPACED:
-        properties.spacing = xlfd.Spacing.MONOSPACED
+        properties.spacing = 'M'
     elif meta_info.width_mode == WidthMode.DUOSPACED:
         properties.spacing = 'D'
     elif meta_info.width_mode == WidthMode.PROPORTIONAL:
-        properties.spacing = xlfd.Spacing.PROPORTIONAL
+        properties.spacing = 'P'
     else:
         properties.spacing = meta_info.width_mode
-    properties.average_width = round(total_advance_width * 10 / len(metrics))
-    properties.charset_registry = xlfd.CharsetRegistry.ISO10646
+    properties.average_width = round(sum([metric.character_width * 10 for metric in font.metrics]) / len(font.metrics))
+    properties.charset_registry = 'ISO10646'
     properties.charset_encoding = '1'
-
-    properties.default_char = bdf_encodings.default_char
-    properties.font_ascent = horizontal_header.ascent
-    properties.font_descent = -horizontal_header.descent
+    properties.generate_xlfd()
     properties.x_height = os2_config.x_height
     properties.cap_height = os2_config.cap_height
-
     properties.font_version = meta_info.version
     properties.copyright = meta_info.copyright_info
     properties['LICENSE'] = meta_info.license_info
-
-    properties.generate_xlfd()
     font.properties = properties
 
     logger.debug("Create 'PcfFont' finished")

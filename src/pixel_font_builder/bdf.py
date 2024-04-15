@@ -1,7 +1,7 @@
 import logging
 import math
 
-from bdffont import BdfFont, BdfGlyph, xlfd
+from bdffont import BdfFont, BdfGlyph
 
 import pixel_font_builder
 from pixel_font_builder.glyph import Glyph
@@ -69,12 +69,12 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     font.properties.foundry = meta_info.manufacturer
     font.properties.family_name = meta_info.family_name
     font.properties.weight_name = meta_info.style_name
-    font.properties.slant = xlfd.Slant.ROMAN
-    font.properties.setwidth_name = xlfd.SetwidthName.NORMAL
+    font.properties.slant = 'R'
+    font.properties.setwidth_name = 'Normal'
     if meta_info.serif_mode == SerifMode.SERIF:
-        font.properties.add_style_name = xlfd.AddStyleName.SERIF
+        font.properties.add_style_name = 'Serif'
     elif meta_info.serif_mode == SerifMode.SANS_SERIF:
-        font.properties.add_style_name = xlfd.AddStyleName.SANS_SERIF
+        font.properties.add_style_name = 'Sans Serif'
     else:
         font.properties.add_style_name = meta_info.serif_mode
     font.properties.pixel_size = font_size
@@ -82,16 +82,17 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     font.properties.resolution_x = config.resolution_x
     font.properties.resolution_y = config.resolution_y
     if meta_info.width_mode == WidthMode.MONOSPACED:
-        font.properties.spacing = xlfd.Spacing.MONOSPACED
+        font.properties.spacing = 'M'
     elif meta_info.width_mode == WidthMode.DUOSPACED:
         font.properties.spacing = 'D'
     elif meta_info.width_mode == WidthMode.PROPORTIONAL:
-        font.properties.spacing = xlfd.Spacing.PROPORTIONAL
+        font.properties.spacing = 'P'
     else:
         font.properties.spacing = meta_info.width_mode
     font.properties.average_width = round(sum([glyph.device_width_x * 10 for glyph in font.glyphs]) / len(font.glyphs))
-    font.properties.charset_registry = xlfd.CharsetRegistry.ISO10646
+    font.properties.charset_registry = 'ISO10646'
     font.properties.charset_encoding = '1'
+    font.generate_name_as_xlfd()
 
     font.properties.default_char = -1
     font.properties.font_ascent = horizontal_header.ascent
@@ -102,8 +103,6 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     font.properties.font_version = meta_info.version
     font.properties.copyright = meta_info.copyright_info
     font.properties['LICENSE'] = meta_info.license_info
-
-    font.generate_xlfd_font_name()
 
     logger.debug("Create 'BdfFont' finished")
     return font
