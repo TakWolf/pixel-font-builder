@@ -31,8 +31,8 @@ def main():
     builder.horizontal_header.ascent = 10
     builder.horizontal_header.descent = -2
 
-    builder.vertical_header.ascent = 10
-    builder.vertical_header.descent = -2
+    builder.vertical_header.ascent = 6
+    builder.vertical_header.descent = -6
 
     builder.os2_config.x_height = 5
     builder.os2_config.cap_height = 7
