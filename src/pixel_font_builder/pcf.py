@@ -50,10 +50,10 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> PcfFont:
         bdf_encodings[code_point] = len(glyph_names)
         glyph_names.append(f'U+{code_point:04X}')
         metric = PcfMetric(
-            left_side_bearing=-glyph.horizontal_origin_x,
-            right_side_bearing=glyph.width + glyph.horizontal_origin_x,
+            left_side_bearing=glyph.horizontal_origin_x,
+            right_side_bearing=glyph.horizontal_origin_x + glyph.width,
             character_width=glyph.advance_width,
-            ascent=glyph.height + glyph.horizontal_origin_y,
+            ascent=glyph.horizontal_origin_y + glyph.height,
             descent=-glyph.horizontal_origin_y,
         )
         if min_bounds is None or (metric.left_side_bearing + metric.right_side_bearing) < (min_bounds.left_side_bearing + min_bounds.right_side_bearing):
