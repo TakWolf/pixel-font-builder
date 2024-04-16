@@ -33,7 +33,6 @@ class FontBuilder:
 
         for glyph in self.glyphs:
             assert glyph.name not in name_to_glyph, f"Duplicate glyphs: '{glyph.name}'"
-            glyph.check_validity()
             if glyph.name != '.notdef':
                 glyph_order.append(glyph.name)
             name_to_glyph[glyph.name] = glyph

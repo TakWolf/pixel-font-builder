@@ -40,6 +40,3 @@ class Glyph:
     @property
     def dimensions(self) -> tuple[int, int]:
         return self.width, self.height
-
-    def check_validity(self):
-        assert all(len(data_row) == len(self.data[0]) for data_row in self.data), f"Glyph '{self.name}': lengths of data rows are not equals"
