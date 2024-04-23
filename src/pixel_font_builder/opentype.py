@@ -25,10 +25,8 @@ class Config:
     def __init__(
             self,
             px_to_units: int = 100,
-            cff_family_name: str = None,
     ):
         self.px_to_units = px_to_units
-        self.cff_family_name = cff_family_name
 
 
 class Flavor(StrEnum):
@@ -93,22 +91,6 @@ def _create_name_strings(meta_info: MetaInfo) -> dict[str, str]:
     if meta_info.sample_text is not None:
         name_strings['sampleText'] = meta_info.sample_text
     return name_strings
-
-
-def _create_cff_strings(config: Config, meta_info: MetaInfo) -> tuple[str, dict[str, str]]:
-    if config.cff_family_name is not None:
-        cff_family_name = config.cff_family_name
-    else:
-        cff_family_name = meta_info.family_name
-    cff_ps_name = f"{cff_family_name.replace(' ', '-')}-{meta_info.style_name}"
-    cff_strings = {
-        'FamilyName': cff_family_name,
-        'FullName': f'{cff_family_name} {meta_info.style_name}',
-        'Weight': meta_info.style_name,
-    }
-    if meta_info.copyright_info is not None:
-        cff_strings['Notice'] = meta_info.copyright_info
-    return cff_ps_name, cff_strings
 
 
 def _create_outlines(glyph_data: list[list[int]], px_to_units: int) -> list[list[tuple[int, int]]]:
@@ -203,7 +185,7 @@ def _create_glyph(glyph: Glyph, outlines: list[list[tuple[int, int]]], px_to_uni
     if is_ttf:
         pen = TTFGlyphPen()
     else:
-        pen = OTFGlyphPen(glyph.advance_width * px_to_units, None)
+        pen = OTFGlyphPen(None, None, CFF2=True)
     if len(outlines) > 0:
         for outline_index, outline in enumerate(outlines):
             for point_index, point in enumerate(outline):
@@ -313,9 +295,8 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
         logger.debug("Setup 'Glyf'")
         builder.setupGlyf(xtf_glyphs)
     else:
-        logger.debug("Setup 'CFF'")
-        cff_ps_name, cff_strings = _create_cff_strings(config, meta_info)
-        builder.setupCFF(cff_ps_name, cff_strings, xtf_glyphs, {})
+        logger.debug("Setup 'CFF2'")
+        builder.setupCFF2(xtf_glyphs)
 
     logger.debug("Setup 'Character Mapping'")
     builder.setupCharacterMap(character_mapping)

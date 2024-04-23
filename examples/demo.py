@@ -101,7 +101,7 @@ def _create_builder(
         glyph_pool: dict[str, Glyph],
         character_mapping: dict[int, str],
         glyph_files: list[GlyphFile],
-        name_num: int = None,
+        name_num: int = 0,
 ) -> FontBuilder:
     builder = FontBuilder(11)
 
@@ -110,10 +110,7 @@ def _create_builder(
     builder.modified_time = time
 
     builder.meta_info.version = '1.0.0'
-    builder.meta_info.family_name = 'Demo Pixel'
-    if name_num is not None:
-        builder.opentype_config.cff_family_name = builder.meta_info.family_name
-        builder.meta_info.family_name += f' {name_num}'
+    builder.meta_info.family_name = f'Demo Pixel {name_num}'
     builder.meta_info.style_name = StyleName.REGULAR
     builder.meta_info.serif_mode = SerifMode.SANS_SERIF
     builder.meta_info.width_mode = WidthMode.PROPORTIONAL
