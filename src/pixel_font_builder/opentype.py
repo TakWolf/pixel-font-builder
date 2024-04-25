@@ -346,7 +346,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     builder.setupPost()
 
     if flavor is not None:
-        logger.debug("Setup 'Flavor': %s", flavor)
+        logger.debug('Set Flavor: %s', flavor)
         builder.font.flavor = flavor
 
     logger.debug("Create '%sBuilder' finished", 'TTF' if is_ttf else 'OTF')
