@@ -118,6 +118,10 @@ if __name__ == '__main__':
 - [BdfFont](https://github.com/TakWolf/bdffont)
 - [PcfFont](https://github.com/TakWolf/pcffont)
 
+## References
+
+- [OpenType Feature File Specification](https://adobe-type-tools.github.io/afdko/OpenTypeFeatureFileSpecification.html)
+
 ## License
 
 Under the [MIT license](LICENSE).
