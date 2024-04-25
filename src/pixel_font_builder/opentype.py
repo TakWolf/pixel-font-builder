@@ -1,4 +1,5 @@
 import logging
+import os
 from enum import StrEnum
 
 from fontTools.fontBuilder import FontBuilder
@@ -21,12 +22,24 @@ _CACHE_NAME_OTF_GLYPH = '_opentype_cache_otf_glyph'
 _CACHE_NAME_TTF_GLYPH = '_opentype_cache_ttf_glyph'
 
 
+class FeatureFile:
+    def __init__(self, file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes]):
+        with open(file_path, 'r', encoding='utf-8') as file:
+            text = file.read()
+        self.file_path = file_path
+        self.text = text
+
+
 class Config:
     def __init__(
             self,
             px_to_units: int = 100,
+            feature_files: list[FeatureFile] = None,
     ):
         self.px_to_units = px_to_units
+        if feature_files is None:
+            feature_files = []
+        self.feature_files = feature_files
 
 
 class Flavor(StrEnum):
@@ -344,6 +357,10 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
 
     logger.debug("Setup 'Post'")
     builder.setupPost()
+
+    for feature_file in config.feature_files:
+        logger.debug("Add Feature: '%s'", feature_file.file_path)
+        builder.addOpenTypeFeatures(feature_file.text, feature_file.file_path)
 
     if flavor is not None:
         logger.debug('Set Flavor: %s', flavor)
