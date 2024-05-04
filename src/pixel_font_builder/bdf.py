@@ -4,7 +4,6 @@ import math
 from bdffont import BdfFont, BdfGlyph
 
 import pixel_font_builder
-from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.info import SerifMode, WidthMode
 
 logger = logging.getLogger('pixel_font_builder.bdf')
@@ -20,24 +19,6 @@ class Config:
         self.resolution_x = resolution_x
         self.resolution_y = resolution_y
         self.only_basic_plane = only_basic_plane
-
-
-def _create_glyph(
-        font_size: int,
-        config: Config,
-        code_point: int,
-        glyph: Glyph,
-) -> BdfGlyph:
-    scalable_width_x = math.ceil((glyph.advance_width / font_size) * (75 / config.resolution_x) * 1000)
-    return BdfGlyph(
-        name=glyph.name,
-        code_point=code_point,
-        scalable_width=(scalable_width_x, 0),
-        device_width=(glyph.advance_width, 0),
-        bounding_box_size=glyph.dimensions,
-        bounding_box_offset=glyph.horizontal_origin,
-        bitmap=glyph.data,
-    )
 
 
 def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
@@ -57,13 +38,23 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
         bounding_box_offset=(0, horizontal_header.descent),
     )
 
-    logger.debug("Add 'Glyph': .notdef")
-    font.glyphs.append(_create_glyph(font_size, config, -1, name_to_glyph['.notdef']))
+    default_char = 0xFFFE
+    character_mapping[default_char] = '.notdef'
     for code_point, glyph_name in sorted(character_mapping.items()):
         if code_point > 0xFFFF and config.only_basic_plane:
             break
         logger.debug("Add 'Glyph': %s", glyph_name)
-        font.glyphs.append(_create_glyph(font_size, config, code_point, name_to_glyph[glyph_name]))
+        glyph = name_to_glyph[glyph_name]
+        scalable_width_x = math.ceil((glyph.advance_width / font_size) * (75 / config.resolution_x) * 1000)
+        font.glyphs.append(BdfGlyph(
+            name=glyph_name,
+            code_point=code_point,
+            scalable_width=(scalable_width_x, 0),
+            device_width=(glyph.advance_width, 0),
+            bounding_box_size=glyph.dimensions,
+            bounding_box_offset=glyph.horizontal_origin,
+            bitmap=glyph.data,
+        ))
 
     logger.debug("Setup 'Properties'")
     font.properties.foundry = meta_info.manufacturer
@@ -94,7 +85,7 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     font.properties.charset_encoding = '1'
     font.generate_name_as_xlfd()
 
-    font.properties.default_char = -1
+    font.properties.default_char = default_char
     font.properties.font_ascent = horizontal_header.ascent
     font.properties.font_descent = -horizontal_header.descent
     font.properties.x_height = os2_config.x_height
