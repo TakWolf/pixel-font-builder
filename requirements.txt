@@ -1,6 +1,6 @@
 fonttools==4.51.0
 Brotli==1.1.0
-bdffont==0.0.21
+bdffont==0.0.23
 pcffont==0.0.7
 
 pytest==8.2.0
