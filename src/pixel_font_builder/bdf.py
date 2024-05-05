@@ -33,11 +33,11 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     logger.debug("Create 'BdfFont': %s", meta_info.family_name)
     font = BdfFont(
         point_size=font_size,
-        resolution_xy=(config.resolution_x, config.resolution_y),
-        bounding_box_size=(font_size, horizontal_header.line_height),
-        bounding_box_offset=(0, horizontal_header.descent),
+        resolution=(config.resolution_x, config.resolution_y),
+        bounding_box=(font_size, horizontal_header.line_height, 0, horizontal_header.descent),
     )
 
+    logger.debug("Setup 'Glyphs'")
     default_char = 0xFFFE
     character_mapping[default_char] = '.notdef'
     for code_point, glyph_name in sorted(character_mapping.items()):
@@ -48,11 +48,10 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
         scalable_width_x = math.ceil((glyph.advance_width / font_size) * (75 / config.resolution_x) * 1000)
         font.glyphs.append(BdfGlyph(
             name=glyph_name,
-            code_point=code_point,
+            encoding=code_point,
             scalable_width=(scalable_width_x, 0),
             device_width=(glyph.advance_width, 0),
-            bounding_box_size=glyph.dimensions,
-            bounding_box_offset=glyph.horizontal_origin,
+            bounding_box=(glyph.width, glyph.height, glyph.horizontal_origin_x, glyph.horizontal_origin_y),
             bitmap=glyph.data,
         ))
 
