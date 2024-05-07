@@ -1,7 +1,7 @@
 import logging
 import math
 
-from pcffont import PcfFont, PcfFontBuilder, PcfGlyph
+from pcffont import PcfFontBuilder, PcfGlyph
 
 import pixel_font_builder
 from pixel_font_builder.info import SerifMode, WidthMode
@@ -19,7 +19,7 @@ class Config:
         self.resolution_y = resolution_y
 
 
-def create_font(context: 'pixel_font_builder.FontBuilder') -> PcfFont:
+def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
     config = context.pcf_config
     font_size = context.font_size
     meta_info = context.meta_info
@@ -89,4 +89,4 @@ def create_font(context: 'pixel_font_builder.FontBuilder') -> PcfFont:
     builder.properties['LICENSE'] = meta_info.license_info
 
     logger.debug("Create 'PcfFont' finished")
-    return builder.build()
+    return builder

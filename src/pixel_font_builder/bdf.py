@@ -21,7 +21,7 @@ class Config:
         self.only_basic_plane = only_basic_plane
 
 
-def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
+def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     config = context.bdf_config
     font_size = context.font_size
     meta_info = context.meta_info
