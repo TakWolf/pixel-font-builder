@@ -9,26 +9,26 @@ from examples import glyphs_dir, build_dir
 from pixel_font_builder import FontBuilder, FontCollectionBuilder, StyleName, SerifMode, WidthMode, Glyph, opentype
 
 
-def _load_glyph_data_from_png(file_path: str) -> tuple[list[list[int]], int, int]:
+def _load_bitmap_from_png(file_path: str) -> tuple[list[list[int]], int, int]:
     width, height, pixels, _ = png.Reader(filename=file_path).read()
-    data = []
+    bitmap = []
     for pixels_row in pixels:
-        data_row = []
+        bitmap_row = []
         for x in range(0, width * 4, 4):
             alpha = pixels_row[x + 3]
             if alpha > 127:
-                data_row.append(1)
+                bitmap_row.append(1)
             else:
-                data_row.append(0)
-        data.append(data_row)
-    return data, width, height
+                bitmap_row.append(0)
+        bitmap.append(bitmap_row)
+    return bitmap, width, height
 
 
-def _save_glyph_data_to_png(data: list[list[int]], file_path: str):
+def _save_bitmap_to_png(bitmap: list[list[int]], file_path: str):
     pixels = []
-    for data_row in data:
+    for bitmap_row in bitmap:
         pixels_row = []
-        for x in data_row:
+        for x in bitmap_row:
             pixels_row.append(0)
             pixels_row.append(0)
             pixels_row.append(0)
@@ -53,7 +53,7 @@ class GlyphFile:
     def __init__(self, file_path: str, code_point: int):
         self.file_path = file_path
         self.code_point = code_point
-        self.glyph_data, self.glyph_width, self.glyph_height = _load_glyph_data_from_png(file_path)
+        self.bitmap, self.width, self.height = _load_bitmap_from_png(file_path)
 
     @property
     def glyph_name(self) -> str:
@@ -63,7 +63,7 @@ class GlyphFile:
             return f'uni{self.code_point:04X}'
 
     def save(self):
-        _save_glyph_data_to_png(self.glyph_data, self.file_path)
+        _save_bitmap_to_png(self.bitmap, self.file_path)
 
 
 def _collect_glyph_files(root_dir: str) -> tuple[dict[int, str], list[GlyphFile]]:
@@ -139,15 +139,15 @@ def _create_builder(
         if glyph_file.file_path in glyph_pool:
             glyph = glyph_pool[glyph_file.file_path]
         else:
-            horizontal_origin_y = math.floor((builder.horizontal_header.ascent + builder.horizontal_header.descent - glyph_file.glyph_height) / 2)
-            vertical_origin_y = (builder.font_size - glyph_file.glyph_height) // 2
+            horizontal_origin_y = math.floor((builder.horizontal_header.ascent + builder.horizontal_header.descent - glyph_file.height) / 2)
+            vertical_origin_y = (builder.font_size - glyph_file.height) // 2
             glyph = Glyph(
                 name=glyph_file.glyph_name,
-                advance_width=glyph_file.glyph_width,
+                advance_width=glyph_file.width,
                 advance_height=builder.font_size,
                 horizontal_origin=(0, horizontal_origin_y),
                 vertical_origin_y=vertical_origin_y,
-                data=glyph_file.glyph_data,
+                bitmap=glyph_file.bitmap,
             )
             glyph_pool[glyph_file.file_path] = glyph
         builder.glyphs.append(glyph)

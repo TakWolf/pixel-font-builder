@@ -47,7 +47,7 @@ def main():
         advance_height=12,
         horizontal_origin=(0, -2),
         vertical_origin_y=0,
-        data=[
+        bitmap=[
             [1, 1, 1, 1, 1, 1, 1, 1],
             [1, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 1],
@@ -68,7 +68,7 @@ def main():
         advance_height=12,
         horizontal_origin=(0, -2),
         vertical_origin_y=0,
-        data=[
+        bitmap=[
             [0, 0, 0, 1, 1, 0, 0, 0],
             [0, 0, 1, 0, 0, 1, 0, 0],
             [0, 0, 1, 0, 0, 1, 0, 0],

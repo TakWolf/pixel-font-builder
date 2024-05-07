@@ -52,7 +52,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
             scalable_width=(scalable_width_x, 0),
             device_width=(glyph.advance_width, 0),
             bounding_box=(glyph.width, glyph.height, glyph.horizontal_origin_x, glyph.horizontal_origin_y),
-            bitmap=glyph.data,
+            bitmap=glyph.bitmap,
         ))
 
     logger.debug("Setup 'Properties'")

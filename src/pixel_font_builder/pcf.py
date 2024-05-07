@@ -49,7 +49,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
             character_width=glyph.advance_width,
             dimensions=glyph.dimensions,
             origin=glyph.horizontal_origin,
-            bitmap=glyph.data,
+            bitmap=glyph.bitmap,
         ))
 
     logger.debug("Setup 'Properties'")

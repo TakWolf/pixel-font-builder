@@ -106,14 +106,14 @@ def _create_name_strings(meta_info: MetaInfo) -> dict[str, str]:
     return name_strings
 
 
-def _create_outlines(glyph_data: list[list[int]], px_to_units: int) -> list[list[tuple[int, int]]]:
+def _create_outlines(bitmap: list[list[int]], px_to_units: int) -> list[list[tuple[int, int]]]:
     """
     将字形数据转换为轮廓数据，左上角原点坐标系
     """
     # 相邻像素分组
     point_group_list = []
-    for y, glyph_data_row in enumerate(glyph_data):
-        for x, alpha in enumerate(glyph_data_row):
+    for y, bitmap_row in enumerate(bitmap):
+        for x, alpha in enumerate(bitmap_row):
             if alpha != 0:
                 new_point_group = {(x, y)}
                 for i, point_group in enumerate(reversed(point_group_list)):
@@ -135,13 +135,13 @@ def _create_outlines(glyph_data: list[list[int]], px_to_units: int) -> list[list
                 (x * px_to_units, (y + 1) * px_to_units),
             ]
             # 一个像素有左右上下四条边，如果该边没有相邻像素，则该边线段有效
-            if x <= 0 or glyph_data[y][x - 1] <= 0:  # 左
+            if x <= 0 or bitmap[y][x - 1] <= 0:  # 左
                 pending_line_segments.append([point_outline[3], point_outline[0]])
-            if x >= len(glyph_data[y]) - 1 or glyph_data[y][x + 1] <= 0:  # 右
+            if x >= len(bitmap[y]) - 1 or bitmap[y][x + 1] <= 0:  # 右
                 pending_line_segments.append([point_outline[1], point_outline[2]])
-            if y <= 0 or glyph_data[y - 1][x] <= 0:  # 上
+            if y <= 0 or bitmap[y - 1][x] <= 0:  # 上
                 pending_line_segments.append([point_outline[0], point_outline[1]])
-            if y >= len(glyph_data) - 1 or glyph_data[y + 1][x] <= 0:  # 下
+            if y >= len(bitmap) - 1 or bitmap[y + 1][x] <= 0:  # 下
                 pending_line_segments.append([point_outline[2], point_outline[3]])
         # 连接所有的线段，注意绘制顺序
         solved_line_segments = []
@@ -227,7 +227,7 @@ def _create_glyph(glyph: Glyph, outlines: list[list[tuple[int, int]]], px_to_uni
 
 
 def _get_glyph_with_cache(glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGlyph | TTFGlyph:
-    cache_tag = f'{glyph.advance_width}#{glyph.horizontal_origin}#{glyph.data}'.replace(' ', '')
+    cache_tag = f'{glyph.advance_width}#{glyph.horizontal_origin}#{glyph.bitmap}'.replace(' ', '')
     if getattr(glyph, _CACHE_NAME_TAG, None) != cache_tag:
         setattr(glyph, _CACHE_NAME_OUTLINES, None)
         setattr(glyph, _CACHE_NAME_OTF_GLYPH, None)
@@ -237,7 +237,7 @@ def _get_glyph_with_cache(glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGl
     outlines = getattr(glyph, _CACHE_NAME_OUTLINES, None)
     if outlines is None:
         logger.debug("Create 'Outlines': %s", glyph.name)
-        outlines = _create_outlines(glyph.data, px_to_units)
+        outlines = _create_outlines(glyph.bitmap, px_to_units)
         setattr(glyph, _CACHE_NAME_OUTLINES, outlines)
     else:
         logger.debug("Use cached 'Outlines': %s", glyph.name)
@@ -256,7 +256,7 @@ def _get_glyph_with_cache(glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGl
 def _get_left_side_bearing(glyph: Glyph) -> int:
     left_padding = 0
     for i in range(glyph.width):
-        if any([data_row[i] for data_row in glyph.data]) != 0:
+        if any([bitmap_row[i] for bitmap_row in glyph.bitmap]) != 0:
             break
         left_padding += 1
     if left_padding == glyph.width:
@@ -266,8 +266,8 @@ def _get_left_side_bearing(glyph: Glyph) -> int:
 
 def _get_top_side_bearing(glyph: Glyph) -> int:
     top_padding = 0
-    for data_row in glyph.data:
-        if any(data_row) != 0:
+    for bitmap_row in glyph.bitmap:
+        if any(bitmap_row) != 0:
             break
         top_padding += 1
     if top_padding == glyph.height:
