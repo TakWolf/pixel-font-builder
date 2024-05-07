@@ -1,5 +1,6 @@
 import datetime
 import os
+from collections import UserList
 
 import bdffont
 import fontTools.fontBuilder
@@ -78,12 +79,7 @@ class FontBuilder:
         self.to_pcf_builder().build().save(file_path)
 
 
-class FontCollectionBuilder:
-    def __init__(self, font_builders: list[FontBuilder] = None):
-        if font_builders is None:
-            font_builders = []
-        self.font_builders = font_builders
-
+class FontCollectionBuilder(UserList[FontBuilder]):
     def to_otc_builder(self) -> fontTools.ttLib.TTCollection:
         return opentype.create_collection_builder(self, False)
 

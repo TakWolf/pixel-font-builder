@@ -176,7 +176,7 @@ def main():
     collection_builder = FontCollectionBuilder()
     for index in range(100):
         builder = _create_builder(glyph_pool, character_mapping, glyph_files, index)
-        collection_builder.font_builders.append(builder)
+        collection_builder.append(builder)
     collection_builder.save_otc(os.path.join(outputs_dir, 'demo.otc'))
     collection_builder.save_ttc(os.path.join(outputs_dir, 'demo.ttc'))
 
