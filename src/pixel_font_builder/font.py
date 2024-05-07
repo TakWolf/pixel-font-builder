@@ -45,11 +45,8 @@ class FontBuilder:
 
         return glyph_order, name_to_glyph
 
-    def to_xtf_builder(self, is_ttf: bool, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
-        return opentype.create_builder(self, is_ttf, flavor)
-
     def to_otf_builder(self, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
-        return self.to_xtf_builder(False, flavor)
+        return opentype.create_builder(self, False, flavor)
 
     def save_otf(
             self,
@@ -59,7 +56,7 @@ class FontBuilder:
         self.to_otf_builder(flavor).save(file_path)
 
     def to_ttf_builder(self, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
-        return self.to_xtf_builder(True, flavor)
+        return opentype.create_builder(self, True, flavor)
 
     def save_ttf(
             self,
@@ -87,14 +84,8 @@ class FontCollectionBuilder:
             font_builders = []
         self.font_builders = font_builders
 
-    def _to_xtf_builders(self, is_ttf: bool) -> list[fontTools.fontBuilder.FontBuilder]:
-        return [font_builder.to_xtf_builder(is_ttf) for font_builder in self.font_builders]
-
-    def to_xtc_builder(self, is_ttf: bool) -> fontTools.ttLib.TTCollection:
-        return opentype.create_collection_builder(self._to_xtf_builders(is_ttf))
-
     def to_otc_builder(self) -> fontTools.ttLib.TTCollection:
-        return self.to_xtc_builder(False)
+        return opentype.create_collection_builder(self, False)
 
     def save_otc(
             self,
@@ -104,7 +95,7 @@ class FontCollectionBuilder:
         self.to_otc_builder().save(file_path, share_tables)
 
     def to_ttc_builder(self) -> fontTools.ttLib.TTCollection:
-        return self.to_xtc_builder(True)
+        return opentype.create_collection_builder(self, True)
 
     def save_ttc(
             self,
