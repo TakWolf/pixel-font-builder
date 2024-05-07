@@ -14,12 +14,9 @@ def _load_bitmap_from_png(file_path: str) -> tuple[list[list[int]], int, int]:
     bitmap = []
     for pixels_row in pixels:
         bitmap_row = []
-        for x in range(0, width * 4, 4):
-            alpha = pixels_row[x + 3]
-            if alpha > 127:
-                bitmap_row.append(1)
-            else:
-                bitmap_row.append(0)
+        for i in range(0, width * 4, 4):
+            alpha = pixels_row[i + 3]
+            bitmap_row.append(1 if alpha > 127 else 0)
         bitmap.append(bitmap_row)
     return bitmap, width, height
 
@@ -28,14 +25,11 @@ def _save_bitmap_to_png(bitmap: list[list[int]], file_path: str):
     pixels = []
     for bitmap_row in bitmap:
         pixels_row = []
-        for x in bitmap_row:
+        for alpha in bitmap_row:
             pixels_row.append(0)
             pixels_row.append(0)
             pixels_row.append(0)
-            if x == 0:
-                pixels_row.append(0)
-            else:
-                pixels_row.append(255)
+            pixels_row.append(255 if alpha != 0 else 0)
         pixels.append(pixels_row)
     png.from_array(pixels, 'RGBA').save(file_path)
 
