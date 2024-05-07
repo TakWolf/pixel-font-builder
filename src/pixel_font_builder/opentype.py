@@ -30,7 +30,7 @@ class FeatureFile:
         self.text = text
 
 
-class Config:
+class Configs:
     def __init__(
             self,
             px_to_units: int = 100,
@@ -276,12 +276,12 @@ def _get_top_side_bearing(glyph: Glyph) -> int:
 
 
 def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flavor: Flavor = None) -> FontBuilder:
-    config = context.opentype_config
-    units_per_em = context.font_size * config.px_to_units
+    configs = context.opentype_configs
+    units_per_em = context.font_size * configs.px_to_units
     meta_info = context.meta_info
-    horizontal_header = context.horizontal_header * config.px_to_units
-    vertical_header = context.vertical_header * config.px_to_units
-    os2_config = context.os2_config * config.px_to_units
+    horizontal_header = context.horizontal_header * configs.px_to_units
+    vertical_header = context.vertical_header * configs.px_to_units
+    os2_configs = context.os2_configs * configs.px_to_units
     character_mapping = context.character_mapping
     glyph_order, name_to_glyph = context.prepare_glyphs()
 
@@ -303,7 +303,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     logger.debug("Create 'Glyphs'")
     xtf_glyphs = {}
     for glyph_name, glyph in name_to_glyph.items():
-        xtf_glyphs[glyph_name] = _get_glyph_with_cache(glyph, config.px_to_units, is_ttf)
+        xtf_glyphs[glyph_name] = _get_glyph_with_cache(glyph, configs.px_to_units, is_ttf)
     if is_ttf:
         logger.debug("Setup 'Glyf'")
         builder.setupGlyf(xtf_glyphs)
@@ -320,12 +320,12 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     for glyph_name in glyph_order:
         glyph = name_to_glyph[glyph_name]
 
-        advance_width = glyph.advance_width * config.px_to_units
-        left_side_bearing = _get_left_side_bearing(glyph) * config.px_to_units
+        advance_width = glyph.advance_width * configs.px_to_units
+        left_side_bearing = _get_left_side_bearing(glyph) * configs.px_to_units
         horizontal_metrics[glyph_name] = advance_width, left_side_bearing
 
-        advance_height = glyph.advance_height * config.px_to_units
-        top_side_bearing = _get_top_side_bearing(glyph) * config.px_to_units
+        advance_height = glyph.advance_height * configs.px_to_units
+        top_side_bearing = _get_top_side_bearing(glyph) * configs.px_to_units
         vertical_metrics[glyph_name] = advance_height, top_side_bearing
     builder.setupHorizontalMetrics(horizontal_metrics)
     builder.setupVerticalMetrics(vertical_metrics)
@@ -351,14 +351,14 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
         sTypoLineGap=horizontal_header.line_gap,
         usWinAscent=horizontal_header.ascent,
         usWinDescent=-horizontal_header.descent,
-        sxHeight=os2_config.x_height,
-        sCapHeight=os2_config.cap_height,
+        sxHeight=os2_configs.x_height,
+        sCapHeight=os2_configs.cap_height,
     )
 
     logger.debug("Setup 'Post'")
     builder.setupPost()
 
-    for feature_file in config.feature_files:
+    for feature_file in configs.feature_files:
         logger.debug("Add Feature: '%s'", feature_file.file_path)
         builder.addOpenTypeFeatures(feature_file.text, feature_file.file_path)
 

@@ -34,8 +34,8 @@ def main():
     builder.vertical_header.ascent = 6
     builder.vertical_header.descent = -6
 
-    builder.os2_config.x_height = 5
-    builder.os2_config.cap_height = 7
+    builder.os2_configs.x_height = 5
+    builder.os2_configs.cap_height = 7
 
     builder.character_mapping.update({
         ord('A'): 'CAP_LETTER_A',

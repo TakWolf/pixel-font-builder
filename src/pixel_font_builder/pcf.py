@@ -9,7 +9,7 @@ from pixel_font_builder.info import SerifMode, WidthMode
 logger = logging.getLogger('pixel_font_builder.pcf')
 
 
-class Config:
+class Configs:
     def __init__(
             self,
             resolution_x: int = 75,
@@ -20,11 +20,11 @@ class Config:
 
 
 def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
-    config = context.pcf_config
+    configs = context.pcf_configs
     font_size = context.font_size
     meta_info = context.meta_info
     horizontal_header = context.horizontal_header
-    os2_config = context.os2_config
+    os2_configs = context.os2_configs
     character_mapping = context.character_mapping
     _, name_to_glyph = context.prepare_glyphs()
 
@@ -41,7 +41,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
             break
         logger.debug("Add 'Glyph': %s", glyph_name)
         glyph = name_to_glyph[glyph_name]
-        scalable_width = math.ceil((glyph.advance_width / font_size) * (75 / config.resolution_x) * 1000)
+        scalable_width = math.ceil((glyph.advance_width / font_size) * (75 / configs.resolution_x) * 1000)
         builder.glyphs.append(PcfGlyph(
             name=glyph_name,
             encoding=code_point,
@@ -66,8 +66,8 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
         builder.properties.add_style_name = meta_info.serif_mode
     builder.properties.pixel_size = font_size
     builder.properties.point_size = font_size * 10
-    builder.properties.resolution_x = config.resolution_x
-    builder.properties.resolution_y = config.resolution_y
+    builder.properties.resolution_x = configs.resolution_x
+    builder.properties.resolution_y = configs.resolution_y
     if meta_info.width_mode == WidthMode.MONOSPACED:
         builder.properties.spacing = 'M'
     elif meta_info.width_mode == WidthMode.DUOSPACED:
@@ -81,8 +81,8 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
     builder.properties.charset_encoding = '1'
     builder.properties.generate_xlfd()
 
-    builder.properties.x_height = os2_config.x_height
-    builder.properties.cap_height = os2_config.cap_height
+    builder.properties.x_height = os2_configs.x_height
+    builder.properties.cap_height = os2_configs.cap_height
 
     builder.properties.font_version = meta_info.version
     builder.properties.copyright = meta_info.copyright_info

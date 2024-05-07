@@ -9,7 +9,7 @@ from pixel_font_builder.info import SerifMode, WidthMode
 logger = logging.getLogger('pixel_font_builder.bdf')
 
 
-class Config:
+class Configs:
     def __init__(
             self,
             resolution_x: int = 75,
@@ -22,18 +22,18 @@ class Config:
 
 
 def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
-    config = context.bdf_config
+    configs = context.bdf_configs
     font_size = context.font_size
     meta_info = context.meta_info
     horizontal_header = context.horizontal_header
-    os2_config = context.os2_config
+    os2_configs = context.os2_configs
     character_mapping = context.character_mapping
     _, name_to_glyph = context.prepare_glyphs()
 
     logger.debug("Create 'BdfFont': %s", meta_info.family_name)
     font = BdfFont(
         point_size=font_size,
-        resolution=(config.resolution_x, config.resolution_y),
+        resolution=(configs.resolution_x, configs.resolution_y),
         bounding_box=(font_size, horizontal_header.line_height, 0, horizontal_header.descent),
     )
 
@@ -41,11 +41,11 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     default_char = 0xFFFE
     character_mapping[default_char] = '.notdef'
     for code_point, glyph_name in sorted(character_mapping.items()):
-        if code_point > 0xFFFF and config.only_basic_plane:
+        if code_point > 0xFFFF and configs.only_basic_plane:
             break
         logger.debug("Add 'Glyph': %s", glyph_name)
         glyph = name_to_glyph[glyph_name]
-        scalable_width_x = math.ceil((glyph.advance_width / font_size) * (75 / config.resolution_x) * 1000)
+        scalable_width_x = math.ceil((glyph.advance_width / font_size) * (75 / configs.resolution_x) * 1000)
         font.glyphs.append(BdfGlyph(
             name=glyph_name,
             encoding=code_point,
@@ -69,8 +69,8 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
         font.properties.add_style_name = meta_info.serif_mode
     font.properties.pixel_size = font_size
     font.properties.point_size = font_size * 10
-    font.properties.resolution_x = config.resolution_x
-    font.properties.resolution_y = config.resolution_y
+    font.properties.resolution_x = configs.resolution_x
+    font.properties.resolution_y = configs.resolution_y
     if meta_info.width_mode == WidthMode.MONOSPACED:
         font.properties.spacing = 'M'
     elif meta_info.width_mode == WidthMode.DUOSPACED:
@@ -87,8 +87,8 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     font.properties.default_char = default_char
     font.properties.font_ascent = horizontal_header.ascent
     font.properties.font_descent = -horizontal_header.descent
-    font.properties.x_height = os2_config.x_height
-    font.properties.cap_height = os2_config.cap_height
+    font.properties.x_height = os2_configs.x_height
+    font.properties.cap_height = os2_configs.cap_height
 
     font.properties.font_version = meta_info.version
     font.properties.copyright = meta_info.copyright_info

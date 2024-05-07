@@ -130,8 +130,8 @@ def _create_builder(
     builder.vertical_header.ascent = 8
     builder.vertical_header.descent = -7
 
-    builder.os2_config.x_height = 5
-    builder.os2_config.cap_height = 7
+    builder.os2_configs.x_height = 5
+    builder.os2_configs.cap_height = 7
 
     builder.character_mapping.update(character_mapping)
 
