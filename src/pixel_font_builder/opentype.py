@@ -38,7 +38,7 @@ class Configs:
     ):
         self.px_to_units = px_to_units
         if feature_files is None:
-            feature_files = []
+            feature_files = list[FeatureFile]()
         self.feature_files = feature_files
 
 

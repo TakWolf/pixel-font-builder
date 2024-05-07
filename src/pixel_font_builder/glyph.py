@@ -15,7 +15,7 @@ class Glyph:
         self.horizontal_origin_x, self.horizontal_origin_y = horizontal_origin
         self.vertical_origin_y = vertical_origin_y
         if bitmap is None:
-            bitmap = []
+            bitmap = list[list[int]]()
         self.bitmap = bitmap
 
     @property
