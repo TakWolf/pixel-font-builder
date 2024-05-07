@@ -277,7 +277,7 @@ def _get_top_side_bearing(glyph: Glyph) -> int:
 
 def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flavor: Flavor = None) -> FontBuilder:
     config = context.opentype_config
-    units_per_em = context.size * config.px_to_units
+    units_per_em = context.font_size * config.px_to_units
     meta_info = context.meta_info
     horizontal_header = context.horizontal_header * config.px_to_units
     vertical_header = context.vertical_header * config.px_to_units

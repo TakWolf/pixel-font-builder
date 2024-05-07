@@ -12,8 +12,8 @@ from pixel_font_builder.info import MetaInfo, LayoutHeader
 
 
 class FontBuilder:
-    def __init__(self, size: int):
-        self.size = size
+    def __init__(self, font_size: int):
+        self.font_size = font_size
         self.created_time: datetime.datetime | None = None
         self.modified_time: datetime.datetime | None = None
 

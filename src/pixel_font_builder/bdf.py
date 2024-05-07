@@ -23,7 +23,7 @@ class Config:
 
 def create_font(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     config = context.bdf_config
-    font_size = context.size
+    font_size = context.font_size
     meta_info = context.meta_info
     horizontal_header = context.horizontal_header
     os2_config = context.os2_config
