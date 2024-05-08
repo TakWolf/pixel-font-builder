@@ -6,7 +6,7 @@ import shutil
 import png
 
 from examples import glyphs_dir, build_dir
-from pixel_font_builder import FontBuilder, FontCollectionBuilder, StyleName, SerifMode, WidthMode, Glyph, opentype
+from pixel_font_builder import FontBuilder, FontCollectionBuilder, WeightName, SerifStyle, SlantStyle, WidthMode, Glyph, opentype
 
 
 def _load_bitmap_from_png(file_path: str) -> tuple[list[list[int]], int, int]:
@@ -110,8 +110,9 @@ def _create_builder(
     builder.meta_info.created_time = datetime.datetime.fromisoformat('2024-01-01T00:00:00Z')
     builder.meta_info.modified_time = builder.meta_info.created_time
     builder.meta_info.family_name = f'Demo Pixel {name_num}'
-    builder.meta_info.style_name = StyleName.REGULAR
-    builder.meta_info.serif_mode = SerifMode.SANS_SERIF
+    builder.meta_info.weight_name = WeightName.REGULAR
+    builder.meta_info.serif_style = SerifStyle.SANS_SERIF
+    builder.meta_info.slant_style = SlantStyle.NORMAL
     builder.meta_info.width_mode = WidthMode.PROPORTIONAL
     builder.meta_info.manufacturer = 'Pixel Font Studio'
     builder.meta_info.designer = 'TakWolf'

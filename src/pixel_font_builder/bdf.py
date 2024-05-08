@@ -5,7 +5,7 @@ from collections import ChainMap
 from bdffont import BdfFont, BdfGlyph
 
 import pixel_font_builder
-from pixel_font_builder.meta import SerifMode, WidthMode
+from pixel_font_builder.meta import SerifStyle, SlantStyle, WidthMode
 
 logger = logging.getLogger('pixel_font_builder.bdf')
 
@@ -56,15 +56,26 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     logger.debug("Setup 'Properties'")
     font.properties.foundry = meta_info.manufacturer
     font.properties.family_name = meta_info.family_name
-    font.properties.weight_name = meta_info.style_name
-    font.properties.slant = 'R'
+    font.properties.weight_name = meta_info.weight_name
+    if meta_info.slant_style is None or meta_info.slant_style == SlantStyle.NORMAL:
+        font.properties.slant = 'R'
+    elif meta_info.slant_style == SlantStyle.ITALIC:
+        font.properties.slant = 'I'
+    elif meta_info.slant_style == SlantStyle.OBLIQUE:
+        font.properties.slant = 'O'
+    elif meta_info.slant_style == SlantStyle.REVERSE_ITALIC:
+        font.properties.slant = 'RI'
+    elif meta_info.slant_style == SlantStyle.REVERSE_OBLIQUE:
+        font.properties.slant = 'RO'
+    else:
+        font.properties.slant = 'OT'
     font.properties.setwidth_name = 'Normal'
-    if meta_info.serif_mode == SerifMode.SERIF:
+    if meta_info.serif_style == SerifStyle.SERIF:
         font.properties.add_style_name = 'Serif'
-    elif meta_info.serif_mode == SerifMode.SANS_SERIF:
+    elif meta_info.serif_style == SerifStyle.SANS_SERIF:
         font.properties.add_style_name = 'Sans Serif'
     else:
-        font.properties.add_style_name = meta_info.serif_mode
+        font.properties.add_style_name = meta_info.serif_style
     font.properties.pixel_size = font_metrics.font_size
     font.properties.point_size = font_metrics.font_size * 10
     font.properties.resolution_x = configs.resolution_x
@@ -75,8 +86,6 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
         font.properties.spacing = 'D'
     elif meta_info.width_mode == WidthMode.PROPORTIONAL:
         font.properties.spacing = 'P'
-    else:
-        font.properties.spacing = meta_info.width_mode
     font.properties.average_width = round(sum([glyph.device_width_x * 10 for glyph in font.glyphs]) / len(font.glyphs))
     font.properties.charset_registry = 'ISO10646'
     font.properties.charset_encoding = '1'

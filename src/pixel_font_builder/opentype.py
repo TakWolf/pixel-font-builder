@@ -12,7 +12,7 @@ from fontTools.ttLib import TTCollection
 from fontTools.ttLib.tables._g_l_y_f import Glyph as TTFGlyph
 
 import pixel_font_builder
-from pixel_font_builder.meta import MetaInfo
+from pixel_font_builder.meta import WeightName, MetaInfo
 from pixel_font_builder.glyph import Glyph
 
 logger = logging.getLogger('pixel_font_builder.opentype')
@@ -78,13 +78,14 @@ def _create_name_strings(meta_info: MetaInfo) -> dict[str, str]:
     variationsPostScriptNamePrefix (nameID 25)
     """
     unique_name = meta_info.family_name.replace(' ', '-')
+    style_name = meta_info.weight_name or WeightName.REGULAR
     name_strings = {
         'familyName': meta_info.family_name,
-        'styleName': meta_info.style_name,
-        'uniqueFontIdentifier': f'{unique_name}-{meta_info.style_name};{meta_info.version}',
-        'fullName': f'{meta_info.family_name} {meta_info.style_name}',
+        'styleName': style_name,
+        'uniqueFontIdentifier': f'{unique_name}-{style_name};{meta_info.version}',
+        'fullName': f'{meta_info.family_name} {style_name}',
         'version': meta_info.version,
-        'psName': f'{unique_name}-{meta_info.style_name}',
+        'psName': f'{unique_name}-{style_name}',
     }
     if meta_info.copyright_info is not None:
         name_strings['copyright'] = meta_info.copyright_info

@@ -2,7 +2,7 @@ import datetime
 from enum import StrEnum
 
 
-class StyleName(StrEnum):
+class WeightName(StrEnum):
     LIGHT = 'Light'
     NORMAL = 'Normal'
     REGULAR = 'Regular'
@@ -11,9 +11,17 @@ class StyleName(StrEnum):
     HEAVY = 'Heavy'
 
 
-class SerifMode(StrEnum):
+class SerifStyle(StrEnum):
     SERIF = 'Serif'
-    SANS_SERIF = 'Sans-Serif'
+    SANS_SERIF = 'Sans Serif'
+
+
+class SlantStyle(StrEnum):
+    NORMAL = 'Normal'
+    ITALIC = 'Italic'
+    OBLIQUE = 'Oblique'
+    REVERSE_ITALIC = 'Reverse Italic'
+    REVERSE_OBLIQUE = 'Reverse Oblique'
 
 
 class WidthMode(StrEnum):
@@ -29,8 +37,9 @@ class MetaInfo:
             created_time: datetime.datetime = None,
             modified_time: datetime.datetime = None,
             family_name: str = None,
-            style_name: str = StyleName.REGULAR,
-            serif_mode: SerifMode = None,
+            weight_name: WeightName = None,
+            serif_style: SerifStyle = None,
+            slant_style: SlantStyle = None,
             width_mode: WidthMode = None,
             manufacturer: str = None,
             designer: str = None,
@@ -46,8 +55,9 @@ class MetaInfo:
         self.created_time = created_time
         self.modified_time = modified_time
         self.family_name = family_name
-        self.style_name = style_name
-        self.serif_mode = serif_mode
+        self.weight_name = weight_name
+        self.serif_style = serif_style
+        self.slant_style = slant_style
         self.width_mode = width_mode
         self.manufacturer = manufacturer
         self.designer = designer
