@@ -8,6 +8,7 @@ from fontTools.misc.psCharStrings import T2CharString as OTFGlyph
 from fontTools.pens.t2CharStringPen import T2CharStringPen as OTFGlyphPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen as TTFGlyphPen
 from fontTools.ttLib import TTCollection
+# noinspection PyProtectedMember
 from fontTools.ttLib.tables._g_l_y_f import Glyph as TTFGlyph
 
 import pixel_font_builder
