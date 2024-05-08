@@ -5,7 +5,7 @@ from collections import ChainMap
 from pcffont import PcfFontBuilder, PcfGlyph
 
 import pixel_font_builder
-from pixel_font_builder.info import SerifMode, WidthMode
+from pixel_font_builder.meta import SerifMode, WidthMode
 
 logger = logging.getLogger('pixel_font_builder.pcf')
 
