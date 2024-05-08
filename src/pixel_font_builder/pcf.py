@@ -17,9 +17,19 @@ class Configs:
             self,
             resolution_x: int = 75,
             resolution_y: int = 75,
+            draw_right_to_left: bool = False,
+            ms_byte_first: bool = True,
+            ms_bit_first: bool = True,
+            glyph_pad_index: int = 0,
+            scan_unit_index: int = 0,
     ):
         self.resolution_x = resolution_x
         self.resolution_y = resolution_y
+        self.draw_right_to_left = draw_right_to_left
+        self.ms_byte_first = ms_byte_first
+        self.ms_bit_first = ms_bit_first
+        self.glyph_pad_index = glyph_pad_index
+        self.scan_unit_index = scan_unit_index
 
 
 def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
@@ -36,6 +46,11 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
     builder.configs.font_ascent = horizontal_header.ascent
     builder.configs.font_descent = -horizontal_header.descent
     builder.configs.default_char = _DEFAULT_CHAR
+    builder.configs.draw_right_to_left = configs.draw_right_to_left
+    builder.configs.ms_byte_first = configs.ms_byte_first
+    builder.configs.ms_bit_first = configs.ms_bit_first
+    builder.configs.glyph_pad_index = configs.glyph_pad_index
+    builder.configs.scan_unit_index = configs.scan_unit_index
 
     logger.debug("Setup 'Glyphs'")
     for code_point, glyph_name in sorted(character_mapping.items()):
