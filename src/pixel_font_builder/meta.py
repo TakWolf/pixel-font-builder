@@ -1,3 +1,4 @@
+import datetime
 from enum import StrEnum
 
 
@@ -25,6 +26,8 @@ class MetaInfo:
     def __init__(
             self,
             version: str = '0.0.0',
+            created_time: datetime.datetime = None,
+            modified_time: datetime.datetime = None,
             family_name: str = None,
             style_name: str = StyleName.REGULAR,
             serif_mode: SerifMode = None,
@@ -40,6 +43,8 @@ class MetaInfo:
             sample_text: str = None,
     ):
         self.version = version
+        self.created_time = created_time
+        self.modified_time = modified_time
         self.family_name = family_name
         self.style_name = style_name
         self.serif_mode = serif_mode

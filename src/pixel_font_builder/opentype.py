@@ -285,10 +285,10 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     logger.debug("Create '%sBuilder': %s", 'TTF' if is_ttf else 'OTF', meta_info.family_name)
     builder = FontBuilder(font_metrics.font_size, isTTF=is_ttf)
 
-    if context.created_time is not None:
-        setattr(builder.font['head'], 'created', timeTools.timestampSinceEpoch(context.created_time.timestamp()))
-    if context.modified_time is not None:
-        setattr(builder.font['head'], 'modified', timeTools.timestampSinceEpoch(context.modified_time.timestamp()))
+    if meta_info.created_time is not None:
+        setattr(builder.font['head'], 'created', timeTools.timestampSinceEpoch(meta_info.created_time.timestamp()))
+    if meta_info.modified_time is not None:
+        setattr(builder.font['head'], 'modified', timeTools.timestampSinceEpoch(meta_info.modified_time.timestamp()))
 
     logger.debug("Setup 'Name Strings'")
     name_strings = _create_name_strings(meta_info)

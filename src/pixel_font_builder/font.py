@@ -1,4 +1,3 @@
-import datetime
 import os
 from collections import UserList
 
@@ -16,14 +15,9 @@ from pixel_font_builder.glyph import Glyph
 class FontBuilder:
     def __init__(self):
         self.font_metrics = FontMetrics()
-
-        self.created_time: datetime.datetime | None = None
-        self.modified_time: datetime.datetime | None = None
         self.meta_info = MetaInfo()
-
         self.character_mapping: dict[int, str] = {}
         self.glyphs: list[Glyph] = []
-
         self.opentype_configs = opentype.Configs()
         self.bdf_configs = bdf.Configs()
         self.pcf_configs = pcf.Configs()

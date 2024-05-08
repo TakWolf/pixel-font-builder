@@ -106,11 +106,9 @@ def _create_builder(
     builder.font_metrics.x_height = 5
     builder.font_metrics.cap_height = 7
 
-    time = datetime.datetime.fromisoformat('2024-01-01T00:00:00Z')
-    builder.created_time = time
-    builder.modified_time = time
-
     builder.meta_info.version = '1.0.0'
+    builder.meta_info.created_time = datetime.datetime.fromisoformat('2024-01-01T00:00:00Z')
+    builder.meta_info.modified_time = builder.meta_info.created_time
     builder.meta_info.family_name = f'Demo Pixel {name_num}'
     builder.meta_info.style_name = StyleName.REGULAR
     builder.meta_info.serif_mode = SerifMode.SANS_SERIF
