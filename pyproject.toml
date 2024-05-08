@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pixel-font-builder"
-version = "0.0.22"
+version = "0.0.23"
 description = "A library that helps create pixel style fonts."
 readme = "README.md"
 license = { text = "MIT License" }
