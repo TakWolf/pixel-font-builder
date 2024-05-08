@@ -1,5 +1,6 @@
 import logging
 import math
+from collections import ChainMap
 
 from bdffont import BdfFont, BdfGlyph
 
@@ -7,6 +8,8 @@ import pixel_font_builder
 from pixel_font_builder.info import SerifMode, WidthMode
 
 logger = logging.getLogger('pixel_font_builder.bdf')
+
+_DEFAULT_CHAR = 0xFFFE
 
 
 class Configs:
@@ -27,7 +30,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     meta_info = context.meta_info
     horizontal_header = context.horizontal_header
     os2_configs = context.os2_configs
-    character_mapping = context.character_mapping
+    character_mapping = ChainMap({_DEFAULT_CHAR: '.notdef'}, context.character_mapping)
     _, name_to_glyph = context.prepare_glyphs()
 
     logger.debug("Create 'BdfFont': %s", meta_info.family_name)
@@ -38,8 +41,6 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     )
 
     logger.debug("Setup 'Glyphs'")
-    default_char = 0xFFFE
-    character_mapping[default_char] = '.notdef'
     for code_point, glyph_name in sorted(character_mapping.items()):
         if code_point > 0xFFFF and configs.only_basic_plane:
             break
@@ -84,7 +85,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     font.properties.charset_encoding = '1'
     font.generate_name_as_xlfd()
 
-    font.properties.default_char = default_char
+    font.properties.default_char = _DEFAULT_CHAR
     font.properties.font_ascent = horizontal_header.ascent
     font.properties.font_descent = -horizontal_header.descent
     font.properties.x_height = os2_configs.x_height

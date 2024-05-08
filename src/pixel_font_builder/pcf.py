@@ -1,5 +1,6 @@
 import logging
 import math
+from collections import ChainMap
 
 from pcffont import PcfFontBuilder, PcfGlyph
 
@@ -7,6 +8,8 @@ import pixel_font_builder
 from pixel_font_builder.info import SerifMode, WidthMode
 
 logger = logging.getLogger('pixel_font_builder.pcf')
+
+_DEFAULT_CHAR = 0xFFFE
 
 
 class Configs:
@@ -25,17 +28,16 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
     meta_info = context.meta_info
     horizontal_header = context.horizontal_header
     os2_configs = context.os2_configs
-    character_mapping = context.character_mapping
+    character_mapping = ChainMap({_DEFAULT_CHAR: '.notdef'}, context.character_mapping)
     _, name_to_glyph = context.prepare_glyphs()
 
     logger.debug("Create 'PcfFont': %s", meta_info.family_name)
     builder = PcfFontBuilder()
     builder.configs.font_ascent = horizontal_header.ascent
     builder.configs.font_descent = -horizontal_header.descent
-    builder.configs.default_char = 0xFFFE
+    builder.configs.default_char = _DEFAULT_CHAR
 
     logger.debug("Setup 'Glyphs'")
-    character_mapping[builder.configs.default_char] = '.notdef'
     for code_point, glyph_name in sorted(character_mapping.items()):
         if code_point > 0xFFFF:
             break
