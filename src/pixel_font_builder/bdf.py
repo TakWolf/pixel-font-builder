@@ -46,11 +46,10 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
             break
         logger.debug("Add 'Glyph': %s", glyph_name)
         glyph = name_to_glyph[glyph_name]
-        scalable_width_x = math.ceil((glyph.advance_width / font_size) * (75 / configs.resolution_x) * 1000)
         font.glyphs.append(BdfGlyph(
             name=glyph_name,
             encoding=code_point,
-            scalable_width=(scalable_width_x, 0),
+            scalable_width=(math.ceil((glyph.advance_width / font_size) * (75 / configs.resolution_x) * 1000), 0),
             device_width=(glyph.advance_width, 0),
             bounding_box=(glyph.width, glyph.height, glyph.horizontal_origin_x, glyph.horizontal_origin_y),
             bitmap=glyph.bitmap,

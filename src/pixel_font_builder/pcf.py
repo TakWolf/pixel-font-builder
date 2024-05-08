@@ -58,11 +58,10 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
             break
         logger.debug("Add 'Glyph': %s", glyph_name)
         glyph = name_to_glyph[glyph_name]
-        scalable_width = math.ceil((glyph.advance_width / font_size) * (75 / configs.resolution_x) * 1000)
         builder.glyphs.append(PcfGlyph(
             name=glyph_name,
             encoding=code_point,
-            scalable_width=scalable_width,
+            scalable_width=math.ceil((glyph.advance_width / font_size) * (75 / configs.resolution_x) * 1000),
             character_width=glyph.advance_width,
             dimensions=glyph.dimensions,
             origin=glyph.horizontal_origin,
