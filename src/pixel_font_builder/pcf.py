@@ -34,17 +34,15 @@ class Configs:
 
 def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
     configs = context.pcf_configs
-    font_size = context.font_size
+    font_metrics = context.font_metrics
     meta_info = context.meta_info
-    horizontal_header = context.horizontal_header
-    os2_configs = context.os2_configs
     character_mapping = ChainMap({_DEFAULT_CHAR: '.notdef'}, context.character_mapping)
     _, name_to_glyph = context.prepare_glyphs()
 
     logger.debug("Create 'PcfFont': %s", meta_info.family_name)
     builder = PcfFontBuilder()
-    builder.configs.font_ascent = horizontal_header.ascent
-    builder.configs.font_descent = -horizontal_header.descent
+    builder.configs.font_ascent = font_metrics.horizontal_layout.ascent
+    builder.configs.font_descent = -font_metrics.horizontal_layout.descent
     builder.configs.default_char = _DEFAULT_CHAR
     builder.configs.draw_right_to_left = configs.draw_right_to_left
     builder.configs.ms_byte_first = configs.ms_byte_first
@@ -61,7 +59,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
         builder.glyphs.append(PcfGlyph(
             name=glyph_name,
             encoding=code_point,
-            scalable_width=math.ceil((glyph.advance_width / font_size) * (75 / configs.resolution_x) * 1000),
+            scalable_width=math.ceil((glyph.advance_width / font_metrics.font_size) * (75 / configs.resolution_x) * 1000),
             character_width=glyph.advance_width,
             dimensions=glyph.dimensions,
             origin=glyph.horizontal_origin,
@@ -80,8 +78,8 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
         builder.properties.add_style_name = 'Sans Serif'
     else:
         builder.properties.add_style_name = meta_info.serif_mode
-    builder.properties.pixel_size = font_size
-    builder.properties.point_size = font_size * 10
+    builder.properties.pixel_size = font_metrics.font_size
+    builder.properties.point_size = font_metrics.font_size * 10
     builder.properties.resolution_x = configs.resolution_x
     builder.properties.resolution_y = configs.resolution_y
     if meta_info.width_mode == WidthMode.MONOSPACED:
@@ -97,8 +95,8 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
     builder.properties.charset_encoding = '1'
     builder.properties.generate_xlfd()
 
-    builder.properties.x_height = os2_configs.x_height
-    builder.properties.cap_height = os2_configs.cap_height
+    builder.properties.x_height = font_metrics.x_height
+    builder.properties.cap_height = font_metrics.cap_height
 
     builder.properties.font_version = meta_info.version
     builder.properties.copyright = meta_info.copyright_info

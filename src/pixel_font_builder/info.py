@@ -53,26 +53,3 @@ class MetaInfo:
         self.designer_url = designer_url
         self.license_url = license_url
         self.sample_text = sample_text
-
-
-class LayoutHeader:
-    def __init__(
-            self,
-            ascent: int = 0,
-            descent: int = 0,
-            line_gap: int = 0,
-    ):
-        self.ascent = ascent
-        self.descent = descent
-        self.line_gap = line_gap
-
-    @property
-    def line_height(self) -> int:
-        return self.ascent - self.descent
-
-    def __mul__(self, other: int) -> 'LayoutHeader':
-        return LayoutHeader(
-            self.ascent * other,
-            self.descent * other,
-            self.line_gap * other,
-        )

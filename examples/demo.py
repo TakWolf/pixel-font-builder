@@ -97,7 +97,14 @@ def _create_builder(
         glyph_files: list[GlyphFile],
         name_num: int = 0,
 ) -> FontBuilder:
-    builder = FontBuilder(11)
+    builder = FontBuilder()
+    builder.font_metrics.font_size = 11
+    builder.font_metrics.horizontal_layout.ascent = 11
+    builder.font_metrics.horizontal_layout.descent = -4
+    builder.font_metrics.vertical_layout.ascent = 8
+    builder.font_metrics.vertical_layout.descent = -7
+    builder.font_metrics.x_height = 5
+    builder.font_metrics.cap_height = 7
 
     time = datetime.datetime.fromisoformat('2024-01-01T00:00:00Z')
     builder.created_time = time
@@ -118,27 +125,18 @@ def _create_builder(
     builder.meta_info.license_url = 'https://openfontlicense.org'
     builder.meta_info.sample_text = 'Hello World!'
 
-    builder.horizontal_header.ascent = 11
-    builder.horizontal_header.descent = -4
-
-    builder.vertical_header.ascent = 8
-    builder.vertical_header.descent = -7
-
-    builder.os2_configs.x_height = 5
-    builder.os2_configs.cap_height = 7
-
     builder.character_mapping.update(character_mapping)
 
     for glyph_file in glyph_files:
         if glyph_file.file_path in glyph_pool:
             glyph = glyph_pool[glyph_file.file_path]
         else:
-            horizontal_origin_y = math.floor((builder.horizontal_header.ascent + builder.horizontal_header.descent - glyph_file.height) / 2)
-            vertical_origin_y = (builder.font_size - glyph_file.height) // 2
+            horizontal_origin_y = math.floor((builder.font_metrics.horizontal_layout.ascent + builder.font_metrics.horizontal_layout.descent - glyph_file.height) / 2)
+            vertical_origin_y = (builder.font_metrics.font_size - glyph_file.height) // 2
             glyph = Glyph(
                 name=glyph_file.glyph_name,
                 advance_width=glyph_file.width,
-                advance_height=builder.font_size,
+                advance_height=builder.font_metrics.font_size,
                 horizontal_origin=(0, horizontal_origin_y),
                 vertical_origin_y=vertical_origin_y,
                 bitmap=glyph_file.bitmap,

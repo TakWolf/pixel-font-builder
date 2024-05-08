@@ -277,16 +277,13 @@ def _get_top_side_bearing(glyph: Glyph) -> int:
 
 def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flavor: Flavor = None) -> FontBuilder:
     configs = context.opentype_configs
-    units_per_em = context.font_size * configs.px_to_units
+    font_metrics = context.font_metrics * configs.px_to_units
     meta_info = context.meta_info
-    horizontal_header = context.horizontal_header * configs.px_to_units
-    vertical_header = context.vertical_header * configs.px_to_units
-    os2_configs = context.os2_configs * configs.px_to_units
     character_mapping = context.character_mapping
     glyph_order, name_to_glyph = context.prepare_glyphs()
 
     logger.debug("Create '%sBuilder': %s", 'TTF' if is_ttf else 'OTF', meta_info.family_name)
-    builder = FontBuilder(units_per_em, isTTF=is_ttf)
+    builder = FontBuilder(font_metrics.font_size, isTTF=is_ttf)
 
     if context.created_time is not None:
         setattr(builder.font['head'], 'created', timeTools.timestampSinceEpoch(context.created_time.timestamp()))
@@ -332,27 +329,27 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
 
     logger.debug("Setup 'Horizontal Header'")
     builder.setupHorizontalHeader(
-        ascent=horizontal_header.ascent,
-        descent=horizontal_header.descent,
-        lineGap=horizontal_header.line_gap,
+        ascent=font_metrics.horizontal_layout.ascent,
+        descent=font_metrics.horizontal_layout.descent,
+        lineGap=font_metrics.horizontal_layout.line_gap,
     )
 
     logger.debug("Setup 'Vertical Header'")
     builder.setupVerticalHeader(
-        ascent=vertical_header.ascent,
-        descent=vertical_header.descent,
-        lineGap=vertical_header.line_gap,
+        ascent=font_metrics.vertical_layout.ascent,
+        descent=font_metrics.vertical_layout.descent,
+        lineGap=font_metrics.vertical_layout.line_gap,
     )
 
     logger.debug("Setup 'OS2'")
     builder.setupOS2(
-        sTypoAscender=horizontal_header.ascent,
-        sTypoDescender=horizontal_header.descent,
-        sTypoLineGap=horizontal_header.line_gap,
-        usWinAscent=horizontal_header.ascent,
-        usWinDescent=-horizontal_header.descent,
-        sxHeight=os2_configs.x_height,
-        sCapHeight=os2_configs.cap_height,
+        sTypoAscender=font_metrics.horizontal_layout.ascent,
+        sTypoDescender=font_metrics.horizontal_layout.descent,
+        sTypoLineGap=font_metrics.horizontal_layout.line_gap,
+        usWinAscent=font_metrics.horizontal_layout.ascent,
+        usWinDescent=-font_metrics.horizontal_layout.descent,
+        sxHeight=font_metrics.x_height,
+        sCapHeight=font_metrics.cap_height,
     )
 
     logger.debug("Setup 'Post'")

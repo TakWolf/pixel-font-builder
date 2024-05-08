@@ -7,23 +7,23 @@ import fontTools.fontBuilder
 import fontTools.ttLib
 import pcffont
 
-from pixel_font_builder import os2, opentype, bdf, pcf
+from pixel_font_builder import opentype, bdf, pcf
+from pixel_font_builder.metric import FontMetrics
+from pixel_font_builder.info import MetaInfo
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.info import MetaInfo, LayoutHeader
 
 
 class FontBuilder:
-    def __init__(self, font_size: int):
-        self.font_size = font_size
+    def __init__(self):
+        self.font_metrics = FontMetrics()
+
         self.created_time: datetime.datetime | None = None
         self.modified_time: datetime.datetime | None = None
-
         self.meta_info = MetaInfo()
-        self.horizontal_header = LayoutHeader()
-        self.vertical_header = LayoutHeader()
-        self.os2_configs = os2.Configs()
+
         self.character_mapping: dict[int, str] = {}
         self.glyphs: list[Glyph] = []
+
         self.opentype_configs = opentype.Configs()
         self.bdf_configs = bdf.Configs()
         self.pcf_configs = pcf.Configs()

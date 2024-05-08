@@ -11,7 +11,14 @@ def main():
         shutil.rmtree(outputs_dir)
     os.makedirs(outputs_dir)
 
-    builder = FontBuilder(12)
+    builder = FontBuilder()
+    builder.font_metrics.font_size = 12
+    builder.font_metrics.horizontal_layout.ascent = 10
+    builder.font_metrics.horizontal_layout.descent = -2
+    builder.font_metrics.vertical_layout.ascent = 6
+    builder.font_metrics.vertical_layout.descent = -6
+    builder.font_metrics.x_height = 5
+    builder.font_metrics.cap_height = 7
 
     builder.meta_info.version = '1.0.0'
     builder.meta_info.family_name = 'My Pixel'
@@ -27,15 +34,6 @@ def main():
     builder.meta_info.designer_url = 'https://takwolf.com'
     builder.meta_info.license_url = 'https://openfontlicense.org'
     builder.meta_info.sample_text = 'Hello World!'
-
-    builder.horizontal_header.ascent = 10
-    builder.horizontal_header.descent = -2
-
-    builder.vertical_header.ascent = 6
-    builder.vertical_header.descent = -6
-
-    builder.os2_configs.x_height = 5
-    builder.os2_configs.cap_height = 7
 
     builder.character_mapping.update({
         ord('A'): 'CAP_LETTER_A',
