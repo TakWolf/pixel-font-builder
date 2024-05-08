@@ -76,7 +76,7 @@ class FontBuilder:
         return pcf.create_builder(self)
 
     def save_pcf(self, file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes]):
-        self.to_pcf_builder().build().save(file_path)
+        self.to_pcf_builder().save(file_path)
 
 
 class FontCollectionBuilder(UserList[FontBuilder]):
