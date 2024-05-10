@@ -41,14 +41,14 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
 
     logger.debug("Create 'PcfFont': %s", meta_info.family_name)
     builder = PcfFontBuilder()
-    builder.configs.font_ascent = font_metrics.horizontal_layout.ascent
-    builder.configs.font_descent = -font_metrics.horizontal_layout.descent
-    builder.configs.default_char = _DEFAULT_CHAR
-    builder.configs.draw_right_to_left = configs.draw_right_to_left
-    builder.configs.ms_byte_first = configs.ms_byte_first
-    builder.configs.ms_bit_first = configs.ms_bit_first
-    builder.configs.glyph_pad_index = configs.glyph_pad_index
-    builder.configs.scan_unit_index = configs.scan_unit_index
+    builder.config.font_ascent = font_metrics.horizontal_layout.ascent
+    builder.config.font_descent = -font_metrics.horizontal_layout.descent
+    builder.config.default_char = _DEFAULT_CHAR
+    builder.config.draw_right_to_left = configs.draw_right_to_left
+    builder.config.ms_byte_first = configs.ms_byte_first
+    builder.config.ms_bit_first = configs.ms_bit_first
+    builder.config.glyph_pad_index = configs.glyph_pad_index
+    builder.config.scan_unit_index = configs.scan_unit_index
 
     logger.debug("Setup 'Glyphs'")
     for code_point, glyph_name in sorted(character_mapping.items()):
