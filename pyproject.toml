@@ -26,7 +26,7 @@ dependencies = [
     "fonttools>=4.51.0",
     "Brotli>=1.1.0",
     "bdffont>=0.0.24",
-    "pcffont>=0.0.10",
+    "pcffont>=0.0.11",
 ]
 
 [project.urls]
