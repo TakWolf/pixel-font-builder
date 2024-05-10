@@ -18,9 +18,9 @@ class FontBuilder:
         self.meta_info = MetaInfo()
         self.character_mapping: dict[int, str] = {}
         self.glyphs: list[Glyph] = []
-        self.opentype_configs = opentype.Configs()
-        self.bdf_configs = bdf.Configs()
-        self.pcf_configs = pcf.Configs()
+        self.opentype_config = opentype.Config()
+        self.bdf_config = bdf.Config()
+        self.pcf_config = pcf.Config()
 
     def prepare_glyphs(self) -> tuple[list[str], dict[str, Glyph]]:
         glyph_order = ['.notdef']

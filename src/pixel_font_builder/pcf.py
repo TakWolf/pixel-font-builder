@@ -12,7 +12,7 @@ logger = logging.getLogger('pixel_font_builder.pcf')
 _DEFAULT_CHAR = 0xFFFE
 
 
-class Configs:
+class Config:
     def __init__(
             self,
             resolution_x: int = 75,
@@ -33,7 +33,7 @@ class Configs:
 
 
 def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
-    configs = context.pcf_configs
+    config = context.pcf_config
     font_metrics = context.font_metrics
     meta_info = context.meta_info
     character_mapping = ChainMap({_DEFAULT_CHAR: '.notdef'}, context.character_mapping)
@@ -44,11 +44,11 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
     builder.config.font_ascent = font_metrics.horizontal_layout.ascent
     builder.config.font_descent = -font_metrics.horizontal_layout.descent
     builder.config.default_char = _DEFAULT_CHAR
-    builder.config.draw_right_to_left = configs.draw_right_to_left
-    builder.config.ms_byte_first = configs.ms_byte_first
-    builder.config.ms_bit_first = configs.ms_bit_first
-    builder.config.glyph_pad_index = configs.glyph_pad_index
-    builder.config.scan_unit_index = configs.scan_unit_index
+    builder.config.draw_right_to_left = config.draw_right_to_left
+    builder.config.ms_byte_first = config.ms_byte_first
+    builder.config.ms_bit_first = config.ms_bit_first
+    builder.config.glyph_pad_index = config.glyph_pad_index
+    builder.config.scan_unit_index = config.scan_unit_index
 
     logger.debug("Setup 'Glyphs'")
     for code_point, glyph_name in sorted(character_mapping.items()):
@@ -59,7 +59,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
         builder.glyphs.append(PcfGlyph(
             name=glyph_name,
             encoding=code_point,
-            scalable_width=math.ceil((glyph.advance_width / font_metrics.font_size) * (75 / configs.resolution_x) * 1000),
+            scalable_width=math.ceil((glyph.advance_width / font_metrics.font_size) * (75 / config.resolution_x) * 1000),
             character_width=glyph.advance_width,
             dimensions=glyph.dimensions,
             origin=glyph.horizontal_origin,
@@ -91,8 +91,8 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
         builder.properties.add_style_name = meta_info.serif_style
     builder.properties.pixel_size = font_metrics.font_size
     builder.properties.point_size = font_metrics.font_size * 10
-    builder.properties.resolution_x = configs.resolution_x
-    builder.properties.resolution_y = configs.resolution_y
+    builder.properties.resolution_x = config.resolution_x
+    builder.properties.resolution_y = config.resolution_y
     if meta_info.width_mode == WidthMode.MONOSPACED:
         builder.properties.spacing = 'M'
     elif meta_info.width_mode == WidthMode.DUOSPACED:
