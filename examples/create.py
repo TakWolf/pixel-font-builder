@@ -13,13 +13,13 @@ def main():
     os.makedirs(outputs_dir)
 
     builder = FontBuilder()
-    builder.font_metrics.font_size = 12
-    builder.font_metrics.horizontal_layout.ascent = 10
-    builder.font_metrics.horizontal_layout.descent = -2
-    builder.font_metrics.vertical_layout.ascent = 6
-    builder.font_metrics.vertical_layout.descent = -6
-    builder.font_metrics.x_height = 5
-    builder.font_metrics.cap_height = 7
+    builder.font_metric.font_size = 12
+    builder.font_metric.horizontal_layout.ascent = 10
+    builder.font_metric.horizontal_layout.descent = -2
+    builder.font_metric.vertical_layout.ascent = 6
+    builder.font_metric.vertical_layout.descent = -6
+    builder.font_metric.x_height = 5
+    builder.font_metric.cap_height = 7
 
     builder.meta_info.version = '1.0.0'
     builder.meta_info.created_time = datetime.datetime.fromisoformat('2024-01-01T00:00:00Z')

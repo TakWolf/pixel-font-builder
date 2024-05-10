@@ -279,13 +279,13 @@ def _get_top_side_bearing(glyph: Glyph) -> int:
 
 def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flavor: Flavor = None) -> FontBuilder:
     config = context.opentype_config
-    font_metrics = context.font_metrics * config.px_to_units
+    font_metric = context.font_metric * config.px_to_units
     meta_info = context.meta_info
     character_mapping = context.character_mapping
     glyph_order, name_to_glyph = context.prepare_glyphs()
 
     logger.debug("Create '%sBuilder': %s", 'TTF' if is_ttf else 'OTF', meta_info.family_name)
-    builder = FontBuilder(font_metrics.font_size, isTTF=is_ttf)
+    builder = FontBuilder(font_metric.font_size, isTTF=is_ttf)
 
     if meta_info.created_time is not None:
         setattr(builder.font['head'], 'created', timeTools.timestampSinceEpoch(meta_info.created_time.timestamp()))
@@ -331,27 +331,27 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
 
     logger.debug("Setup 'Horizontal Header'")
     builder.setupHorizontalHeader(
-        ascent=font_metrics.horizontal_layout.ascent,
-        descent=font_metrics.horizontal_layout.descent,
-        lineGap=font_metrics.horizontal_layout.line_gap,
+        ascent=font_metric.horizontal_layout.ascent,
+        descent=font_metric.horizontal_layout.descent,
+        lineGap=font_metric.horizontal_layout.line_gap,
     )
 
     logger.debug("Setup 'Vertical Header'")
     builder.setupVerticalHeader(
-        ascent=font_metrics.vertical_layout.ascent,
-        descent=font_metrics.vertical_layout.descent,
-        lineGap=font_metrics.vertical_layout.line_gap,
+        ascent=font_metric.vertical_layout.ascent,
+        descent=font_metric.vertical_layout.descent,
+        lineGap=font_metric.vertical_layout.line_gap,
     )
 
     logger.debug("Setup 'OS2'")
     builder.setupOS2(
-        sTypoAscender=font_metrics.horizontal_layout.ascent,
-        sTypoDescender=font_metrics.horizontal_layout.descent,
-        sTypoLineGap=font_metrics.horizontal_layout.line_gap,
-        usWinAscent=font_metrics.horizontal_layout.ascent,
-        usWinDescent=-font_metrics.horizontal_layout.descent,
-        sxHeight=font_metrics.x_height,
-        sCapHeight=font_metrics.cap_height,
+        sTypoAscender=font_metric.horizontal_layout.ascent,
+        sTypoDescender=font_metric.horizontal_layout.descent,
+        sTypoLineGap=font_metric.horizontal_layout.line_gap,
+        usWinAscent=font_metric.horizontal_layout.ascent,
+        usWinDescent=-font_metric.horizontal_layout.descent,
+        sxHeight=font_metric.x_height,
+        sCapHeight=font_metric.cap_height,
     )
 
     logger.debug("Setup 'Post'")

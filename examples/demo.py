@@ -98,13 +98,13 @@ def _create_builder(
         name_num: int = 0,
 ) -> FontBuilder:
     builder = FontBuilder()
-    builder.font_metrics.font_size = 11
-    builder.font_metrics.horizontal_layout.ascent = 11
-    builder.font_metrics.horizontal_layout.descent = -4
-    builder.font_metrics.vertical_layout.ascent = 8
-    builder.font_metrics.vertical_layout.descent = -7
-    builder.font_metrics.x_height = 5
-    builder.font_metrics.cap_height = 7
+    builder.font_metric.font_size = 11
+    builder.font_metric.horizontal_layout.ascent = 11
+    builder.font_metric.horizontal_layout.descent = -4
+    builder.font_metric.vertical_layout.ascent = 8
+    builder.font_metric.vertical_layout.descent = -7
+    builder.font_metric.x_height = 5
+    builder.font_metric.cap_height = 7
 
     builder.meta_info.version = '1.0.0'
     builder.meta_info.created_time = datetime.datetime.fromisoformat('2024-01-01T00:00:00Z')
@@ -130,12 +130,12 @@ def _create_builder(
         if glyph_file.file_path in glyph_pool:
             glyph = glyph_pool[glyph_file.file_path]
         else:
-            horizontal_origin_y = math.floor((builder.font_metrics.horizontal_layout.ascent + builder.font_metrics.horizontal_layout.descent - glyph_file.height) / 2)
-            vertical_origin_y = (builder.font_metrics.font_size - glyph_file.height) // 2
+            horizontal_origin_y = math.floor((builder.font_metric.horizontal_layout.ascent + builder.font_metric.horizontal_layout.descent - glyph_file.height) / 2)
+            vertical_origin_y = (builder.font_metric.font_size - glyph_file.height) // 2
             glyph = Glyph(
                 name=glyph_file.glyph_name,
                 advance_width=glyph_file.width,
-                advance_height=builder.font_metrics.font_size,
+                advance_height=builder.font_metric.font_size,
                 horizontal_origin=(0, horizontal_origin_y),
                 vertical_origin_y=vertical_origin_y,
                 bitmap=glyph_file.bitmap,

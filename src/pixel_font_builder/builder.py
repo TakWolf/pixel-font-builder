@@ -7,14 +7,14 @@ import fontTools.ttLib
 import pcffont
 
 from pixel_font_builder import opentype, bdf, pcf
-from pixel_font_builder.metric import FontMetrics
+from pixel_font_builder.metric import FontMetric
 from pixel_font_builder.meta import MetaInfo
 from pixel_font_builder.glyph import Glyph
 
 
 class FontBuilder:
     def __init__(self):
-        self.font_metrics = FontMetrics()
+        self.font_metric = FontMetric()
         self.meta_info = MetaInfo()
         self.character_mapping: dict[int, str] = {}
         self.glyphs: list[Glyph] = []

@@ -22,7 +22,7 @@ class FontLayoutHeader:
         )
 
 
-class FontMetrics:
+class FontMetric:
     def __init__(
             self,
             font_size: int = 0,
@@ -41,8 +41,8 @@ class FontMetrics:
         self.x_height = x_height
         self.cap_height = cap_height
 
-    def __mul__(self, other: int) -> 'FontMetrics':
-        return FontMetrics(
+    def __mul__(self, other: int) -> 'FontMetric':
+        return FontMetric(
             self.font_size * other,
             self.horizontal_layout * other,
             self.vertical_layout * other,
