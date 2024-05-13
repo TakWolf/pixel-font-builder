@@ -62,13 +62,11 @@ class GlyphFile:
 
 def _collect_glyph_files(root_dir: Path) -> tuple[dict[int, str], list[GlyphFile]]:
     registry = {}
-    for file_dir, _, file_names in root_dir.walk():
-        for file_name in file_names:
-            if not file_name.endswith('.png'):
-                continue
-            file_path = file_dir.joinpath(file_name)
-            glyph_file = GlyphFile.load(file_path)
-            registry[glyph_file.code_point] = glyph_file
+    for file_path in root_dir.iterdir():
+        if file_path.suffix != '.png':
+            continue
+        glyph_file = GlyphFile.load(file_path)
+        registry[glyph_file.code_point] = glyph_file
 
     character_mapping = {}
     glyph_files = []
