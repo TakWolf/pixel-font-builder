@@ -1,8 +1,8 @@
 import logging
-import os
+from pathlib import Path
 
 logging.basicConfig(level=logging.DEBUG)
 
-project_root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-glyphs_dir = os.path.join(project_root_dir, 'assets', 'glyphs')
-build_dir = os.path.join(project_root_dir, 'build')
+project_root_dir = Path(__file__).parent.joinpath('..').resolve()
+glyphs_dir = project_root_dir.joinpath('assets', 'glyphs')
+build_dir = project_root_dir.joinpath('build')

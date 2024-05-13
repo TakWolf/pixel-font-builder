@@ -15,7 +15,6 @@ pip install pixel-font-builder
 
 ```python
 import datetime
-import os
 import shutil
 
 from examples import build_dir
@@ -23,10 +22,10 @@ from pixel_font_builder import FontBuilder, WeightName, SerifStyle, SlantStyle, 
 
 
 def main():
-    outputs_dir = os.path.join(build_dir, 'create')
-    if os.path.exists(outputs_dir):
+    outputs_dir = build_dir.joinpath('create')
+    if outputs_dir.exists():
         shutil.rmtree(outputs_dir)
-    os.makedirs(outputs_dir)
+    outputs_dir.mkdir(parents=True)
 
     builder = FontBuilder()
     builder.font_metric.font_size = 12
@@ -102,11 +101,11 @@ def main():
         ],
     ))
 
-    builder.save_otf(os.path.join(outputs_dir, 'my-pixel.otf'))
-    builder.save_otf(os.path.join(outputs_dir, 'my-pixel.woff2'), flavor=opentype.Flavor.WOFF2)
-    builder.save_ttf(os.path.join(outputs_dir, 'my-font.ttf'))
-    builder.save_bdf(os.path.join(outputs_dir, 'my-font.bdf'))
-    builder.save_pcf(os.path.join(outputs_dir, 'my-font.pcf'))
+    builder.save_otf(outputs_dir.joinpath('my-pixel.otf'))
+    builder.save_otf(outputs_dir.joinpath('my-pixel.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_ttf(outputs_dir.joinpath('my-font.ttf'))
+    builder.save_bdf(outputs_dir.joinpath('my-font.bdf'))
+    builder.save_pcf(outputs_dir.joinpath('my-font.pcf'))
 
 
 if __name__ == '__main__':

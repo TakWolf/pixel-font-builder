@@ -1,7 +1,7 @@
 import datetime
 import math
-import os
 import shutil
+from pathlib import Path
 
 import png
 
@@ -9,7 +9,7 @@ from examples import glyphs_dir, build_dir
 from pixel_font_builder import FontBuilder, FontCollectionBuilder, WeightName, SerifStyle, SlantStyle, WidthMode, Glyph, opentype
 
 
-def _load_bitmap_from_png(file_path: str) -> tuple[list[list[int]], int, int]:
+def _load_bitmap_from_png(file_path: Path) -> tuple[list[list[int]], int, int]:
     width, height, pixels, _ = png.Reader(filename=file_path).read()
     bitmap = []
     for pixels_row in pixels:
@@ -21,7 +21,7 @@ def _load_bitmap_from_png(file_path: str) -> tuple[list[list[int]], int, int]:
     return bitmap, width, height
 
 
-def _save_bitmap_to_png(bitmap: list[list[int]], file_path: str):
+def _save_bitmap_to_png(bitmap: list[list[int]], file_path: Path):
     pixels = []
     for bitmap_row in bitmap:
         pixels_row = []
@@ -36,15 +36,15 @@ def _save_bitmap_to_png(bitmap: list[list[int]], file_path: str):
 
 class GlyphFile:
     @staticmethod
-    def load(file_path: str) -> 'GlyphFile':
-        hex_name = os.path.basename(file_path).removesuffix('.png')
+    def load(file_path: Path) -> 'GlyphFile':
+        hex_name = file_path.name.removesuffix('.png')
         if hex_name == 'notdef':
             code_point = -1
         else:
             code_point = int(hex_name, 16)
         return GlyphFile(file_path, code_point)
 
-    def __init__(self, file_path: str, code_point: int):
+    def __init__(self, file_path: Path, code_point: int):
         self.file_path = file_path
         self.code_point = code_point
         self.bitmap, self.width, self.height = _load_bitmap_from_png(file_path)
@@ -60,13 +60,13 @@ class GlyphFile:
         _save_bitmap_to_png(self.bitmap, self.file_path)
 
 
-def _collect_glyph_files(root_dir: str) -> tuple[dict[int, str], list[GlyphFile]]:
+def _collect_glyph_files(root_dir: Path) -> tuple[dict[int, str], list[GlyphFile]]:
     registry = {}
-    for file_dir, _, file_names in os.walk(root_dir):
+    for file_dir, _, file_names in root_dir.walk():
         for file_name in file_names:
             if not file_name.endswith('.png'):
                 continue
-            file_path = os.path.join(file_dir, file_name)
+            file_path = file_dir.joinpath(file_name)
             glyph_file = GlyphFile.load(file_path)
             registry[glyph_file.code_point] = glyph_file
 
@@ -92,7 +92,7 @@ def _collect_glyph_files(root_dir: str) -> tuple[dict[int, str], list[GlyphFile]
 
 
 def _create_builder(
-        glyph_pool: dict[str, Glyph],
+        glyph_pool: dict[Path, Glyph],
         character_mapping: dict[int, str],
         glyph_files: list[GlyphFile],
         name_num: int = 0,
@@ -147,10 +147,10 @@ def _create_builder(
 
 
 def main():
-    outputs_dir = os.path.join(build_dir, 'demo')
-    if os.path.exists(outputs_dir):
+    outputs_dir = build_dir.joinpath('demo')
+    if outputs_dir.exists():
         shutil.rmtree(outputs_dir)
-    os.makedirs(outputs_dir)
+    outputs_dir.mkdir(parents=True)
 
     character_mapping, glyph_files = _collect_glyph_files(glyphs_dir)
     for glyph_file in glyph_files:
@@ -158,18 +158,18 @@ def main():
     glyph_pool = {}
 
     builder = _create_builder(glyph_pool, character_mapping, glyph_files)
-    builder.save_otf(os.path.join(outputs_dir, 'demo.otf'))
-    builder.save_otf(os.path.join(outputs_dir, 'demo.woff2'), flavor=opentype.Flavor.WOFF2)
-    builder.save_ttf(os.path.join(outputs_dir, 'demo.ttf'))
-    builder.save_bdf(os.path.join(outputs_dir, 'demo.bdf'))
-    builder.save_pcf(os.path.join(outputs_dir, 'demo.pcf'))
+    builder.save_otf(outputs_dir.joinpath('demo.otf'))
+    builder.save_otf(outputs_dir.joinpath('demo.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_ttf(outputs_dir.joinpath('demo.ttf'))
+    builder.save_bdf(outputs_dir.joinpath('demo.bdf'))
+    builder.save_pcf(outputs_dir.joinpath('demo.pcf'))
 
     collection_builder = FontCollectionBuilder()
     for index in range(100):
         builder = _create_builder(glyph_pool, character_mapping, glyph_files, index)
         collection_builder.append(builder)
-    collection_builder.save_otc(os.path.join(outputs_dir, 'demo.otc'))
-    collection_builder.save_ttc(os.path.join(outputs_dir, 'demo.ttc'))
+    collection_builder.save_otc(outputs_dir.joinpath('demo.otc'))
+    collection_builder.save_ttc(outputs_dir.joinpath('demo.ttc'))
 
 
 if __name__ == '__main__':

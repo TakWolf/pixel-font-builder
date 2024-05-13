@@ -1,5 +1,5 @@
-import os
 from collections import UserList
+from os import PathLike
 
 import bdffont
 import fontTools.fontBuilder
@@ -45,7 +45,7 @@ class FontBuilder:
 
     def save_otf(
             self,
-            file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes],
+            file_path: str | bytes | PathLike[str] | PathLike[bytes],
             flavor: opentype.Flavor = None,
     ):
         self.to_otf_builder(flavor).save(file_path)
@@ -55,7 +55,7 @@ class FontBuilder:
 
     def save_ttf(
             self,
-            file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes],
+            file_path: str | bytes | PathLike[str] | PathLike[bytes],
             flavor: opentype.Flavor = None,
     ):
         self.to_ttf_builder(flavor).save(file_path)
@@ -63,13 +63,13 @@ class FontBuilder:
     def to_bdf_builder(self) -> bdffont.BdfFont:
         return bdf.create_builder(self)
 
-    def save_bdf(self, file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes]):
+    def save_bdf(self, file_path: str | bytes | PathLike[str] | PathLike[bytes]):
         self.to_bdf_builder().save(file_path)
 
     def to_pcf_builder(self) -> pcffont.PcfFontBuilder:
         return pcf.create_builder(self)
 
-    def save_pcf(self, file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes]):
+    def save_pcf(self, file_path: str | bytes | PathLike[str] | PathLike[bytes]):
         self.to_pcf_builder().save(file_path)
 
 
@@ -79,7 +79,7 @@ class FontCollectionBuilder(UserList[FontBuilder]):
 
     def save_otc(
             self,
-            file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes],
+            file_path: str | bytes | PathLike[str] | PathLike[bytes],
             share_tables: bool = True,
     ):
         self.to_otc_builder().save(file_path, share_tables)
@@ -89,7 +89,7 @@ class FontCollectionBuilder(UserList[FontBuilder]):
 
     def save_ttc(
             self,
-            file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes],
+            file_path: str | bytes | PathLike[str] | PathLike[bytes],
             share_tables: bool = True,
     ):
         self.to_ttc_builder().save(file_path, share_tables)

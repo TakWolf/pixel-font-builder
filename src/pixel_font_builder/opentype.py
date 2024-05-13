@@ -1,6 +1,6 @@
 import logging
-import os
 from enum import StrEnum
+from os import PathLike
 
 from fontTools.fontBuilder import FontBuilder
 from fontTools.misc import timeTools
@@ -24,7 +24,7 @@ _CACHE_NAME_TTF_GLYPH = '_opentype_cache_ttf_glyph'
 
 
 class FeatureFile:
-    def __init__(self, file_path: str | bytes | os.PathLike[str] | os.PathLike[bytes]):
+    def __init__(self, file_path: str | bytes | PathLike[str] | PathLike[bytes]):
         with open(file_path, 'r', encoding='utf-8') as file:
             text = file.read()
         self.file_path = file_path
