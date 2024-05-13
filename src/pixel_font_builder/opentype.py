@@ -12,8 +12,8 @@ from fontTools.ttLib import TTCollection
 from fontTools.ttLib.tables._g_l_y_f import Glyph as TTFGlyph
 
 import pixel_font_builder
-from pixel_font_builder.meta import WeightName, MetaInfo
 from pixel_font_builder.glyph import Glyph
+from pixel_font_builder.meta import WeightName, MetaInfo
 
 logger = logging.getLogger('pixel_font_builder.opentype')
 

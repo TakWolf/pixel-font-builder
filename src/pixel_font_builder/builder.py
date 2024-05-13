@@ -7,9 +7,9 @@ import fontTools.ttLib
 import pcffont
 
 from pixel_font_builder import opentype, bdf, pcf
-from pixel_font_builder.metric import FontMetric
-from pixel_font_builder.meta import MetaInfo
 from pixel_font_builder.glyph import Glyph
+from pixel_font_builder.meta import MetaInfo
+from pixel_font_builder.metric import FontMetric
 
 
 class FontBuilder:
