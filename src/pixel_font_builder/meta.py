@@ -31,6 +31,24 @@ class WidthMode(StrEnum):
 
 
 class MetaInfo:
+    version: str
+    created_time: datetime.datetime | None
+    modified_time: datetime.datetime | None
+    family_name: str | None
+    weight_name: WeightName | None
+    serif_style: SerifStyle | None
+    slant_style: SlantStyle | None
+    width_mode: WidthMode | None
+    manufacturer: str | None
+    designer: str | None
+    description: str | None
+    copyright_info: str | None
+    license_info: str | None
+    vendor_url: str | None
+    designer_url: str | None
+    license_url: str | None
+    sample_text: str | None
+
     def __init__(
             self,
             version: str = '0.0.0',

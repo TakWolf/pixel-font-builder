@@ -1,5 +1,9 @@
 
 class FontLayoutHeader:
+    ascent: int
+    descent: int
+    line_gap: int
+
     def __init__(
             self,
             ascent: int = 0,
@@ -23,6 +27,12 @@ class FontLayoutHeader:
 
 
 class FontMetric:
+    font_size: int
+    horizontal_layout: FontLayoutHeader
+    vertical_layout: FontLayoutHeader
+    x_height: int
+    cap_height: int
+
     def __init__(
             self,
             font_size: int = 0,

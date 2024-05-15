@@ -1,5 +1,13 @@
 
 class Glyph:
+    name: str
+    advance_width: int
+    advance_height: int
+    horizontal_origin_x: int
+    horizontal_origin_y: int
+    vertical_origin_y: int
+    bitmap: list[list[int]]
+
     def __init__(
             self,
             name: str,
@@ -15,7 +23,7 @@ class Glyph:
         self.horizontal_origin_x, self.horizontal_origin_y = horizontal_origin
         self.vertical_origin_y = vertical_origin_y
         if bitmap is None:
-            bitmap = list[list[int]]()
+            bitmap = []
         self.bitmap = bitmap
 
     @property

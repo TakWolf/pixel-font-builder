@@ -24,6 +24,9 @@ _CACHE_NAME_TTF_GLYPH = '_opentype_cache_ttf_glyph'
 
 
 class FeatureFile:
+    file_path: str | bytes | PathLike[str] | PathLike[bytes]
+    text: str
+
     def __init__(self, file_path: str | bytes | PathLike[str] | PathLike[bytes]):
         with open(file_path, 'r', encoding='utf-8') as file:
             text = file.read()
@@ -32,6 +35,9 @@ class FeatureFile:
 
 
 class Config:
+    px_to_units: int
+    feature_files: list[FeatureFile]
+
     def __init__(
             self,
             px_to_units: int = 100,
@@ -39,7 +45,7 @@ class Config:
     ):
         self.px_to_units = px_to_units
         if feature_files is None:
-            feature_files = list[FeatureFile]()
+            feature_files = []
         self.feature_files = feature_files
 
 

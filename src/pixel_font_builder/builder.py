@@ -13,11 +13,19 @@ from pixel_font_builder.metric import FontMetric
 
 
 class FontBuilder:
+    font_metric: FontMetric
+    meta_info: MetaInfo
+    character_mapping: dict[int, str]
+    glyphs: list[Glyph]
+    opentype_config: opentype.Config
+    bdf_config: bdf.Config
+    pcf_config: pcf.Config
+
     def __init__(self):
         self.font_metric = FontMetric()
         self.meta_info = MetaInfo()
-        self.character_mapping: dict[int, str] = {}
-        self.glyphs: list[Glyph] = []
+        self.character_mapping = {}
+        self.glyphs = []
         self.opentype_config = opentype.Config()
         self.bdf_config = bdf.Config()
         self.pcf_config = pcf.Config()

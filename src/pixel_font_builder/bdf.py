@@ -13,6 +13,10 @@ _DEFAULT_CHAR = 0xFFFE
 
 
 class Config:
+    resolution_x: int
+    resolution_y: int
+    only_basic_plane: bool
+
     def __init__(
             self,
             resolution_x: int = 75,

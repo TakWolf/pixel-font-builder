@@ -44,6 +44,12 @@ class GlyphFile:
             code_point = int(hex_name, 16)
         return GlyphFile(file_path, code_point)
 
+    file_path: Path
+    code_point: int
+    bitmap: list[list[int]]
+    width: int
+    height: int
+
     def __init__(self, file_path: Path, code_point: int):
         self.file_path = file_path
         self.code_point = code_point

@@ -13,6 +13,14 @@ _DEFAULT_CHAR = 0xFFFE
 
 
 class Config:
+    resolution_x: int
+    resolution_y: int
+    draw_right_to_left: bool
+    ms_byte_first: bool
+    ms_bit_first: bool
+    glyph_pad_index: int
+    scan_unit_index: int
+
     def __init__(
             self,
             resolution_x: int = 75,
