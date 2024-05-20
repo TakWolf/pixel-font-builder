@@ -3,5 +3,5 @@ Brotli==1.1.0
 bdffont==0.0.25
 pcffont==0.0.13
 
-pytest==8.2.0
+pytest==8.2.1
 pypng==0.20220715.0
