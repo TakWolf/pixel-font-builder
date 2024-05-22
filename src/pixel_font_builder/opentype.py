@@ -24,14 +24,21 @@ _CACHE_NAME_TTF_GLYPH = '_opentype_cache_ttf_glyph'
 
 
 class FeatureFile:
-    file_path: str | bytes | PathLike[str] | PathLike[bytes]
-    text: str
-
-    def __init__(self, file_path: str | bytes | PathLike[str] | PathLike[bytes]):
+    @staticmethod
+    def load(file_path: str | bytes | PathLike[str] | PathLike[bytes]):
         with open(file_path, 'r', encoding='utf-8') as file:
-            text = file.read()
-        self.file_path = file_path
+            return FeatureFile(file.read(), file_path)
+
+    text: str
+    file_path: str | bytes | PathLike[str] | PathLike[bytes] | None
+
+    def __init__(
+            self,
+            text: str,
+            file_path: str | bytes | PathLike[str] | PathLike[bytes] = None,
+    ):
         self.text = text
+        self.file_path = file_path
 
 
 class Config:
