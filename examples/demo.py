@@ -37,7 +37,7 @@ def _save_bitmap_to_png(bitmap: list[list[int]], file_path: Path):
 class GlyphFile:
     @staticmethod
     def load(file_path: Path) -> 'GlyphFile':
-        hex_name = file_path.name.removesuffix('.png')
+        hex_name = file_path.stem
         if hex_name == 'notdef':
             code_point = -1
         else:
