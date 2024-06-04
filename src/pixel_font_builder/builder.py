@@ -48,23 +48,23 @@ class FontBuilder:
 
         return glyph_order, name_to_glyph
 
-    def to_otf_builder(self, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
+    def to_otf_builder(self, flavor: opentype.Flavor | None = None) -> fontTools.fontBuilder.FontBuilder:
         return opentype.create_builder(self, False, flavor)
 
     def save_otf(
             self,
             file_path: str | bytes | PathLike[str] | PathLike[bytes],
-            flavor: opentype.Flavor = None,
+            flavor: opentype.Flavor | None = None,
     ):
         self.to_otf_builder(flavor).save(file_path)
 
-    def to_ttf_builder(self, flavor: opentype.Flavor = None) -> fontTools.fontBuilder.FontBuilder:
+    def to_ttf_builder(self, flavor: opentype.Flavor | None = None) -> fontTools.fontBuilder.FontBuilder:
         return opentype.create_builder(self, True, flavor)
 
     def save_ttf(
             self,
             file_path: str | bytes | PathLike[str] | PathLike[bytes],
-            flavor: opentype.Flavor = None,
+            flavor: opentype.Flavor | None = None,
     ):
         self.to_ttf_builder(flavor).save(file_path)
 

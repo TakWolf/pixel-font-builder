@@ -36,8 +36,8 @@ class FontMetric:
     def __init__(
             self,
             font_size: int = 0,
-            horizontal_layout: FontLayoutHeader = None,
-            vertical_layout: FontLayoutHeader = None,
+            horizontal_layout: FontLayoutHeader | None = None,
+            vertical_layout: FontLayoutHeader | None = None,
             x_height: int = 0,
             cap_height: int = 0,
     ):

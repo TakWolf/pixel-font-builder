@@ -15,7 +15,7 @@ class Glyph:
             advance_height: int = 0,
             horizontal_origin: tuple[int, int] = (0, 0),
             vertical_origin_y: int = 0,
-            bitmap: list[list[int]] = None,
+            bitmap: list[list[int]] | None = None,
     ):
         self.name = name
         self.advance_width = advance_width

@@ -35,7 +35,7 @@ class FeatureFile:
     def __init__(
             self,
             text: str,
-            file_path: str | bytes | PathLike[str] | PathLike[bytes] = None,
+            file_path: str | bytes | PathLike[str] | PathLike[bytes] | None = None,
     ):
         self.text = text
         self.file_path = file_path
@@ -48,7 +48,7 @@ class Config:
     def __init__(
             self,
             px_to_units: int = 100,
-            feature_files: list[FeatureFile] = None,
+            feature_files: list[FeatureFile] | None = None,
     ):
         self.px_to_units = px_to_units
         if feature_files is None:
@@ -290,7 +290,7 @@ def _get_top_side_bearing(glyph: Glyph) -> int:
     return top_padding + glyph.vertical_origin_y
 
 
-def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flavor: Flavor = None) -> FontBuilder:
+def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flavor: Flavor | None = None) -> FontBuilder:
     config = context.opentype_config
     font_metric = context.font_metric * config.px_to_units
     meta_info = context.meta_info
