@@ -37,11 +37,8 @@ def _save_bitmap_to_png(bitmap: list[list[int]], file_path: Path):
 class GlyphFile:
     @staticmethod
     def load(file_path: Path) -> 'GlyphFile':
-        hex_name = file_path.stem
-        if hex_name == 'notdef':
-            code_point = -1
-        else:
-            code_point = int(hex_name, 16)
+        hex_name = file_path.stem.strip()
+        code_point = -1 if hex_name == 'notdef' else int(hex_name, 16)
         return GlyphFile(file_path, code_point)
 
     file_path: Path
@@ -57,41 +54,20 @@ class GlyphFile:
 
     @property
     def glyph_name(self) -> str:
-        if self.code_point == -1:
-            return '.notdef'
-        else:
-            return f'uni{self.code_point:04X}'
-
-    def save(self):
-        _save_bitmap_to_png(self.bitmap, self.file_path)
+        return '.notdef' if self.code_point == -1 else f'{self.code_point:04X}'
 
 
-def _collect_glyph_files(root_dir: Path) -> tuple[dict[int, str], list[GlyphFile]]:
-    registry = {}
-    for file_path in root_dir.iterdir():
+def _collect_glyph_files() -> tuple[dict[int, str], list[GlyphFile]]:
+    character_mapping = {}
+    glyph_files = []
+    for file_path in glyphs_dir.iterdir():
         if file_path.suffix != '.png':
             continue
         glyph_file = GlyphFile.load(file_path)
-        registry[glyph_file.code_point] = glyph_file
-
-    character_mapping = {}
-    glyph_files = []
-    for glyph_file in registry.values():
         if glyph_file.code_point != -1:
             character_mapping[glyph_file.code_point] = glyph_file.glyph_name
         glyph_files.append(glyph_file)
     glyph_files.sort(key=lambda x: x.code_point)
-
-    for code_point in range(ord('A'), ord('Z') + 1):
-        fallback_code_point = code_point + ord('Ａ') - ord('A')
-        character_mapping[fallback_code_point] = character_mapping[code_point]
-    for code_point in range(ord('a'), ord('z') + 1):
-        fallback_code_point = code_point + ord('ａ') - ord('a')
-        character_mapping[fallback_code_point] = character_mapping[code_point]
-    for code_point in range(ord('0'), ord('9') + 1):
-        fallback_code_point = code_point + ord('０') - ord('0')
-        character_mapping[fallback_code_point] = character_mapping[code_point]
-
     return character_mapping, glyph_files
 
 
@@ -156,9 +132,9 @@ def main():
         shutil.rmtree(outputs_dir)
     outputs_dir.mkdir(parents=True)
 
-    character_mapping, glyph_files = _collect_glyph_files(glyphs_dir)
+    character_mapping, glyph_files = _collect_glyph_files()
     for glyph_file in glyph_files:
-        glyph_file.save()
+        _save_bitmap_to_png(glyph_file.bitmap, glyph_file.file_path)
     glyph_pool = {}
 
     builder = _create_builder(glyph_pool, character_mapping, glyph_files)
