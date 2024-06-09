@@ -271,7 +271,7 @@ def _get_glyph_with_cache(glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGl
 def _get_left_side_bearing(glyph: Glyph) -> int:
     left_padding = 0
     for i in range(glyph.width):
-        if any([bitmap_row[i] for bitmap_row in glyph.bitmap]) != 0:
+        if any(bitmap_row[i] for bitmap_row in glyph.bitmap) != 0:
             break
         left_padding += 1
     if left_padding == glyph.width:
