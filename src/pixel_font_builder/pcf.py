@@ -7,7 +7,7 @@ from pcffont import PcfFontBuilder, PcfGlyph
 import pixel_font_builder
 from pixel_font_builder.meta import SerifStyle, SlantStyle, WidthMode
 
-logger = logging.getLogger('pixel_font_builder.pcf')
+logger = logging.getLogger(__name__)
 
 _DEFAULT_CHAR = 0xFFFE
 

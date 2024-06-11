@@ -15,7 +15,7 @@ import pixel_font_builder
 from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.meta import WeightName, MetaInfo
 
-logger = logging.getLogger('pixel_font_builder.opentype')
+logger = logging.getLogger(__name__)
 
 _CACHE_NAME_TAG = '_opentype_cache_tag'
 _CACHE_NAME_OUTLINES = '_opentype_cache_outlines'
