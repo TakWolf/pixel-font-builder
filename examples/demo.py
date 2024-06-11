@@ -56,6 +56,13 @@ class GlyphFile:
     def glyph_name(self) -> str:
         return '.notdef' if self.code_point == -1 else f'{self.code_point:04X}'
 
+    def standardized(self):
+        _save_bitmap_to_png(self.bitmap, self.file_path)
+        file_path = self.file_path.with_stem('notdef' if self.code_point == -1 else f'{self.code_point:04X}')
+        if self.file_path != file_path:
+            self.file_path.rename(file_path)
+            self.file_path = file_path
+
 
 def _collect_glyph_files() -> tuple[dict[int, str], list[GlyphFile]]:
     character_mapping = {}
@@ -134,7 +141,8 @@ def main():
 
     character_mapping, glyph_files = _collect_glyph_files()
     for glyph_file in glyph_files:
-        _save_bitmap_to_png(glyph_file.bitmap, glyph_file.file_path)
+        glyph_file.standardized()
+
     glyph_pool = {}
 
     builder = _create_builder(glyph_pool, character_mapping, glyph_files)
