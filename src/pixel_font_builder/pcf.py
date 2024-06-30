@@ -1,4 +1,3 @@
-import logging
 import math
 from collections import ChainMap
 
@@ -6,8 +5,6 @@ from pcffont import PcfFontBuilder, PcfGlyph
 
 import pixel_font_builder
 from pixel_font_builder.meta import SerifStyle, SlantStyle, WidthMode
-
-logger = logging.getLogger(__name__)
 
 _DEFAULT_CHAR = 0xFFFE
 
@@ -47,7 +44,6 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
     character_mapping = ChainMap({_DEFAULT_CHAR: '.notdef'}, context.character_mapping)
     _, name_to_glyph = context.prepare_glyphs()
 
-    logger.debug("Create 'PcfFont': %s", meta_info.family_name)
     builder = PcfFontBuilder()
     builder.config.font_ascent = font_metric.horizontal_layout.ascent
     builder.config.font_descent = -font_metric.horizontal_layout.descent
@@ -58,11 +54,9 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
     builder.config.glyph_pad_index = config.glyph_pad_index
     builder.config.scan_unit_index = config.scan_unit_index
 
-    logger.debug("Setup 'Glyphs'")
     for code_point, glyph_name in sorted(character_mapping.items()):
         if code_point > 0xFFFF:
             break
-        logger.debug("Add 'Glyph': %s", glyph_name)
         glyph = name_to_glyph[glyph_name]
         builder.glyphs.append(PcfGlyph(
             name=glyph_name,
@@ -74,7 +68,6 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
             bitmap=glyph.bitmap,
         ))
 
-    logger.debug("Setup 'Properties'")
     builder.properties.foundry = meta_info.manufacturer
     builder.properties.family_name = meta_info.family_name
     builder.properties.weight_name = meta_info.weight_name
@@ -119,5 +112,4 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
     builder.properties.copyright = meta_info.copyright_info
     builder.properties['LICENSE'] = meta_info.license_info
 
-    logger.debug("Create 'PcfFont' finished")
     return builder

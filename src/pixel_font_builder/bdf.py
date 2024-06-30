@@ -1,4 +1,3 @@
-import logging
 import math
 from collections import ChainMap
 
@@ -6,8 +5,6 @@ from bdffont import BdfFont, BdfGlyph
 
 import pixel_font_builder
 from pixel_font_builder.meta import SerifStyle, SlantStyle, WidthMode
-
-logger = logging.getLogger(__name__)
 
 _DEFAULT_CHAR = 0xFFFE
 
@@ -35,18 +32,15 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     character_mapping = ChainMap({_DEFAULT_CHAR: '.notdef'}, context.character_mapping)
     _, name_to_glyph = context.prepare_glyphs()
 
-    logger.debug("Create 'BdfFont': %s", meta_info.family_name)
     font = BdfFont(
         point_size=font_metric.font_size,
         resolution=(config.resolution_x, config.resolution_y),
         bounding_box=(font_metric.font_size, font_metric.horizontal_layout.line_height, 0, font_metric.horizontal_layout.descent),
     )
 
-    logger.debug("Setup 'Glyphs'")
     for code_point, glyph_name in sorted(character_mapping.items()):
         if code_point > 0xFFFF and config.only_basic_plane:
             break
-        logger.debug("Add 'Glyph': %s", glyph_name)
         glyph = name_to_glyph[glyph_name]
         font.glyphs.append(BdfGlyph(
             name=glyph_name,
@@ -57,7 +51,6 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
             bitmap=glyph.bitmap,
         ))
 
-    logger.debug("Setup 'Properties'")
     font.properties.foundry = meta_info.manufacturer
     font.properties.family_name = meta_info.family_name
     font.properties.weight_name = meta_info.weight_name
@@ -105,5 +98,4 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     font.properties.copyright = meta_info.copyright_info
     font.properties['LICENSE'] = meta_info.license_info
 
-    logger.debug("Create 'BdfFont' finished")
     return font

@@ -1,4 +1,3 @@
-import logging
 from enum import StrEnum
 from os import PathLike
 
@@ -14,8 +13,6 @@ from fontTools.ttLib.tables._g_l_y_f import Glyph as TTFGlyph
 import pixel_font_builder
 from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.meta import WeightName, MetaInfo
-
-logger = logging.getLogger(__name__)
 
 _CACHE_NAME_TAG = '_opentype_cache_tag'
 _CACHE_NAME_OUTLINES = '_opentype_cache_outlines'
@@ -251,20 +248,14 @@ def _get_glyph_with_cache(glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGl
 
     outlines = getattr(glyph, _CACHE_NAME_OUTLINES, None)
     if outlines is None:
-        logger.debug("Create 'Outlines': %s", glyph.name)
         outlines = _create_outlines(glyph.bitmap, px_to_units)
         setattr(glyph, _CACHE_NAME_OUTLINES, outlines)
-    else:
-        logger.debug("Use cached 'Outlines': %s", glyph.name)
 
     cache_name_xtf_glyph = _CACHE_NAME_TTF_GLYPH if is_ttf else _CACHE_NAME_OTF_GLYPH
     xtf_glyph = getattr(glyph, cache_name_xtf_glyph, None)
     if xtf_glyph is None:
-        logger.debug("Create '%sGlyph': %s", 'TTF' if is_ttf else 'OTF', glyph.name)
         xtf_glyph = _create_glyph(glyph, outlines, px_to_units, is_ttf)
         setattr(glyph, cache_name_xtf_glyph, xtf_glyph)
-    else:
-        logger.debug("Use cached '%sGlyph': %s", 'TTF' if is_ttf else 'OTF', glyph.name)
     return xtf_glyph
 
 
@@ -297,7 +288,6 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     character_mapping = context.character_mapping
     glyph_order, name_to_glyph = context.prepare_glyphs()
 
-    logger.debug("Create '%sBuilder': %s", 'TTF' if is_ttf else 'OTF', meta_info.family_name)
     builder = FontBuilder(font_metric.font_size, isTTF=is_ttf)
 
     if meta_info.created_time is not None:
@@ -305,28 +295,20 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     if meta_info.modified_time is not None:
         setattr(builder.font['head'], 'modified', timeTools.timestampSinceEpoch(meta_info.modified_time.timestamp()))
 
-    logger.debug("Setup 'Name Strings'")
     name_strings = _create_name_strings(meta_info)
     builder.setupNameTable(name_strings)
 
-    logger.debug("Setup 'Glyph Order'")
     builder.setupGlyphOrder(glyph_order)
-
-    logger.debug("Create 'Glyphs'")
     xtf_glyphs = {}
     for glyph_name, glyph in name_to_glyph.items():
         xtf_glyphs[glyph_name] = _get_glyph_with_cache(glyph, config.px_to_units, is_ttf)
     if is_ttf:
-        logger.debug("Setup 'Glyf'")
         builder.setupGlyf(xtf_glyphs)
     else:
-        logger.debug("Setup 'CFF'")
         builder.setupCFF('', {}, xtf_glyphs, {})
 
-    logger.debug("Setup 'Character Mapping'")
     builder.setupCharacterMap(character_mapping)
 
-    logger.debug("Setup 'Horizontal Metrics' and 'Vertical Metrics'")
     horizontal_metrics = {}
     vertical_metrics = {}
     for glyph_name in glyph_order:
@@ -342,21 +324,16 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     builder.setupHorizontalMetrics(horizontal_metrics)
     builder.setupVerticalMetrics(vertical_metrics)
 
-    logger.debug("Setup 'Horizontal Header'")
     builder.setupHorizontalHeader(
         ascent=font_metric.horizontal_layout.ascent,
         descent=font_metric.horizontal_layout.descent,
         lineGap=font_metric.horizontal_layout.line_gap,
     )
-
-    logger.debug("Setup 'Vertical Header'")
     builder.setupVerticalHeader(
         ascent=font_metric.vertical_layout.ascent,
         descent=font_metric.vertical_layout.descent,
         lineGap=font_metric.vertical_layout.line_gap,
     )
-
-    logger.debug("Setup 'OS2'")
     builder.setupOS2(
         sTypoAscender=font_metric.horizontal_layout.ascent,
         sTypoDescender=font_metric.horizontal_layout.descent,
@@ -366,19 +343,14 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
         sxHeight=font_metric.x_height,
         sCapHeight=font_metric.cap_height,
     )
-
-    logger.debug("Setup 'Post'")
     builder.setupPost()
 
     for feature_file in config.feature_files:
-        logger.debug("Add Feature: '%s'", feature_file.file_path)
         builder.addOpenTypeFeatures(feature_file.text, feature_file.file_path)
 
     if flavor is not None:
-        logger.debug('Set Flavor: %s', flavor)
         builder.font.flavor = flavor
 
-    logger.debug("Create '%sBuilder' finished", 'TTF' if is_ttf else 'OTF')
     return builder
 
 
