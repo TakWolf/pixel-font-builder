@@ -6,7 +6,7 @@ from pathlib import Path
 import png
 
 from examples import glyphs_dir, build_dir
-from pixel_font_builder import FontBuilder, FontCollectionBuilder, WeightName, SerifStyle, SlantStyle, WidthMode, Glyph, opentype
+from pixel_font_builder import FontBuilder, FontCollectionBuilder, WeightName, SerifStyle, SlantStyle, WidthStyle, Glyph, opentype
 
 
 def _load_bitmap_from_png(file_path: Path) -> tuple[list[list[int]], int, int]:
@@ -100,7 +100,7 @@ def _create_builder(
     builder.meta_info.weight_name = WeightName.REGULAR
     builder.meta_info.serif_style = SerifStyle.SANS_SERIF
     builder.meta_info.slant_style = SlantStyle.NORMAL
-    builder.meta_info.width_mode = WidthMode.PROPORTIONAL
+    builder.meta_info.width_style = WidthStyle.PROPORTIONAL
     builder.meta_info.manufacturer = 'Pixel Font Studio'
     builder.meta_info.designer = 'TakWolf'
     builder.meta_info.description = 'A demo pixel font.'

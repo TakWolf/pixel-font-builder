@@ -4,7 +4,7 @@ from collections import ChainMap
 from bdffont import BdfFont, BdfGlyph
 
 import pixel_font_builder
-from pixel_font_builder.meta import SerifStyle, SlantStyle, WidthMode
+from pixel_font_builder.meta import SerifStyle, SlantStyle, WidthStyle
 
 _DEFAULT_CHAR = 0xFFFE
 
@@ -77,11 +77,11 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     font.properties.point_size = font_metric.font_size * 10
     font.properties.resolution_x = config.resolution_x
     font.properties.resolution_y = config.resolution_y
-    if meta_info.width_mode == WidthMode.MONOSPACED:
+    if meta_info.width_style == WidthStyle.MONOSPACED:
         font.properties.spacing = 'M'
-    elif meta_info.width_mode == WidthMode.DUOSPACED:
+    elif meta_info.width_style == WidthStyle.DUOSPACED:
         font.properties.spacing = 'D'
-    elif meta_info.width_mode == WidthMode.PROPORTIONAL:
+    elif meta_info.width_style == WidthStyle.PROPORTIONAL:
         font.properties.spacing = 'P'
     font.properties.average_width = round(sum([glyph.device_width_x * 10 for glyph in font.glyphs]) / len(font.glyphs))
     font.properties.charset_registry = 'ISO10646'

@@ -24,7 +24,7 @@ class SlantStyle(StrEnum):
     REVERSE_OBLIQUE = 'Reverse Oblique'
 
 
-class WidthMode(StrEnum):
+class WidthStyle(StrEnum):
     MONOSPACED = 'Monospaced'
     DUOSPACED = 'Duospaced'
     PROPORTIONAL = 'Proportional'
@@ -38,7 +38,7 @@ class MetaInfo:
     weight_name: WeightName | None
     serif_style: SerifStyle | None
     slant_style: SlantStyle | None
-    width_mode: WidthMode | None
+    width_style: WidthStyle | None
     manufacturer: str | None
     designer: str | None
     description: str | None
@@ -58,7 +58,7 @@ class MetaInfo:
             weight_name: WeightName | None = None,
             serif_style: SerifStyle | None = None,
             slant_style: SlantStyle | None = None,
-            width_mode: WidthMode | None = None,
+            width_style: WidthStyle | None = None,
             manufacturer: str | None = None,
             designer: str | None = None,
             description: str | None = None,
@@ -76,7 +76,7 @@ class MetaInfo:
         self.weight_name = weight_name
         self.serif_style = serif_style
         self.slant_style = slant_style
-        self.width_mode = width_mode
+        self.width_style = width_style
         self.manufacturer = manufacturer
         self.designer = designer
         self.description = description

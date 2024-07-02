@@ -4,7 +4,7 @@ from collections import ChainMap
 from pcffont import PcfFontBuilder, PcfGlyph
 
 import pixel_font_builder
-from pixel_font_builder.meta import SerifStyle, SlantStyle, WidthMode
+from pixel_font_builder.meta import SerifStyle, SlantStyle, WidthStyle
 
 _DEFAULT_CHAR = 0xFFFE
 
@@ -94,11 +94,11 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
     builder.properties.point_size = font_metric.font_size * 10
     builder.properties.resolution_x = config.resolution_x
     builder.properties.resolution_y = config.resolution_y
-    if meta_info.width_mode == WidthMode.MONOSPACED:
+    if meta_info.width_style == WidthStyle.MONOSPACED:
         builder.properties.spacing = 'M'
-    elif meta_info.width_mode == WidthMode.DUOSPACED:
+    elif meta_info.width_style == WidthStyle.DUOSPACED:
         builder.properties.spacing = 'D'
-    elif meta_info.width_mode == WidthMode.PROPORTIONAL:
+    elif meta_info.width_style == WidthStyle.PROPORTIONAL:
         builder.properties.spacing = 'P'
     builder.properties.average_width = round(sum([glyph.character_width * 10 for glyph in builder.glyphs]) / len(builder.glyphs))
     builder.properties.charset_registry = 'ISO10646'
