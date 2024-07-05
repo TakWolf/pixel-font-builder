@@ -55,33 +55,25 @@ class FontBuilder:
     def to_otf_builder(self, flavor: opentype.Flavor | None = None) -> fontTools.fontBuilder.FontBuilder:
         return opentype.create_builder(self, False, flavor)
 
-    def save_otf(
-            self,
-            file_path: str | bytes | PathLike[str] | PathLike[bytes],
-            flavor: opentype.Flavor | None = None,
-    ):
+    def save_otf(self, file_path: str | PathLike[str], flavor: opentype.Flavor | None = None):
         self.to_otf_builder(flavor).save(file_path)
 
     def to_ttf_builder(self, flavor: opentype.Flavor | None = None) -> fontTools.fontBuilder.FontBuilder:
         return opentype.create_builder(self, True, flavor)
 
-    def save_ttf(
-            self,
-            file_path: str | bytes | PathLike[str] | PathLike[bytes],
-            flavor: opentype.Flavor | None = None,
-    ):
+    def save_ttf(self, file_path: str | PathLike[str], flavor: opentype.Flavor | None = None):
         self.to_ttf_builder(flavor).save(file_path)
 
     def to_bdf_builder(self) -> bdffont.BdfFont:
         return bdf.create_builder(self)
 
-    def save_bdf(self, file_path: str | bytes | PathLike[str] | PathLike[bytes]):
+    def save_bdf(self, file_path: str | PathLike[str]):
         self.to_bdf_builder().save(file_path)
 
     def to_pcf_builder(self) -> pcffont.PcfFontBuilder:
         return pcf.create_builder(self)
 
-    def save_pcf(self, file_path: str | bytes | PathLike[str] | PathLike[bytes]):
+    def save_pcf(self, file_path: str | PathLike[str]):
         self.to_pcf_builder().save(file_path)
 
 
@@ -89,19 +81,11 @@ class FontCollectionBuilder(UserList[FontBuilder]):
     def to_otc_builder(self) -> fontTools.ttLib.TTCollection:
         return opentype.create_collection_builder(self, False)
 
-    def save_otc(
-            self,
-            file_path: str | bytes | PathLike[str] | PathLike[bytes],
-            share_tables: bool = True,
-    ):
+    def save_otc(self, file_path: str | PathLike[str], share_tables: bool = True):
         self.to_otc_builder().save(file_path, share_tables)
 
     def to_ttc_builder(self) -> fontTools.ttLib.TTCollection:
         return opentype.create_collection_builder(self, True)
 
-    def save_ttc(
-            self,
-            file_path: str | bytes | PathLike[str] | PathLike[bytes],
-            share_tables: bool = True,
-    ):
+    def save_ttc(self, file_path: str | PathLike[str], share_tables: bool = True):
         self.to_ttc_builder().save(file_path, share_tables)

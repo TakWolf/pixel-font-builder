@@ -22,18 +22,14 @@ _CACHE_NAME_TTF_GLYPH = '_opentype_cache_ttf_glyph'
 
 class FeatureFile:
     @staticmethod
-    def load(file_path: str | bytes | PathLike[str] | PathLike[bytes]):
+    def load(file_path: str | PathLike[str]):
         with open(file_path, 'r', encoding='utf-8') as file:
             return FeatureFile(file.read(), file_path)
 
     text: str
-    file_path: str | bytes | PathLike[str] | PathLike[bytes] | None
+    file_path: str | PathLike[str] | None
 
-    def __init__(
-            self,
-            text: str,
-            file_path: str | bytes | PathLike[str] | PathLike[bytes] | None = None,
-    ):
+    def __init__(self, text: str, file_path: str | PathLike[str] | None = None):
         self.text = text
         self.file_path = file_path
 
