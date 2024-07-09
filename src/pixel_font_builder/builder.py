@@ -36,19 +36,19 @@ class FontBuilder:
 
         for glyph in self.glyphs:
             if glyph.name in name_to_glyph:
-                raise RuntimeError(f"Duplicate glyphs: '{glyph.name}'")
+                raise RuntimeError(f'duplicate glyphs: {repr(glyph.name)}')
             if glyph.name != '.notdef':
                 glyph_order.append(glyph.name)
             name_to_glyph[glyph.name] = glyph
 
         if '.notdef' not in name_to_glyph:
-            raise RuntimeError("Need to provide a glyph named '.notdef'")
+            raise RuntimeError("missing glyph: '.notdef'")
 
         for code_point, glyph_name in self.character_mapping.items():
             if code_point < 0:
-                raise RuntimeError('Code points must >= 0')
+                raise RuntimeError('code points must >= 0')
             if glyph_name not in name_to_glyph:
-                raise RuntimeError(f"Missing glyph: '{glyph_name}'")
+                raise RuntimeError(f'missing glyph: {repr(glyph_name)}')
 
         return glyph_order, name_to_glyph
 
