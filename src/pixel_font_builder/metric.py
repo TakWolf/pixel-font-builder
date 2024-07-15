@@ -1,3 +1,5 @@
+from typing import Any
+
 
 class FontLayoutHeader:
     ascent: int
@@ -18,7 +20,9 @@ class FontLayoutHeader:
     def line_height(self) -> int:
         return self.ascent - self.descent
 
-    def __mul__(self, other: int) -> 'FontLayoutHeader':
+    def __mul__(self, other: Any) -> 'FontLayoutHeader':
+        if not isinstance(other, int):
+            raise TypeError(f"can't multiply 'FontLayoutHeader' by non-int of type '{type(other).__name__}'")
         return FontLayoutHeader(
             self.ascent * other,
             self.descent * other,
@@ -51,7 +55,9 @@ class FontMetric:
         self.x_height = x_height
         self.cap_height = cap_height
 
-    def __mul__(self, other: int) -> 'FontMetric':
+    def __mul__(self, other: Any) -> 'FontMetric':
+        if not isinstance(other, int):
+            raise TypeError(f"can't multiply 'FontMetric' by non-int of type '{type(other).__name__}'")
         return FontMetric(
             self.font_size * other,
             self.horizontal_layout * other,
