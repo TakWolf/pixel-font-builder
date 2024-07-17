@@ -112,6 +112,15 @@ if __name__ == '__main__':
     main()
 ```
 
+## Supported Output Formats
+
+| Format | File Extension |
+|---|---|
+| [OpenType](https://learn.microsoft.com/en-us/typography/opentype/) | `.otf`, `.otc`, `.woff`, `.woff2` |
+| [TrueType](https://learn.microsoft.com/en-us/typography/truetype/) | `.ttf`, `.ttc`, `.woff`, `.woff2` |
+| [Glyph Bitmap Distribution Format](https://en.wikipedia.org/wiki/Glyph_Bitmap_Distribution_Format) | `.bdf` |
+| [Portable Compiled Format](https://en.wikipedia.org/wiki/Portable_Compiled_Format) | `.pcf` |
+
 ## Dependencies
 
 - [FontTools](https://github.com/fonttools/fonttools)
