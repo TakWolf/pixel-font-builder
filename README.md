@@ -112,6 +112,18 @@ if __name__ == '__main__':
     main()
 ```
 
+## Coordinate Systems
+
+Use the same coordinate systems as OpenType.
+
+### Horizontal Layout
+
+![Horizontal Layout](https://freetype.org/freetype2/docs/glyphs/glyph-metrics-3.svg)
+
+### Vertical Layout
+
+![Vertical Layout](https://freetype.org/freetype2/docs/glyphs/glyph-metrics-4.svg)
+
 ## Supported Output Formats
 
 | Format | File Extension |
@@ -130,6 +142,7 @@ if __name__ == '__main__':
 
 ## References
 
+- [FreeType Glyph Conventions - Glyph Metrics](https://freetype.org/freetype2/docs/glyphs/glyphs-3.html)
 - [OpenType Feature File Specification](https://adobe-type-tools.github.io/afdko/OpenTypeFeatureFileSpecification.html)
 
 ## License
