@@ -255,28 +255,6 @@ def _get_glyph_with_cache(glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGl
     return xtf_glyph
 
 
-def _get_left_side_bearing(glyph: Glyph) -> int:
-    left_padding = 0
-    for i in range(glyph.width):
-        if any(bitmap_row[i] for bitmap_row in glyph.bitmap) != 0:
-            break
-        left_padding += 1
-    if left_padding == glyph.width:
-        left_padding = 0
-    return left_padding + glyph.horizontal_origin_x
-
-
-def _get_top_side_bearing(glyph: Glyph) -> int:
-    top_padding = 0
-    for bitmap_row in glyph.bitmap:
-        if any(bitmap_row) != 0:
-            break
-        top_padding += 1
-    if top_padding == glyph.height:
-        top_padding = 0
-    return top_padding + glyph.vertical_origin_y
-
-
 def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flavor: Flavor | None = None) -> FontBuilder:
     config = context.opentype_config
     font_metric = context.font_metric * config.px_to_units
@@ -311,11 +289,11 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
         glyph = name_to_glyph[glyph_name]
 
         advance_width = glyph.advance_width * config.px_to_units
-        left_side_bearing = _get_left_side_bearing(glyph) * config.px_to_units
+        left_side_bearing = (glyph.calculate_bitmap_left_padding() + glyph.horizontal_origin_x) * config.px_to_units
         horizontal_metrics[glyph_name] = advance_width, left_side_bearing
 
         advance_height = glyph.advance_height * config.px_to_units
-        top_side_bearing = _get_top_side_bearing(glyph) * config.px_to_units
+        top_side_bearing = (glyph.calculate_bitmap_top_padding() + glyph.vertical_origin_y) * config.px_to_units
         vertical_metrics[glyph_name] = advance_height, top_side_bearing
     builder.setupHorizontalMetrics(horizontal_metrics)
     builder.setupVerticalMetrics(vertical_metrics)

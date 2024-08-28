@@ -57,3 +57,23 @@ class Glyph:
     @property
     def dimensions(self) -> tuple[int, int]:
         return self.width, self.height
+
+    def calculate_bitmap_left_padding(self) -> int:
+        padding = 0
+        for i in range(self.width):
+            if any(bitmap_row[i] for bitmap_row in self.bitmap) != 0:
+                break
+            padding += 1
+        if padding == self.width:
+            padding = 0
+        return padding
+
+    def calculate_bitmap_top_padding(self) -> int:
+        padding = 0
+        for bitmap_row in self.bitmap:
+            if any(bitmap_row) != 0:
+                break
+            padding += 1
+        if padding == self.height:
+            padding = 0
+        return padding
