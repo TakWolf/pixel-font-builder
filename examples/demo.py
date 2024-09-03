@@ -118,8 +118,8 @@ def _create_builder(
             glyph = glyph_pool[glyph_file.file_path]
         else:
             horizontal_origin_x = 0
-            horizontal_origin_y = math.floor((builder.font_metric.horizontal_layout.ascent + builder.font_metric.horizontal_layout.descent - glyph_file.height) / 2)
-            vertical_origin_x = -(glyph_file.width // 2)
+            horizontal_origin_y = (builder.font_metric.horizontal_layout.ascent + builder.font_metric.horizontal_layout.descent - glyph_file.height) // 2
+            vertical_origin_x = -math.ceil(glyph_file.width / 2)
             vertical_origin_y = (builder.font_metric.font_size - glyph_file.height) // 2
             glyph = Glyph(
                 name=glyph_file.glyph_name,
