@@ -17,6 +17,7 @@ class FontBuilder:
     meta_info: MetaInfo
     character_mapping: dict[int, str]
     glyphs: list[Glyph]
+    kerning_pairs: dict[tuple[str, str], int]
     opentype_config: opentype.Config
     bdf_config: bdf.Config
     pcf_config: pcf.Config
@@ -26,6 +27,7 @@ class FontBuilder:
         self.meta_info = MetaInfo()
         self.character_mapping = {}
         self.glyphs = []
+        self.kerning_pairs = {}
         self.opentype_config = opentype.Config()
         self.bdf_config = bdf.Config()
         self.pcf_config = pcf.Config()
@@ -49,6 +51,12 @@ class FontBuilder:
                 raise RuntimeError('code points must >= 0')
             if glyph_name not in name_to_glyph:
                 raise RuntimeError(f'missing glyph: {repr(glyph_name)}')
+
+        for (left_glyph_name, right_glyph_name), _ in self.kerning_pairs.items():
+            if left_glyph_name not in name_to_glyph:
+                raise RuntimeError(f'missing glyph: {repr(left_glyph_name)}')
+            if right_glyph_name not in name_to_glyph:
+                raise RuntimeError(f'missing glyph: {repr(right_glyph_name)}')
 
         return glyph_order, name_to_glyph
 

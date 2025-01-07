@@ -1,4 +1,5 @@
 from enum import StrEnum
+from io import StringIO
 from os import PathLike
 
 from fontTools.fontBuilder import FontBuilder
@@ -261,6 +262,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     meta_info = context.meta_info
     character_mapping = context.character_mapping
     glyph_order, name_to_glyph = context.prepare_glyphs()
+    kerning_pairs = context.kerning_pairs
 
     builder = FontBuilder(font_metric.font_size, isTTF=is_ttf)
 
@@ -318,6 +320,17 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
         sCapHeight=font_metric.cap_height,
     )
     builder.setupPost()
+
+    if len(kerning_pairs) > 0:
+        text = StringIO()
+        text.write('languagesystem DFLT dflt;\n')
+        text.write('languagesystem latn dflt;\n')
+        text.write('\n')
+        text.write('feature kern {\n')
+        for (left_glyph_name, right_glyph_name), offset in kerning_pairs.items():
+            text.write(f'    position {left_glyph_name} {right_glyph_name} {offset * config.px_to_units};\n')
+        text.write('} kern;\n')
+        builder.addOpenTypeFeatures(text.getvalue())
 
     for feature_file in config.feature_files:
         builder.addOpenTypeFeatures(feature_file.text, feature_file.file_path)
