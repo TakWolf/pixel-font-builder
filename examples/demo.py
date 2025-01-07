@@ -52,16 +52,16 @@ class GlyphFile:
         self.code_point = code_point
         self.bitmap, self.width, self.height = _load_bitmap_from_png(file_path)
 
-    @property
-    def glyph_name(self) -> str:
-        return '.notdef' if self.code_point == -1 else f'{self.code_point:04X}'
-
     def standardized(self):
         _save_bitmap_to_png(self.bitmap, self.file_path)
         file_path = self.file_path.with_stem('notdef' if self.code_point == -1 else f'{self.code_point:04X}')
         if self.file_path != file_path:
             self.file_path.rename(file_path)
             self.file_path = file_path
+
+
+def _get_glyph_name(code_point: int) -> str:
+    return '.notdef' if code_point == -1 else f'u{code_point:04X}'
 
 
 def _collect_glyph_files() -> tuple[dict[int, str], list[GlyphFile]]:
@@ -72,7 +72,7 @@ def _collect_glyph_files() -> tuple[dict[int, str], list[GlyphFile]]:
             continue
         glyph_file = GlyphFile.load(file_path)
         if glyph_file.code_point != -1:
-            character_mapping[glyph_file.code_point] = glyph_file.glyph_name
+            character_mapping[glyph_file.code_point] = _get_glyph_name(glyph_file.code_point)
         glyph_files.append(glyph_file)
     glyph_files.sort(key=lambda x: x.code_point)
     return character_mapping, glyph_files
@@ -122,7 +122,7 @@ def _create_builder(
             vertical_origin_x = -math.ceil(glyph_file.width / 2)
             vertical_origin_y = (builder.font_metric.font_size - glyph_file.height) // 2
             glyph = Glyph(
-                name=glyph_file.glyph_name,
+                name=_get_glyph_name(glyph_file.code_point),
                 horizontal_origin=(horizontal_origin_x, horizontal_origin_y),
                 advance_width=glyph_file.width,
                 vertical_origin=(vertical_origin_x, vertical_origin_y),
