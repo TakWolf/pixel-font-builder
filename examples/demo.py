@@ -52,12 +52,8 @@ class GlyphFile:
         self.code_point = code_point
         self.bitmap, self.width, self.height = _load_bitmap_from_png(file_path)
 
-    def standardized(self):
+    def save(self):
         _save_bitmap_to_png(self.bitmap, self.file_path)
-        file_path = self.file_path.with_stem('notdef' if self.code_point == -1 else f'{self.code_point:04X}')
-        if self.file_path != file_path:
-            self.file_path.rename(file_path)
-            self.file_path = file_path
 
 
 def _get_glyph_name(code_point: int) -> str:
@@ -153,9 +149,9 @@ def main():
     outputs_dir.mkdir(parents=True)
 
     character_mapping, glyph_files = _collect_glyph_files()
-    kerning_pairs = _build_kerning_pairs()
     for glyph_file in glyph_files:
-        glyph_file.standardized()
+        glyph_file.save()
+    kerning_pairs = _build_kerning_pairs()
 
     glyph_pool = {}
 
