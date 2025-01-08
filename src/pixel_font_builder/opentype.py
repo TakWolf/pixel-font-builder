@@ -325,7 +325,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
         text.write('languagesystem latn dflt;\n')
         text.write('\n')
         text.write('feature kern {\n')
-        for (left_glyph_name, right_glyph_name), offset in kerning_pairs.items():
+        for (left_glyph_name, right_glyph_name), offset in sorted(kerning_pairs.items()):
             text.write(f'    position {left_glyph_name} {right_glyph_name} {offset * config.px_to_units};\n')
         text.write('} kern;\n')
         builder.addOpenTypeFeatures(text.getvalue())
