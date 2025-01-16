@@ -23,7 +23,7 @@ _CACHE_NAME_TTF_GLYPH = '_opentype_cache_ttf_glyph'
 
 class FeatureFile:
     @staticmethod
-    def load(file_path: str | PathLike[str]):
+    def load(file_path: str | PathLike[str]) -> 'FeatureFile':
         with open(file_path, 'r', encoding='utf-8') as file:
             return FeatureFile(file.read(), file_path)
 
