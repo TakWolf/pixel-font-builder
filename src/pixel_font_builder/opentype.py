@@ -122,8 +122,8 @@ def _create_outlines(bitmap: list[list[int]], px_to_units: int) -> list[list[tup
     # 相邻像素分组
     point_group_list = []
     for y, bitmap_row in enumerate(bitmap):
-        for x, alpha in enumerate(bitmap_row):
-            if alpha != 0:
+        for x, color in enumerate(bitmap_row):
+            if color != 0:
                 new_point_group = {(x, y)}
                 for i, point_group in enumerate(reversed(point_group_list)):
                     # 遍历方向为右下，因此只需检查左上
