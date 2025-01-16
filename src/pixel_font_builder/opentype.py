@@ -113,10 +113,7 @@ def _create_name_strings(meta_info: MetaInfo) -> dict[str, str]:
     return name_strings
 
 
-def _create_outlines(bitmap: list[list[int]], px_to_units: int) -> list[list[tuple[int, int]]]:
-    """
-    将字形数据转换为轮廓数据，左上角原点坐标系
-    """
+def _create_outlines(bitmap: list[list[int]]) -> list[list[tuple[int, int]]]:
     # 相邻像素分组
     point_group_list = []
     for y, bitmap_row in enumerate(bitmap):
@@ -135,12 +132,7 @@ def _create_outlines(bitmap: list[list[int]], px_to_units: int) -> list[list[tup
         # 按照像素拆分线段，注意绘制顺序
         pending_line_segments = []
         for (x, y) in point_group:
-            point_outline = [
-                (x * px_to_units, y * px_to_units),
-                ((x + 1) * px_to_units, y * px_to_units),
-                ((x + 1) * px_to_units, (y + 1) * px_to_units),
-                (x * px_to_units, (y + 1) * px_to_units),
-            ]
+            point_outline = [(x, y), (x + 1, y), (x + 1, y + 1), (x, y + 1)]
             # 一个像素有左右上下四条边，如果该边没有相邻像素，则该边线段有效
             if x <= 0 or bitmap[y][x - 1] <= 0:  # 左
                 pending_line_segments.append([point_outline[3], point_outline[0]])
@@ -202,35 +194,18 @@ def _create_outlines(bitmap: list[list[int]], px_to_units: int) -> list[list[tup
 
 
 def _create_glyph(glyph: Glyph, outlines: list[list[tuple[int, int]]], px_to_units: int, is_ttf: bool) -> OTFGlyph | TTFGlyph:
-    if is_ttf:
-        pen = TTFGlyphPen()
-    else:
-        pen = OTFGlyphPen(glyph.advance_width * px_to_units, None)
-    if len(outlines) > 0:
-        for outline_index, outline in enumerate(outlines):
-            for point_index, point in enumerate(outline):
+    pen = TTFGlyphPen() if is_ttf else OTFGlyphPen(glyph.advance_width * px_to_units, None)
+    for outline in outlines:
+        for index, (x, y) in enumerate(outline):
+            x = (x + glyph.horizontal_origin_x) * px_to_units
+            y = (glyph.height + glyph.horizontal_origin_y - y) * px_to_units
 
-                # 转换左上角原点坐标系为左下角原点坐标系
-                x, y = point
-                x += glyph.horizontal_origin_x * px_to_units
-                y = (glyph.height + glyph.horizontal_origin_y) * px_to_units - y
-                point = x, y
-
-                if point_index == 0:
-                    pen.moveTo(point)
-                else:
-                    pen.lineTo(point)
-            if outline_index < len(outlines) - 1:
-                pen.endPath()
+            if index == 0:
+                pen.moveTo((x, y))
             else:
-                pen.closePath()
-    else:
-        pen.moveTo((0, 0))
+                pen.lineTo((x, y))
         pen.closePath()
-    if is_ttf:
-        return pen.glyph()
-    else:
-        return pen.getCharString()
+    return pen.glyph() if is_ttf else pen.getCharString()
 
 
 def _get_glyph_with_cache(glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGlyph | TTFGlyph:
@@ -243,7 +218,7 @@ def _get_glyph_with_cache(glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGl
 
     outlines = getattr(glyph, _CACHE_NAME_OUTLINES, None)
     if outlines is None:
-        outlines = _create_outlines(glyph.bitmap, px_to_units)
+        outlines = _create_outlines(glyph.bitmap)
         setattr(glyph, _CACHE_NAME_OUTLINES, outlines)
 
     cache_name_xtf_glyph = _CACHE_NAME_TTF_GLYPH if is_ttf else _CACHE_NAME_OTF_GLYPH
