@@ -15,11 +15,6 @@ import pixel_font_builder
 from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.meta import WeightName, MetaInfo
 
-_CACHE_NAME_TAG = '_opentype_cache_tag'
-_CACHE_NAME_OUTLINES = '_opentype_cache_outlines'
-_CACHE_NAME_OTF_GLYPH = '_opentype_cache_otf_glyph'
-_CACHE_NAME_TTF_GLYPH = '_opentype_cache_ttf_glyph'
-
 
 class FeatureFile:
     @staticmethod
@@ -193,8 +188,9 @@ def _create_outlines(bitmap: list[list[int]]) -> list[list[tuple[int, int]]]:
     return outlines
 
 
-def _create_glyph(glyph: Glyph, outlines: list[list[tuple[int, int]]], px_to_units: int, is_ttf: bool) -> OTFGlyph | TTFGlyph:
+def _create_glyph(glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGlyph | TTFGlyph:
     pen = TTFGlyphPen() if is_ttf else OTFGlyphPen(glyph.advance_width * px_to_units, None)
+    outlines = _create_outlines(glyph.bitmap)
     for outline in outlines:
         for index, (x, y) in enumerate(outline):
             x = (x + glyph.horizontal_origin_x) * px_to_units
@@ -206,27 +202,6 @@ def _create_glyph(glyph: Glyph, outlines: list[list[tuple[int, int]]], px_to_uni
                 pen.lineTo((x, y))
         pen.closePath()
     return pen.glyph() if is_ttf else pen.getCharString()
-
-
-def _get_glyph_with_cache(glyph: Glyph, px_to_units: int, is_ttf: bool) -> OTFGlyph | TTFGlyph:
-    cache_tag = f'{glyph.advance_width}#{glyph.horizontal_origin}#{glyph.bitmap}'.replace(' ', '')
-    if getattr(glyph, _CACHE_NAME_TAG, None) != cache_tag:
-        setattr(glyph, _CACHE_NAME_OUTLINES, None)
-        setattr(glyph, _CACHE_NAME_OTF_GLYPH, None)
-        setattr(glyph, _CACHE_NAME_TTF_GLYPH, None)
-        setattr(glyph, _CACHE_NAME_TAG, cache_tag)
-
-    outlines = getattr(glyph, _CACHE_NAME_OUTLINES, None)
-    if outlines is None:
-        outlines = _create_outlines(glyph.bitmap)
-        setattr(glyph, _CACHE_NAME_OUTLINES, outlines)
-
-    cache_name_xtf_glyph = _CACHE_NAME_TTF_GLYPH if is_ttf else _CACHE_NAME_OTF_GLYPH
-    xtf_glyph = getattr(glyph, cache_name_xtf_glyph, None)
-    if xtf_glyph is None:
-        xtf_glyph = _create_glyph(glyph, outlines, px_to_units, is_ttf)
-        setattr(glyph, cache_name_xtf_glyph, xtf_glyph)
-    return xtf_glyph
 
 
 def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flavor: Flavor | None = None) -> FontBuilder:
@@ -250,7 +225,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     builder.setupGlyphOrder(glyph_order)
     xtf_glyphs = {}
     for glyph_name, glyph in name_to_glyph.items():
-        xtf_glyphs[glyph_name] = _get_glyph_with_cache(glyph, config.px_to_units, is_ttf)
+        xtf_glyphs[glyph_name] = _create_glyph(glyph, config.px_to_units, is_ttf)
     if is_ttf:
         builder.setupGlyf(xtf_glyphs)
     else:
