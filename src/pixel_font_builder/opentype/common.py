@@ -1,6 +1,4 @@
 from enum import StrEnum
-from io import StringIO
-from os import PathLike
 
 from fontTools.fontBuilder import FontBuilder
 from fontTools.misc import timeTools
@@ -13,99 +11,13 @@ from fontTools.ttLib.tables._g_l_y_f import Glyph as TTFGlyph
 
 import pixel_font_builder
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.meta import WeightName, MetaInfo
-
-
-class FeatureFile:
-    @staticmethod
-    def load(file_path: str | PathLike[str]) -> 'FeatureFile':
-        with open(file_path, 'r', encoding='utf-8') as file:
-            return FeatureFile(file.read(), file_path)
-
-    text: str
-    file_path: str | PathLike[str] | None
-
-    def __init__(self, text: str, file_path: str | PathLike[str] | None = None):
-        self.text = text
-        self.file_path = file_path
-
-
-class Config:
-    px_to_units: int
-    feature_files: list[FeatureFile]
-
-    def __init__(
-            self,
-            px_to_units: int = 100,
-            feature_files: list[FeatureFile] | None = None,
-    ):
-        self.px_to_units = px_to_units
-        self.feature_files = [] if feature_files is None else feature_files
+from pixel_font_builder.opentype.feature import build_kern_feature
+from pixel_font_builder.opentype.name import create_name_strings
 
 
 class Flavor(StrEnum):
     WOFF = 'woff'
     WOFF2 = 'woff2'
-
-
-def _create_name_strings(meta_info: MetaInfo) -> dict[str, str]:
-    """
-    https://learn.microsoft.com/en-us/typography/opentype/spec/name#name-ids
-    copyright (nameID 0)
-    familyName (nameID 1)
-    styleName (nameID 2)
-    uniqueFontIdentifier (nameID 3)
-    fullName (nameID 4)
-    version (nameID 5)
-    psName (nameID 6)
-    trademark (nameID 7)
-    manufacturer (nameID 8)
-    designer (nameID 9)
-    description (nameID 10)
-    vendorURL (nameID 11)
-    designerURL (nameID 12)
-    licenseDescription (nameID 13)
-    licenseInfoURL (nameID 14)
-    typographicFamily (nameID 16)
-    typographicSubfamily (nameID 17)
-    compatibleFullName (nameID 18)
-    sampleText (nameID 19)
-    postScriptCIDFindfontName (nameID 20)
-    wwsFamilyName (nameID 21)
-    wwsSubfamilyName (nameID 22)
-    lightBackgroundPalette (nameID 23)
-    darkBackgroundPalette (nameID 24)
-    variationsPostScriptNamePrefix (nameID 25)
-    """
-    unique_name = meta_info.family_name.replace(' ', '-')
-    style_name = meta_info.weight_name or WeightName.REGULAR
-    name_strings = {
-        'familyName': meta_info.family_name,
-        'styleName': style_name,
-        'uniqueFontIdentifier': f'{unique_name}-{style_name};{meta_info.version}',
-        'fullName': f'{meta_info.family_name} {style_name}',
-        'version': meta_info.version,
-        'psName': f'{unique_name}-{style_name}',
-    }
-    if meta_info.copyright_info is not None:
-        name_strings['copyright'] = meta_info.copyright_info
-    if meta_info.manufacturer is not None:
-        name_strings['manufacturer'] = meta_info.manufacturer
-    if meta_info.designer is not None:
-        name_strings['designer'] = meta_info.designer
-    if meta_info.description is not None:
-        name_strings['description'] = meta_info.description
-    if meta_info.vendor_url is not None:
-        name_strings['vendorURL'] = meta_info.vendor_url
-    if meta_info.designer_url is not None:
-        name_strings['designerURL'] = meta_info.designer_url
-    if meta_info.license_info is not None:
-        name_strings['licenseDescription'] = meta_info.license_info
-    if meta_info.license_url is not None:
-        name_strings['licenseInfoURL'] = meta_info.license_url
-    if meta_info.sample_text is not None:
-        name_strings['sampleText'] = meta_info.sample_text
-    return name_strings
 
 
 def _create_outlines(bitmap: list[list[int]]) -> list[list[tuple[int, int]]]:
@@ -219,7 +131,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     if meta_info.modified_time is not None:
         setattr(builder.font['head'], 'modified', timeTools.timestampSinceEpoch(meta_info.modified_time.timestamp()))
 
-    name_strings = _create_name_strings(meta_info)
+    name_strings = create_name_strings(meta_info)
     builder.setupNameTable(name_strings)
 
     builder.setupGlyphOrder(glyph_order)
@@ -270,15 +182,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder', is_ttf: bool, flav
     builder.setupPost()
 
     if len(kerning_pairs) > 0:
-        text = StringIO()
-        text.write('languagesystem DFLT dflt;\n')
-        text.write('languagesystem latn dflt;\n')
-        text.write('\n')
-        text.write('feature kern {\n')
-        for (left_glyph_name, right_glyph_name), offset in sorted(kerning_pairs.items()):
-            text.write(f'    position {left_glyph_name} {right_glyph_name} {offset * config.px_to_units};\n')
-        text.write('} kern;\n')
-        builder.addOpenTypeFeatures(text.getvalue())
+        builder.addOpenTypeFeatures(build_kern_feature(kerning_pairs, config.px_to_units))
 
     for feature_file in config.feature_files:
         builder.addOpenTypeFeatures(feature_file.text, feature_file.file_path)
