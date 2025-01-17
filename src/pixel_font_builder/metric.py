@@ -46,12 +46,8 @@ class FontMetric:
             cap_height: int = 0,
     ):
         self.font_size = font_size
-        if horizontal_layout is None:
-            horizontal_layout = FontLayoutHeader()
-        self.horizontal_layout = horizontal_layout
-        if vertical_layout is None:
-            vertical_layout = FontLayoutHeader()
-        self.vertical_layout = vertical_layout
+        self.horizontal_layout = FontLayoutHeader() if horizontal_layout is None else horizontal_layout
+        self.vertical_layout = FontLayoutHeader() if vertical_layout is None else vertical_layout
         self.x_height = x_height
         self.cap_height = cap_height
 

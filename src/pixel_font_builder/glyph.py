@@ -23,9 +23,7 @@ class Glyph:
         self.advance_width = advance_width
         self.vertical_origin_x, self.vertical_origin_y = vertical_origin
         self.advance_height = advance_height
-        if bitmap is None:
-            bitmap = []
-        self.bitmap = bitmap
+        self.bitmap = [] if bitmap is None else bitmap
 
     @property
     def horizontal_origin(self) -> tuple[int, int]:

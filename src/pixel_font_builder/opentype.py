@@ -45,9 +45,7 @@ class Config:
             feature_files: list[FeatureFile] | None = None,
     ):
         self.px_to_units = px_to_units
-        if feature_files is None:
-            feature_files = []
-        self.feature_files = feature_files
+        self.feature_files = [] if feature_files is None else feature_files
 
 
 class Flavor(StrEnum):
