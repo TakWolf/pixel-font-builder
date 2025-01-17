@@ -16,17 +16,13 @@ pip install pixel-font-builder
 ```python
 import datetime
 import shutil
+from typing import Literal
 
 from examples import build_dir
 from pixel_font_builder import FontBuilder, WeightName, SerifStyle, SlantStyle, WidthStyle, Glyph, opentype
 
 
-def main():
-    outputs_dir = build_dir.joinpath('create')
-    if outputs_dir.exists():
-        shutil.rmtree(outputs_dir)
-    outputs_dir.mkdir(parents=True)
-
+def _create_builder(outlines_style: Literal['SquareDot', 'CircleDot'] | None = None) -> FontBuilder:
     builder = FontBuilder()
     builder.font_metric.font_size = 12
     builder.font_metric.horizontal_layout.ascent = 10
@@ -40,6 +36,8 @@ def main():
     builder.meta_info.created_time = datetime.datetime.fromisoformat('2024-01-01T00:00:00Z')
     builder.meta_info.modified_time = builder.meta_info.created_time
     builder.meta_info.family_name = 'My Pixel'
+    if outlines_style is not None:
+        builder.meta_info.family_name = f'{builder.meta_info.family_name} {outlines_style}'
     builder.meta_info.weight_name = WeightName.REGULAR
     builder.meta_info.serif_style = SerifStyle.SANS_SERIF
     builder.meta_info.slant_style = SlantStyle.NORMAL
@@ -101,11 +99,36 @@ def main():
         ],
     ))
 
+    if outlines_style == 'SquareDot':
+        builder.opentype_config.outlines_painter = opentype.SquareDotOutlinesPainter()
+    elif outlines_style == 'CircleDot':
+        builder.opentype_config.outlines_painter = opentype.CircleDotOutlinesPainter()
+
+    return builder
+
+
+def main():
+    outputs_dir = build_dir.joinpath('create')
+    if outputs_dir.exists():
+        shutil.rmtree(outputs_dir)
+    outputs_dir.mkdir(parents=True)
+
+    builder = _create_builder()
     builder.save_otf(outputs_dir.joinpath('my-pixel.otf'))
     builder.save_otf(outputs_dir.joinpath('my-pixel.woff2'), flavor=opentype.Flavor.WOFF2)
     builder.save_ttf(outputs_dir.joinpath('my-font.ttf'))
     builder.save_bdf(outputs_dir.joinpath('my-font.bdf'))
     builder.save_pcf(outputs_dir.joinpath('my-font.pcf'))
+
+    square_dot_builder = _create_builder('SquareDot')
+    square_dot_builder.save_otf(outputs_dir.joinpath('my-pixel-square_dot.otf'))
+    square_dot_builder.save_otf(outputs_dir.joinpath('my-pixel-square_dot.woff2'), flavor=opentype.Flavor.WOFF2)
+    square_dot_builder.save_ttf(outputs_dir.joinpath('my-font-square_dot.ttf'))
+
+    circle_dot_builder = _create_builder('CircleDot')
+    circle_dot_builder.save_otf(outputs_dir.joinpath('my-pixel-circle_dot.otf'))
+    circle_dot_builder.save_otf(outputs_dir.joinpath('my-pixel-circle_dot.woff2'), flavor=opentype.Flavor.WOFF2)
+    circle_dot_builder.save_ttf(outputs_dir.joinpath('my-font-circle_dot.ttf'))
 
 
 if __name__ == '__main__':
