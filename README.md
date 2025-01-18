@@ -116,19 +116,19 @@ def main():
     builder = _create_builder()
     builder.save_otf(outputs_dir.joinpath('my-pixel.otf'))
     builder.save_otf(outputs_dir.joinpath('my-pixel.woff2'), flavor=opentype.Flavor.WOFF2)
-    builder.save_ttf(outputs_dir.joinpath('my-font.ttf'))
-    builder.save_bdf(outputs_dir.joinpath('my-font.bdf'))
-    builder.save_pcf(outputs_dir.joinpath('my-font.pcf'))
+    builder.save_ttf(outputs_dir.joinpath('my-pixel.ttf'))
+    builder.save_bdf(outputs_dir.joinpath('my-pixel.bdf'))
+    builder.save_pcf(outputs_dir.joinpath('my-pixel.pcf'))
 
     square_dot_builder = _create_builder('SquareDot')
     square_dot_builder.save_otf(outputs_dir.joinpath('my-pixel-square_dot.otf'))
     square_dot_builder.save_otf(outputs_dir.joinpath('my-pixel-square_dot.woff2'), flavor=opentype.Flavor.WOFF2)
-    square_dot_builder.save_ttf(outputs_dir.joinpath('my-font-square_dot.ttf'))
+    square_dot_builder.save_ttf(outputs_dir.joinpath('my-pixel-square_dot.ttf'))
 
     circle_dot_builder = _create_builder('CircleDot')
     circle_dot_builder.save_otf(outputs_dir.joinpath('my-pixel-circle_dot.otf'))
     circle_dot_builder.save_otf(outputs_dir.joinpath('my-pixel-circle_dot.woff2'), flavor=opentype.Flavor.WOFF2)
-    circle_dot_builder.save_ttf(outputs_dir.joinpath('my-font-circle_dot.ttf'))
+    circle_dot_builder.save_ttf(outputs_dir.joinpath('my-pixel-circle_dot.ttf'))
 
 
 if __name__ == '__main__':
