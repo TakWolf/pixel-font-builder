@@ -152,10 +152,11 @@ class SquareDotOutlinesPainter(OutlinesPainter):
 
     def draw_outlines(self, glyph: Glyph, pen: OutlinesPen, px_to_units: int):
         size = self.size * px_to_units
+        offset = (1 - self.size) / 2 * px_to_units
         for y, bitmap_row in enumerate(glyph.bitmap):
-            y = (glyph.height + glyph.horizontal_origin_y - y) * px_to_units
+            y = (glyph.height + glyph.horizontal_origin_y - y) * px_to_units - offset
             for x, color in enumerate(bitmap_row):
-                x = (x + glyph.horizontal_origin_x) * px_to_units
+                x = (x + glyph.horizontal_origin_x) * px_to_units + offset
                 if color != 0:
                     pen.move_to((x, y))
                     pen.line_to((x + size, y))
