@@ -1,3 +1,4 @@
+import math
 from abc import abstractmethod
 from typing import Protocol, runtime_checkable
 
@@ -211,14 +212,15 @@ class CircleDotOutlinesPainter(OutlinesPainter):
 
     def draw_outlines(self, glyph: Glyph, pen: OutlinesPen, px_to_units: int):
         radius = self.radius * px_to_units
+        c = radius * 4 / 3 * (math.sqrt(2) - 1)
         for y, bitmap_row in enumerate(glyph.bitmap):
             y = (glyph.height + glyph.horizontal_origin_y - y - 0.5) * px_to_units
             for x, color in enumerate(bitmap_row):
                 x = (x + glyph.horizontal_origin_x + 0.5) * px_to_units
                 if color != 0:
                     pen.move_to((x, y + radius))
-                    pen.quadratic_curve_to((x + radius, y + radius), (x + radius, y))
-                    pen.quadratic_curve_to((x + radius, y - radius), (x, y - radius))
-                    pen.quadratic_curve_to((x - radius, y - radius), (x - radius, y))
-                    pen.quadratic_curve_to((x - radius, y + radius), (x, y + radius))
+                    pen.compat_cubic_curve_to((x + c, y + radius), (x + radius, y + c), (x + radius, y))
+                    pen.compat_cubic_curve_to((x + radius, y - c), (x + c, y - radius), (x, y - radius))
+                    pen.compat_cubic_curve_to((x - c, y - radius), (x - radius, y - c), (x - radius, y))
+                    pen.compat_cubic_curve_to((x - radius, y + c), (x - c, y + radius), (x, y + radius))
                     pen.close_path()
