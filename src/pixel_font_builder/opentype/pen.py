@@ -26,11 +26,20 @@ class OutlinesPen:
     def line_to(self, point: tuple[float, float]):
         self.pen.lineTo(point)
 
-    def curve_to(self, *points: tuple[float, float]):
-        self.pen.curveTo(*points)
+    def cubic_curve_to(
+            self,
+            control_point_1: tuple[float, float],
+            control_point_2: tuple[float, float],
+            end_point: tuple[float, float],
+    ):
+        self.pen.curveTo(control_point_1, control_point_2, end_point)
 
-    def q_curve_to(self, *points: tuple[float, float]):
-        self.pen.qCurveTo(*points)
+    def quadratic_curve_to(
+            self,
+            control_point: tuple[float, float],
+            end_point: tuple[float, float],
+    ):
+        self.pen.qCurveTo(control_point, end_point)
 
     def end_path(self):
         self.pen.endPath()
@@ -179,8 +188,8 @@ class CircleDotOutlinesPainter(OutlinesPainter):
                 x = (x + glyph.horizontal_origin_x + 0.5) * px_to_units
                 if color != 0:
                     pen.move_to((x, y + radius))
-                    pen.q_curve_to((x + radius, y + radius), (x + radius, y))
-                    pen.q_curve_to((x + radius, y - radius), (x, y - radius))
-                    pen.q_curve_to((x - radius, y - radius), (x - radius, y))
-                    pen.q_curve_to((x - radius, y + radius), (x, y + radius))
+                    pen.quadratic_curve_to((x + radius, y + radius), (x + radius, y))
+                    pen.quadratic_curve_to((x + radius, y - radius), (x, y - radius))
+                    pen.quadratic_curve_to((x - radius, y - radius), (x - radius, y))
+                    pen.quadratic_curve_to((x - radius, y + radius), (x, y + radius))
                     pen.close_path()
