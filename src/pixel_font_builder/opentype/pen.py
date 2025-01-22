@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from typing import Protocol, runtime_checkable
 
+from fontTools import cu2qu
 from fontTools.misc.psCharStrings import T2CharString as OTFGlyph
 from fontTools.pens.t2CharStringPen import T2CharStringPen as OTFGlyphPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen as TTFGlyphPen
@@ -14,11 +15,18 @@ type XTFGlyph = OTFGlyph | TTFGlyph
 
 class OutlinesPen:
     is_ttf: bool
+    is_cubic_supported: bool
     pen: OTFGlyphPen | TTFGlyphPen
     current_point: tuple[float, float] | None
 
-    def __init__(self, is_ttf: bool, advance_width: int):
+    def __init__(
+            self,
+            is_ttf: bool,
+            is_cubic_supported: bool,
+            advance_width: int,
+    ):
         self.is_ttf = is_ttf
+        self.is_cubic_supported = is_cubic_supported
         self.pen = TTFGlyphPen() if is_ttf else OTFGlyphPen(advance_width, None)
         self.current_point = None
 
@@ -45,6 +53,19 @@ class OutlinesPen:
             end_point: tuple[float, float],
     ):
         self.pen.qCurveTo(control_point, end_point)
+        self.current_point = end_point
+
+    def compat_cubic_curve_to(
+            self,
+            control_point_1: tuple[float, float],
+            control_point_2: tuple[float, float],
+            end_point: tuple[float, float],
+            double_max_err: float = 1,
+    ):
+        if self.is_cubic_supported:
+            self.pen.curveTo(control_point_1, control_point_2, end_point)
+        else:
+            self.pen.qCurveTo(*cu2qu.curve_to_quadratic([self.current_point, control_point_1, control_point_2, end_point], double_max_err)[1:])
         self.current_point = end_point
 
     def end_path(self):

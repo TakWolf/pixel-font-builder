@@ -52,7 +52,7 @@ def create_builder(
         top_side_bearing = (glyph.calculate_bitmap_top_padding() + glyph.vertical_origin_y) * config.px_to_units
         vertical_metrics[glyph_name] = advance_height, top_side_bearing
 
-        pen = OutlinesPen(is_ttf, advance_width)
+        pen = OutlinesPen(is_ttf, not is_ttf or config.glyph_data_format == 1, advance_width)
         outlines_painter.draw_outlines(glyph, pen, config.px_to_units)
         xtf_glyphs[glyph_name] = pen.to_glyph()
     builder.setupGlyphOrder(glyph_order)
