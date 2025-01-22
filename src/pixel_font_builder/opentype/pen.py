@@ -15,16 +15,20 @@ type XTFGlyph = OTFGlyph | TTFGlyph
 class OutlinesPen:
     is_ttf: bool
     pen: OTFGlyphPen | TTFGlyphPen
+    current_point: tuple[float, float] | None
 
     def __init__(self, is_ttf: bool, advance_width: int):
         self.is_ttf = is_ttf
         self.pen = TTFGlyphPen() if is_ttf else OTFGlyphPen(advance_width, None)
+        self.current_point = None
 
     def move_to(self, point: tuple[float, float]):
         self.pen.moveTo(point)
+        self.current_point = point
 
     def line_to(self, point: tuple[float, float]):
         self.pen.lineTo(point)
+        self.current_point = point
 
     def cubic_curve_to(
             self,
@@ -33,6 +37,7 @@ class OutlinesPen:
             end_point: tuple[float, float],
     ):
         self.pen.curveTo(control_point_1, control_point_2, end_point)
+        self.current_point = end_point
 
     def quadratic_curve_to(
             self,
@@ -40,12 +45,15 @@ class OutlinesPen:
             end_point: tuple[float, float],
     ):
         self.pen.qCurveTo(control_point, end_point)
+        self.current_point = end_point
 
     def end_path(self):
         self.pen.endPath()
+        self.current_point = None
 
     def close_path(self):
         self.pen.closePath()
+        self.current_point = None
 
     def to_glyph(self) -> XTFGlyph:
         return self.pen.glyph() if self.is_ttf else self.pen.getCharString()
