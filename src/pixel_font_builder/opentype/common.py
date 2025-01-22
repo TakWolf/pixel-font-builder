@@ -40,24 +40,10 @@ def create_builder(
     name_strings = create_name_strings(meta_info)
     builder.setupNameTable(name_strings)
 
-    builder.setupGlyphOrder(glyph_order)
     xtf_glyphs = {}
-    for glyph_name, glyph in name_to_glyph.items():
-        pen = OutlinesPen(is_ttf, glyph.advance_width * config.px_to_units)
-        outlines_painter.draw_outlines(glyph, pen, config.px_to_units)
-        xtf_glyphs[glyph_name] = pen.to_glyph()
-    if is_ttf:
-        builder.setupGlyf(xtf_glyphs)
-    else:
-        builder.setupCFF('', {}, xtf_glyphs, {})
-
-    builder.setupCharacterMap(character_mapping)
-
     horizontal_metrics = {}
     vertical_metrics = {}
-    for glyph_name in glyph_order:
-        glyph = name_to_glyph[glyph_name]
-
+    for glyph_name, glyph in name_to_glyph.items():
         advance_width = glyph.advance_width * config.px_to_units
         left_side_bearing = (glyph.calculate_bitmap_left_padding() + glyph.horizontal_origin_x) * config.px_to_units
         horizontal_metrics[glyph_name] = advance_width, left_side_bearing
@@ -65,6 +51,13 @@ def create_builder(
         advance_height = glyph.advance_height * config.px_to_units
         top_side_bearing = (glyph.calculate_bitmap_top_padding() + glyph.vertical_origin_y) * config.px_to_units
         vertical_metrics[glyph_name] = advance_height, top_side_bearing
+
+        pen = OutlinesPen(is_ttf, advance_width)
+        outlines_painter.draw_outlines(glyph, pen, config.px_to_units)
+        xtf_glyphs[glyph_name] = pen.to_glyph()
+    builder.setupGlyphOrder(glyph_order)
+    builder.setupGlyf(xtf_glyphs) if is_ttf else builder.setupCFF('', {}, xtf_glyphs, {})
+    builder.setupCharacterMap(character_mapping)
     builder.setupHorizontalMetrics(horizontal_metrics)
     builder.setupVerticalMetrics(vertical_metrics)
 
