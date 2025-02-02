@@ -7,7 +7,7 @@ from fontTools.ttLib import TTCollection
 import pixel_font_builder
 from pixel_font_builder.opentype.feature import build_kern_feature
 from pixel_font_builder.opentype.name import create_name_strings
-from pixel_font_builder.opentype.pen import OutlinesPen, OutlinesPainter
+from pixel_font_builder.opentype.pen import OutlinesPen
 
 
 class Flavor(StrEnum):
@@ -18,7 +18,6 @@ class Flavor(StrEnum):
 def create_builder(
         context: 'pixel_font_builder.FontBuilder',
         is_ttf: bool,
-        outlines_painter: OutlinesPainter | None = None,
         flavor: Flavor | None = None,
 ) -> FontBuilder:
     config = context.opentype_config
@@ -27,8 +26,6 @@ def create_builder(
     character_mapping = context.character_mapping
     glyph_order, name_to_glyph = context.prepare_glyphs()
     kerning_pairs = context.kerning_pairs
-    if outlines_painter is None:
-        outlines_painter = config.outlines_painter
 
     builder = FontBuilder(font_metric.font_size, isTTF=is_ttf, glyphDataFormat=config.glyph_data_format)
 
@@ -53,7 +50,7 @@ def create_builder(
         vertical_metrics[glyph_name] = advance_height, top_side_bearing
 
         pen = OutlinesPen(is_ttf, not is_ttf or config.glyph_data_format == 1, advance_width)
-        outlines_painter.draw_outlines(glyph, pen, config.px_to_units)
+        config.outlines_painter.draw_outlines(glyph, pen, config.px_to_units)
         xtf_glyphs[glyph_name] = pen.to_glyph()
     builder.setupGlyphOrder(glyph_order)
     builder.setupGlyf(xtf_glyphs) if is_ttf else builder.setupCFF('', {}, xtf_glyphs, {})
@@ -97,10 +94,9 @@ def create_builder(
 def create_collection_builder(
         contexts: 'pixel_font_builder.FontCollectionBuilder',
         is_ttf: bool,
-        outlines_painter: OutlinesPainter | None = None,
 ) -> TTCollection:
     collection_builder = TTCollection()
     for context in contexts:
-        builder = create_builder(context, is_ttf, outlines_painter)
+        builder = create_builder(context, is_ttf)
         collection_builder.fonts.append(builder.font)
     return collection_builder
