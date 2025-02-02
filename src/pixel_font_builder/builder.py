@@ -60,35 +60,25 @@ class FontBuilder:
 
         return glyph_order, name_to_glyph
 
-    def to_otf_builder(
-            self,
-            outlines_painter: opentype.OutlinesPainter | None = None,
-            flavor: opentype.Flavor | None = None,
-    ) -> fontTools.fontBuilder.FontBuilder:
-        return opentype.create_builder(self, False, outlines_painter, flavor)
+    def to_otf_builder(self, flavor: opentype.Flavor | None = None) -> fontTools.fontBuilder.FontBuilder:
+        return opentype.create_builder(self, False, flavor)
 
     def save_otf(
             self,
             file_path: str | PathLike[str],
-            outlines_painter: opentype.OutlinesPainter | None = None,
             flavor: opentype.Flavor | None = None,
     ):
-        self.to_otf_builder(outlines_painter, flavor).save(file_path)
+        self.to_otf_builder(flavor).save(file_path)
 
-    def to_ttf_builder(
-            self,
-            outlines_painter: opentype.OutlinesPainter | None = None,
-            flavor: opentype.Flavor | None = None,
-    ) -> fontTools.fontBuilder.FontBuilder:
-        return opentype.create_builder(self, True, outlines_painter, flavor)
+    def to_ttf_builder(self, flavor: opentype.Flavor | None = None) -> fontTools.fontBuilder.FontBuilder:
+        return opentype.create_builder(self, True, flavor)
 
     def save_ttf(
             self,
             file_path: str | PathLike[str],
-            outlines_painter: opentype.OutlinesPainter | None = None,
             flavor: opentype.Flavor | None = None,
     ):
-        self.to_ttf_builder(outlines_painter, flavor).save(file_path)
+        self.to_ttf_builder(flavor).save(file_path)
 
     def to_bdf_builder(self) -> bdffont.BdfFont:
         return bdf.create_builder(self)
@@ -104,30 +94,22 @@ class FontBuilder:
 
 
 class FontCollectionBuilder(UserList[FontBuilder]):
-    def to_otc_builder(
-            self,
-            outlines_painter: opentype.OutlinesPainter | None = None,
-    ) -> fontTools.ttLib.TTCollection:
-        return opentype.create_collection_builder(self, False, outlines_painter)
+    def to_otc_builder(self) -> fontTools.ttLib.TTCollection:
+        return opentype.create_collection_builder(self, False)
 
     def save_otc(
             self,
             file_path: str | PathLike[str],
             share_tables: bool = True,
-            outlines_painter: opentype.OutlinesPainter | None = None,
     ):
-        self.to_otc_builder(outlines_painter).save(file_path, share_tables)
+        self.to_otc_builder().save(file_path, share_tables)
 
-    def to_ttc_builder(
-            self,
-            outlines_painter: opentype.OutlinesPainter | None = None,
-    ) -> fontTools.ttLib.TTCollection:
-        return opentype.create_collection_builder(self, True, outlines_painter)
+    def to_ttc_builder(self) -> fontTools.ttLib.TTCollection:
+        return opentype.create_collection_builder(self, True)
 
     def save_ttc(
             self,
             file_path: str | PathLike[str],
             share_tables: bool = True,
-            outlines_painter: opentype.OutlinesPainter | None = None,
     ):
-        self.to_ttc_builder(outlines_painter).save(file_path, share_tables)
+        self.to_ttc_builder().save(file_path, share_tables)
