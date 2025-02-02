@@ -47,8 +47,11 @@ class FontBuilder:
             raise RuntimeError("missing glyph: '.notdef'")
 
         for code_point, glyph_name in self.character_mapping.items():
-            if code_point < 0:
-                raise RuntimeError('code points must >= 0')
+            try:
+                if code_point < 0:
+                    raise RuntimeError('code points must >= 0')
+            except TypeError:
+                raise RuntimeError('code points must be int')
             if glyph_name not in name_to_glyph:
                 raise RuntimeError(f'missing glyph: {repr(glyph_name)}')
 
