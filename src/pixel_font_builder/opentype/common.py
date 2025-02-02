@@ -96,7 +96,5 @@ def create_collection_builder(
         is_ttf: bool,
 ) -> TTCollection:
     collection_builder = TTCollection()
-    for context in contexts:
-        builder = create_builder(context, is_ttf)
-        collection_builder.fonts.append(builder.font)
+    collection_builder.fonts.extend(create_builder(context, is_ttf).font for context in contexts)
     return collection_builder
