@@ -1,15 +1,15 @@
-from pixel_font_builder import FontLayoutHeader, FontMetric
+from pixel_font_builder import LineMetric, FontMetric
 
 
 def test_font_metric_1():
     font_metric = FontMetric(
         font_size=10,
-        horizontal_layout=FontLayoutHeader(
+        horizontal_layout=LineMetric(
             ascent=1,
             descent=-1,
             line_gap=2,
         ),
-        vertical_layout=FontLayoutHeader(
+        vertical_layout=LineMetric(
             ascent=3,
             descent=-3,
             line_gap=4,

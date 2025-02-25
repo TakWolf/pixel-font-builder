@@ -1,7 +1,7 @@
 from typing import Any
 
 
-class FontLayoutHeader:
+class LineMetric:
     ascent: int
     descent: int
     line_gap: int
@@ -20,10 +20,10 @@ class FontLayoutHeader:
     def line_height(self) -> int:
         return self.ascent - self.descent
 
-    def __mul__(self, other: Any) -> 'FontLayoutHeader':
+    def __mul__(self, other: Any) -> 'LineMetric':
         if not isinstance(other, int):
-            raise TypeError(f"can't multiply 'FontLayoutHeader' by non-int of type '{type(other).__name__}'")
-        return FontLayoutHeader(
+            raise TypeError(f"can't multiply 'LineMetric' by non-int of type '{type(other).__name__}'")
+        return LineMetric(
             self.ascent * other,
             self.descent * other,
             self.line_gap * other,
@@ -32,22 +32,22 @@ class FontLayoutHeader:
 
 class FontMetric:
     font_size: int
-    horizontal_layout: FontLayoutHeader
-    vertical_layout: FontLayoutHeader
+    horizontal_layout: LineMetric
+    vertical_layout: LineMetric
     x_height: int
     cap_height: int
 
     def __init__(
             self,
             font_size: int = 0,
-            horizontal_layout: FontLayoutHeader | None = None,
-            vertical_layout: FontLayoutHeader | None = None,
+            horizontal_layout: LineMetric | None = None,
+            vertical_layout: LineMetric | None = None,
             x_height: int = 0,
             cap_height: int = 0,
     ):
         self.font_size = font_size
-        self.horizontal_layout = FontLayoutHeader() if horizontal_layout is None else horizontal_layout
-        self.vertical_layout = FontLayoutHeader() if vertical_layout is None else vertical_layout
+        self.horizontal_layout = LineMetric() if horizontal_layout is None else horizontal_layout
+        self.vertical_layout = LineMetric() if vertical_layout is None else vertical_layout
         self.x_height = x_height
         self.cap_height = cap_height
 
