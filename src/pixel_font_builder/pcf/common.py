@@ -1,10 +1,11 @@
 import math
+import re
 from collections import ChainMap
 
 from pcffont import PcfFontBuilder, PcfGlyph
 
 import pixel_font_builder
-from pixel_font_builder.meta import SerifStyle, SlantStyle, WidthStyle
+from pixel_font_builder.meta import WeightName, SlantStyle, WidthStyle
 
 _DEFAULT_CHAR = 0xFFFE
 
@@ -40,9 +41,10 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
             bitmap=glyph.bitmap,
         ))
 
-    builder.properties.foundry = meta_info.manufacturer
-    builder.properties.family_name = meta_info.family_name
-    builder.properties.weight_name = meta_info.weight_name
+    if meta_info.manufacturer is not None:
+        builder.properties.foundry = meta_info.manufacturer.replace('-', '_')
+    builder.properties.family_name = meta_info.family_name.replace('-', '_')
+    builder.properties.weight_name = meta_info.weight_name or WeightName.REGULAR
     if meta_info.slant_style is None or meta_info.slant_style == SlantStyle.NORMAL:
         builder.properties.slant = 'R'
     elif meta_info.slant_style == SlantStyle.ITALIC:
@@ -56,11 +58,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
     else:
         builder.properties.slant = 'OT'
     builder.properties.setwidth_name = 'Normal'
-    if meta_info.serif_style == SerifStyle.SERIF:
-        builder.properties.add_style_name = 'Serif'
-    elif meta_info.serif_style == SerifStyle.SANS_SERIF:
-        builder.properties.add_style_name = 'Sans Serif'
-    else:
+    if meta_info.serif_style is not None:
         builder.properties.add_style_name = meta_info.serif_style
     builder.properties.pixel_size = font_metric.font_size
     builder.properties.point_size = font_metric.font_size * 10
@@ -81,7 +79,9 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
     builder.properties.cap_height = font_metric.cap_height
 
     builder.properties.font_version = meta_info.version
-    builder.properties.copyright = meta_info.copyright_info
-    builder.properties['LICENSE'] = meta_info.license_info
+    if meta_info.copyright_info is not None:
+        builder.properties.copyright = re.sub(r'\r\n|\r|\n', '<br>', meta_info.copyright_info)
+    if meta_info.license_info is not None:
+        builder.properties['LICENSE'] = re.sub(r'\r\n|\r|\n', '<br>', meta_info.license_info)
 
     return builder

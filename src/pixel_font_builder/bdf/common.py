@@ -1,10 +1,11 @@
 import math
+import re
 from collections import ChainMap
 
 from bdffont import BdfFont, BdfGlyph
 
 import pixel_font_builder
-from pixel_font_builder.meta import SerifStyle, SlantStyle, WidthStyle
+from pixel_font_builder.meta import WeightName, SlantStyle, WidthStyle
 
 _DEFAULT_CHAR = 0xFFFE
 
@@ -35,9 +36,10 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
             bitmap=glyph.bitmap,
         ))
 
-    font.properties.foundry = meta_info.manufacturer
-    font.properties.family_name = meta_info.family_name
-    font.properties.weight_name = meta_info.weight_name
+    if meta_info.manufacturer is not None:
+        font.properties.foundry = meta_info.manufacturer.replace('-', '_')
+    font.properties.family_name = meta_info.family_name.replace('-', '_')
+    font.properties.weight_name = meta_info.weight_name or WeightName.REGULAR
     if meta_info.slant_style is None or meta_info.slant_style == SlantStyle.NORMAL:
         font.properties.slant = 'R'
     elif meta_info.slant_style == SlantStyle.ITALIC:
@@ -51,11 +53,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     else:
         font.properties.slant = 'OT'
     font.properties.setwidth_name = 'Normal'
-    if meta_info.serif_style == SerifStyle.SERIF:
-        font.properties.add_style_name = 'Serif'
-    elif meta_info.serif_style == SerifStyle.SANS_SERIF:
-        font.properties.add_style_name = 'Sans Serif'
-    else:
+    if meta_info.serif_style is not None:
         font.properties.add_style_name = meta_info.serif_style
     font.properties.pixel_size = font_metric.font_size
     font.properties.point_size = font_metric.font_size * 10
@@ -79,7 +77,9 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
     font.properties.cap_height = font_metric.cap_height
 
     font.properties.font_version = meta_info.version
-    font.properties.copyright = meta_info.copyright_info
-    font.properties['LICENSE'] = meta_info.license_info
+    if meta_info.copyright_info is not None:
+        font.properties.copyright = re.sub(r'\r\n|\r|\n', '<br>', meta_info.copyright_info)
+    if meta_info.license_info is not None:
+        font.properties['LICENSE'] = re.sub(r'\r\n|\r|\n', '<br>', meta_info.license_info)
 
     return font
