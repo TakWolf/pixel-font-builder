@@ -24,8 +24,8 @@ classifiers = [
 
 dependencies = [
     "fonttools[woff]>=4.56.0",
-    "bdffont>=0.0.28",
-    "pcffont>=0.0.17",
+    "bdffont>=0.0.29",
+    "pcffont>=0.0.18",
 ]
 
 [project.urls]
