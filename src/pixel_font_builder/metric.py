@@ -16,10 +16,6 @@ class LineMetric:
         self.descent = descent
         self.line_gap = line_gap
 
-    @property
-    def line_height(self) -> int:
-        return self.ascent - self.descent
-
     def __mul__(self, other: Any) -> 'LineMetric':
         if not isinstance(other, int):
             raise TypeError(f"can't multiply 'LineMetric' by non-int of type '{type(other).__name__}'")
@@ -28,6 +24,10 @@ class LineMetric:
             self.descent * other,
             self.line_gap * other,
         )
+
+    @property
+    def line_height(self) -> int:
+        return self.ascent - self.descent
 
 
 class FontMetric:
