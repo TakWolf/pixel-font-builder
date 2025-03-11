@@ -72,8 +72,8 @@ def create_builder(
         sTypoAscender=font_metric.horizontal_layout.ascent,
         sTypoDescender=font_metric.horizontal_layout.descent,
         sTypoLineGap=font_metric.horizontal_layout.line_gap,
-        usWinAscent=font_metric.horizontal_layout.ascent,
-        usWinDescent=-font_metric.horizontal_layout.descent,
+        usWinAscent=max(font_metric.horizontal_layout.ascent, 0),
+        usWinDescent=max(-font_metric.horizontal_layout.descent, 0),
         sxHeight=font_metric.x_height,
         sCapHeight=font_metric.cap_height,
     )
