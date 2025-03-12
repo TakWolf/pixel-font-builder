@@ -7,7 +7,7 @@ from fontTools.ttLib import TTCollection
 import pixel_font_builder
 from pixel_font_builder.opentype.feature import build_kern_feature
 from pixel_font_builder.opentype.name import create_name_strings
-from pixel_font_builder.opentype.pen import OutlinesPen
+from pixel_font_builder.opentype.outline import create_outline_glyphs
 
 
 class Flavor(StrEnum):
@@ -37,21 +37,7 @@ def create_builder(
     name_strings = create_name_strings(meta_info)
     builder.setupNameTable(name_strings)
 
-    xtf_glyphs = {}
-    horizontal_metrics = {}
-    vertical_metrics = {}
-    for glyph_name, glyph in name_to_glyph.items():
-        advance_width = glyph.advance_width * config.px_to_units
-        left_side_bearing = (glyph.calculate_bitmap_left_padding() + glyph.horizontal_origin_x) * config.px_to_units
-        horizontal_metrics[glyph_name] = advance_width, left_side_bearing
-
-        advance_height = glyph.advance_height * config.px_to_units
-        top_side_bearing = (glyph.calculate_bitmap_top_padding() + glyph.vertical_origin_y) * config.px_to_units
-        vertical_metrics[glyph_name] = advance_height, top_side_bearing
-
-        pen = OutlinesPen(is_ttf, not is_ttf or config.glyph_data_format == 1, advance_width)
-        config.outlines_painter.draw_outlines(glyph, pen, config.px_to_units)
-        xtf_glyphs[glyph_name] = pen.to_glyph()
+    xtf_glyphs, horizontal_metrics, vertical_metrics = create_outline_glyphs(is_ttf, not is_ttf or config.glyph_data_format == 1, config.outlines_painter, name_to_glyph, config.px_to_units)
     builder.setupGlyphOrder(glyph_order)
     builder.setupGlyf(xtf_glyphs) if is_ttf else builder.setupCFF('', {}, xtf_glyphs, {})
     builder.setupHorizontalMetrics(horizontal_metrics)

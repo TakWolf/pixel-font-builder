@@ -1,7 +1,7 @@
 from typing import Final
 
 from pixel_font_builder.opentype.feature import FeatureFile
-from pixel_font_builder.opentype.pen import OutlinesPainter, SolidOutlinesPainter
+from pixel_font_builder.opentype.outline import OutlinesPainter, SolidOutlinesPainter
 
 
 class Config:

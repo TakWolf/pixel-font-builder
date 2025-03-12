@@ -224,3 +224,28 @@ class CircleDotOutlinesPainter(OutlinesPainter):
                     pen.compat_cubic_curve_to((x - c, y - radius), (x - radius, y - c), (x - radius, y))
                     pen.compat_cubic_curve_to((x - radius, y + c), (x - c, y + radius), (x, y + radius))
                     pen.close_path()
+
+
+def create_outline_glyphs(
+        is_ttf: bool,
+        is_cubic_supported: bool,
+        outlines_painter: OutlinesPainter,
+        name_to_glyph: dict[str, Glyph],
+        px_to_units: int,
+) -> tuple[dict[str, XTFGlyph], dict[str, tuple[int, int]], dict[str, tuple[int, int]]]:
+    xtf_glyphs = {}
+    horizontal_metrics = {}
+    vertical_metrics = {}
+    for glyph_name, glyph in name_to_glyph.items():
+        advance_width = glyph.advance_width * px_to_units
+        left_side_bearing = (glyph.calculate_bitmap_left_padding() + glyph.horizontal_origin_x) * px_to_units
+        horizontal_metrics[glyph_name] = advance_width, left_side_bearing
+
+        advance_height = glyph.advance_height * px_to_units
+        top_side_bearing = (glyph.calculate_bitmap_top_padding() + glyph.vertical_origin_y) * px_to_units
+        vertical_metrics[glyph_name] = advance_height, top_side_bearing
+
+        pen = OutlinesPen(is_ttf, is_cubic_supported, advance_width)
+        outlines_painter.draw_outlines(glyph, pen, px_to_units)
+        xtf_glyphs[glyph_name] = pen.to_glyph()
+    return xtf_glyphs, horizontal_metrics, vertical_metrics
