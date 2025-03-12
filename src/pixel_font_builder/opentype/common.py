@@ -54,9 +54,10 @@ def create_builder(
         xtf_glyphs[glyph_name] = pen.to_glyph()
     builder.setupGlyphOrder(glyph_order)
     builder.setupGlyf(xtf_glyphs) if is_ttf else builder.setupCFF('', {}, xtf_glyphs, {})
-    builder.setupCharacterMap(character_mapping)
     builder.setupHorizontalMetrics(horizontal_metrics)
     builder.setupVerticalMetrics(vertical_metrics)
+
+    builder.setupCharacterMap(character_mapping)
 
     builder.setupHorizontalHeader(
         ascent=font_metric.horizontal_layout.ascent,
