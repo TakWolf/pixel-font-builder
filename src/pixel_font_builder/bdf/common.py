@@ -32,7 +32,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
             encoding=code_point,
             scalable_width=(math.ceil((glyph.advance_width / font_metric.font_size) * (75 / config.resolution_x) * 1000), 0),
             device_width=(glyph.advance_width, 0),
-            bounding_box=(glyph.width, glyph.height, glyph.horizontal_origin_x, glyph.horizontal_origin_y),
+            bounding_box=(glyph.width, glyph.height, glyph.horizontal_offset_x, glyph.horizontal_offset_y),
             bitmap=glyph.bitmap,
         ))
 

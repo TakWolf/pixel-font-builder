@@ -4,9 +4,9 @@ from pixel_font_builder import Glyph
 def test_glyph_1():
     glyph = Glyph(
         name='test',
-        horizontal_origin=(1, 2),
+        horizontal_offset=(1, 2),
         advance_width=3,
-        vertical_origin=(4, 5),
+        vertical_offset=(4, 5),
         advance_height=6,
         bitmap=[
             [0, 0, 0, 0, 0, 0, 0],
@@ -21,13 +21,13 @@ def test_glyph_1():
         ],
     )
     assert glyph.name == 'test'
-    assert glyph.horizontal_origin_x == 1
-    assert glyph.horizontal_origin_y == 2
-    assert glyph.horizontal_origin == (1, 2)
+    assert glyph.horizontal_offset_x == 1
+    assert glyph.horizontal_offset_y == 2
+    assert glyph.horizontal_offset == (1, 2)
     assert glyph.advance_width == 3
-    assert glyph.vertical_origin_x == 4
-    assert glyph.vertical_origin_y == 5
-    assert glyph.vertical_origin == (4, 5)
+    assert glyph.vertical_offset_x == 4
+    assert glyph.vertical_offset_y == 5
+    assert glyph.vertical_offset == (4, 5)
     assert glyph.advance_height == 6
     assert glyph.width == 7
     assert glyph.height == 9
@@ -37,20 +37,20 @@ def test_glyph_1():
     assert glyph.calculate_bitmap_top_padding() == 3
     assert glyph.calculate_bitmap_bottom_padding() == 1
 
-    glyph.horizontal_origin = (7, 8)
-    assert glyph.horizontal_origin_x == 7
-    assert glyph.horizontal_origin_y == 8
+    glyph.horizontal_offset = (7, 8)
+    assert glyph.horizontal_offset_x == 7
+    assert glyph.horizontal_offset_y == 8
 
-    glyph.vertical_origin = (9, 10)
-    assert glyph.vertical_origin_x == 9
-    assert glyph.vertical_origin_y == 10
+    glyph.vertical_offset = (9, 10)
+    assert glyph.vertical_offset_x == 9
+    assert glyph.vertical_offset_y == 10
 
 
 def test_glyph_2():
     glyph = Glyph(name='test')
-    assert glyph.horizontal_origin == (0, 0)
+    assert glyph.horizontal_offset == (0, 0)
     assert glyph.advance_width == 0
-    assert glyph.vertical_origin == (0, 0)
+    assert glyph.vertical_offset == (0, 0)
     assert glyph.advance_height == 0
     assert glyph.dimensions == (0, 0)
     assert glyph.calculate_bitmap_left_padding() == 0

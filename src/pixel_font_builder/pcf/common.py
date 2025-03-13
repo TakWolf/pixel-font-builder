@@ -37,7 +37,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
             scalable_width=math.ceil((glyph.advance_width / font_metric.font_size) * (75 / config.resolution_x) * 1000),
             character_width=glyph.advance_width,
             dimensions=glyph.dimensions,
-            origin=glyph.horizontal_origin,
+            offset=glyph.horizontal_offset,
             bitmap=glyph.bitmap,
         ))
 

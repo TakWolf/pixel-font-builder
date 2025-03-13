@@ -121,15 +121,15 @@ def _create_builder(
         if glyph_file.file_path in glyph_pool:
             glyph = glyph_pool[glyph_file.file_path]
         else:
-            horizontal_origin_x = 0
-            horizontal_origin_y = (builder.font_metric.horizontal_layout.ascent + builder.font_metric.horizontal_layout.descent - glyph_file.height) // 2
-            vertical_origin_x = -math.ceil(glyph_file.width / 2)
-            vertical_origin_y = (builder.font_metric.font_size - glyph_file.height) // 2
+            horizontal_offset_x = 0
+            horizontal_offset_y = (builder.font_metric.horizontal_layout.ascent + builder.font_metric.horizontal_layout.descent - glyph_file.height) // 2
+            vertical_offset_x = -math.ceil(glyph_file.width / 2)
+            vertical_offset_y = (builder.font_metric.font_size - glyph_file.height) // 2
             glyph = Glyph(
                 name=_get_glyph_name(glyph_file.code_point),
-                horizontal_origin=(horizontal_origin_x, horizontal_origin_y),
+                horizontal_offset=(horizontal_offset_x, horizontal_offset_y),
                 advance_width=glyph_file.width,
-                vertical_origin=(vertical_origin_x, vertical_origin_y),
+                vertical_offset=(vertical_offset_x, vertical_offset_y),
                 advance_height=builder.font_metric.font_size,
                 bitmap=glyph_file.bitmap,
             )

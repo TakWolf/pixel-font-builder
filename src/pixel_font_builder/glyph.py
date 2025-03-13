@@ -1,45 +1,45 @@
 
 class Glyph:
     name: str
-    horizontal_origin_x: int
-    horizontal_origin_y: int
+    horizontal_offset_x: int
+    horizontal_offset_y: int
     advance_width: int
-    vertical_origin_x: int
-    vertical_origin_y: int
+    vertical_offset_x: int
+    vertical_offset_y: int
     advance_height: int
     bitmap: list[list[int]]
 
     def __init__(
             self,
             name: str,
-            horizontal_origin: tuple[int, int] = (0, 0),
+            horizontal_offset: tuple[int, int] = (0, 0),
             advance_width: int = 0,
-            vertical_origin: tuple[int, int] = (0, 0),
+            vertical_offset: tuple[int, int] = (0, 0),
             advance_height: int = 0,
             bitmap: list[list[int]] | None = None,
     ):
         self.name = name
-        self.horizontal_origin_x, self.horizontal_origin_y = horizontal_origin
+        self.horizontal_offset_x, self.horizontal_offset_y = horizontal_offset
         self.advance_width = advance_width
-        self.vertical_origin_x, self.vertical_origin_y = vertical_origin
+        self.vertical_offset_x, self.vertical_offset_y = vertical_offset
         self.advance_height = advance_height
         self.bitmap = [] if bitmap is None else bitmap
 
     @property
-    def horizontal_origin(self) -> tuple[int, int]:
-        return self.horizontal_origin_x, self.horizontal_origin_y
+    def horizontal_offset(self) -> tuple[int, int]:
+        return self.horizontal_offset_x, self.horizontal_offset_y
 
-    @horizontal_origin.setter
-    def horizontal_origin(self, value: tuple[int, int]):
-        self.horizontal_origin_x, self.horizontal_origin_y = value
+    @horizontal_offset.setter
+    def horizontal_offset(self, value: tuple[int, int]):
+        self.horizontal_offset_x, self.horizontal_offset_y = value
 
     @property
-    def vertical_origin(self) -> tuple[int, int]:
-        return self.vertical_origin_x, self.vertical_origin_y
+    def vertical_offset(self) -> tuple[int, int]:
+        return self.vertical_offset_x, self.vertical_offset_y
 
-    @vertical_origin.setter
-    def vertical_origin(self, value: tuple[int, int]):
-        self.vertical_origin_x, self.vertical_origin_y = value
+    @vertical_offset.setter
+    def vertical_offset(self, value: tuple[int, int]):
+        self.vertical_offset_x, self.vertical_offset_y = value
 
     @property
     def width(self) -> int:

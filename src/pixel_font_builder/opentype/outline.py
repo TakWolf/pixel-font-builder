@@ -173,8 +173,8 @@ class SolidOutlinesPainter(OutlinesPainter):
         outlines = self._create_outlines(glyph.bitmap)
         for outline in outlines:
             for index, (x, y) in enumerate(outline):
-                x = (x + glyph.horizontal_origin_x) * px_to_units
-                y = (glyph.height + glyph.horizontal_origin_y - y) * px_to_units
+                x = (x + glyph.horizontal_offset_x) * px_to_units
+                y = (glyph.height + glyph.horizontal_offset_y - y) * px_to_units
 
                 if index == 0:
                     pen.move_to((x, y))
@@ -193,9 +193,9 @@ class SquareDotOutlinesPainter(OutlinesPainter):
         size = self.size * px_to_units
         offset = (1 - self.size) / 2 * px_to_units
         for y, bitmap_row in enumerate(glyph.bitmap):
-            y = (glyph.height + glyph.horizontal_origin_y - y) * px_to_units - offset
+            y = (glyph.height + glyph.horizontal_offset_y - y) * px_to_units - offset
             for x, color in enumerate(bitmap_row):
-                x = (x + glyph.horizontal_origin_x) * px_to_units + offset
+                x = (x + glyph.horizontal_offset_x) * px_to_units + offset
                 if color != 0:
                     pen.move_to((x, y))
                     pen.line_to((x + size, y))
@@ -214,9 +214,9 @@ class CircleDotOutlinesPainter(OutlinesPainter):
         radius = self.radius * px_to_units
         c = radius * 4 / 3 * (math.sqrt(2) - 1)
         for y, bitmap_row in enumerate(glyph.bitmap):
-            y = (glyph.height + glyph.horizontal_origin_y - y - 0.5) * px_to_units
+            y = (glyph.height + glyph.horizontal_offset_y - y - 0.5) * px_to_units
             for x, color in enumerate(bitmap_row):
-                x = (x + glyph.horizontal_origin_x + 0.5) * px_to_units
+                x = (x + glyph.horizontal_offset_x + 0.5) * px_to_units
                 if color != 0:
                     pen.move_to((x, y + radius))
                     pen.compat_cubic_curve_to((x + c, y + radius), (x + radius, y + c), (x + radius, y))
@@ -238,11 +238,11 @@ def create_outline_glyphs(
     vertical_metrics = {}
     for glyph_name, glyph in name_to_glyph.items():
         advance_width = glyph.advance_width * px_to_units
-        left_side_bearing = (glyph.calculate_bitmap_left_padding() + glyph.horizontal_origin_x) * px_to_units
+        left_side_bearing = (glyph.calculate_bitmap_left_padding() + glyph.horizontal_offset_x) * px_to_units
         horizontal_metrics[glyph_name] = advance_width, left_side_bearing
 
         advance_height = glyph.advance_height * px_to_units
-        top_side_bearing = (glyph.calculate_bitmap_top_padding() + glyph.vertical_origin_y) * px_to_units
+        top_side_bearing = (glyph.calculate_bitmap_top_padding() + glyph.vertical_offset_y) * px_to_units
         vertical_metrics[glyph_name] = advance_height, top_side_bearing
 
         pen = OutlinesPen(is_ttf, is_cubic_supported, advance_width)

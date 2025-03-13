@@ -59,9 +59,9 @@ def main():
 
     builder.glyphs.append(Glyph(
         name='.notdef',
-        horizontal_origin=(0, -2),
+        horizontal_offset=(0, -2),
         advance_width=8,
-        vertical_origin=(-4, 0),
+        vertical_offset=(-4, 0),
         advance_height=16,
         bitmap=[
             [1, 1, 1, 1, 1, 1, 1, 1],
@@ -84,9 +84,9 @@ def main():
     ))
     builder.glyphs.append(Glyph(
         name='CAP_LETTER_A',
-        horizontal_origin=(0, -2),
+        horizontal_offset=(0, -2),
         advance_width=8,
-        vertical_origin=(-4, 0),
+        vertical_offset=(-4, 0),
         advance_height=16,
         bitmap=[
             [0, 0, 0, 0, 0, 0, 0, 0],
