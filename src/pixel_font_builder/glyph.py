@@ -1,3 +1,5 @@
+from typing import Any
+
 
 class Glyph:
     name: str
@@ -24,6 +26,18 @@ class Glyph:
         self.vertical_offset_x, self.vertical_offset_y = vertical_offset
         self.advance_height = advance_height
         self.bitmap = [] if bitmap is None else bitmap
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Glyph):
+            return False
+        return (self.name == other.name and
+                self.horizontal_offset_x == other.horizontal_offset_x and
+                self.horizontal_offset_y == other.horizontal_offset_y and
+                self.advance_width == other.advance_width and
+                self.vertical_offset_x == other.vertical_offset_x and
+                self.vertical_offset_y == other.vertical_offset_y and
+                self.advance_height == other.advance_height and
+                self.bitmap == other.bitmap)
 
     @property
     def horizontal_offset(self) -> tuple[int, int]:

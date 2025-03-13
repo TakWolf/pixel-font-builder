@@ -25,6 +25,13 @@ class LineMetric:
             self.line_gap * other,
         )
 
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, LineMetric):
+            return False
+        return (self.ascent == other.ascent and
+                self.descent == other.descent and
+                self.line_gap == other.line_gap)
+
     @property
     def line_height(self) -> int:
         return self.ascent - self.descent
@@ -61,3 +68,12 @@ class FontMetric:
             self.x_height * other,
             self.cap_height * other,
         )
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, FontMetric):
+            return False
+        return (self.font_size == other.font_size and
+                self.horizontal_layout == other.horizontal_layout and
+                self.vertical_layout == other.vertical_layout and
+                self.x_height == other.x_height and
+                self.cap_height == other.cap_height)

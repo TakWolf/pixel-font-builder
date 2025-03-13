@@ -1,5 +1,6 @@
 import datetime
 from enum import StrEnum
+from typing import Any
 
 
 class WeightName(StrEnum):
@@ -86,3 +87,24 @@ class MetaInfo:
         self.designer_url = designer_url
         self.license_url = license_url
         self.sample_text = sample_text
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, MetaInfo):
+            return False
+        return (self.version == other.version and
+                self.created_time == other.created_time and
+                self.modified_time == other.modified_time and
+                self.family_name == other.family_name and
+                self.weight_name == other.weight_name and
+                self.serif_style == other.serif_style and
+                self.slant_style == other.slant_style and
+                self.width_style == other.width_style and
+                self.manufacturer == other.manufacturer and
+                self.designer == other.designer and
+                self.description == other.description and
+                self.copyright_info == other.copyright_info and
+                self.license_info == other.license_info and
+                self.vendor_url == other.vendor_url and
+                self.designer_url == other.designer_url and
+                self.license_url == other.license_url and
+                self.sample_text == other.sample_text)
