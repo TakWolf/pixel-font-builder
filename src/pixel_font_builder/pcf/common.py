@@ -1,5 +1,4 @@
 import math
-import re
 from collections import ChainMap
 
 from pcffont import PcfFontBuilder, PcfGlyph
@@ -79,9 +78,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
     builder.properties.cap_height = font_metric.cap_height
 
     builder.properties.font_version = meta_info.version
-    if meta_info.copyright_info is not None:
-        builder.properties.copyright = re.sub(r'\r\n|\r|\n', '<br>', meta_info.copyright_info)
-    if meta_info.license_info is not None:
-        builder.properties['LICENSE'] = re.sub(r'\r\n|\r|\n', '<br>', meta_info.license_info)
+    builder.properties.copyright = meta_info.copyright_info
+    builder.properties['LICENSE'] = meta_info.license_info
 
     return builder

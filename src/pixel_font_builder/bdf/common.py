@@ -1,5 +1,4 @@
 import math
-import re
 from collections import ChainMap
 
 from bdffont import BdfFont, BdfGlyph
@@ -78,8 +77,8 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
 
     font.properties.font_version = meta_info.version
     if meta_info.copyright_info is not None:
-        font.properties.copyright = re.sub(r'\r\n|\r|\n', '<br>', meta_info.copyright_info)
+        font.properties.copyright = '<br>'.join(meta_info.copyright_info.splitlines())
     if meta_info.license_info is not None:
-        font.properties['LICENSE'] = re.sub(r'\r\n|\r|\n', '<br>', meta_info.license_info)
+        font.properties['LICENSE'] = '<br>'.join(meta_info.license_info.splitlines())
 
     return font
