@@ -54,7 +54,7 @@ def main():
     builder.meta_info.license_url = 'https://openfontlicense.org'
 
     builder.character_mapping.update({
-        ord('A'): 'CAP_LETTER_A',
+        65: 'CAP_LETTER_A',
     })
 
     builder.glyphs.append(Glyph(

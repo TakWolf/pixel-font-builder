@@ -29,7 +29,7 @@ def _save_bitmap_to_png(bitmap: list[list[int]], file_path: Path):
             pixels_row.append(0)
             pixels_row.append(0)
             pixels_row.append(0)
-            pixels_row.append(255 if color != 0 else 0)
+            pixels_row.append(0 if color == 0 else 255)
         pixels.append(pixels_row)
     png.from_array(pixels, 'RGBA').save(file_path)
 
