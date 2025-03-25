@@ -165,4 +165,4 @@ Use the same coordinate systems as OpenType.
 
 ## License
 
-Under the [MIT license](LICENSE).
+[MIT License](LICENSE)
