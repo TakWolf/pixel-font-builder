@@ -1,4 +1,5 @@
 import math
+import statistics
 from collections import ChainMap
 
 from bdffont import BdfFont, BdfGlyph
@@ -64,7 +65,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> BdfFont:
         font.properties.spacing = 'D'
     elif meta_info.width_style == WidthStyle.PROPORTIONAL:
         font.properties.spacing = 'P'
-    font.properties.average_width = round(sum([glyph.device_width_x * 10 for glyph in font.glyphs]) / len(font.glyphs))
+    font.properties.average_width = round(statistics.fmean(glyph.device_width_x * 10 for glyph in font.glyphs))
     font.properties.charset_registry = 'ISO10646'
     font.properties.charset_encoding = '1'
     font.generate_name_as_xlfd()

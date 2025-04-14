@@ -1,4 +1,5 @@
 import math
+import statistics
 from collections import ChainMap
 
 from pcffont import PcfFontBuilder, PcfGlyph
@@ -69,7 +70,7 @@ def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
         builder.properties.spacing = 'D'
     elif meta_info.width_style == WidthStyle.PROPORTIONAL:
         builder.properties.spacing = 'P'
-    builder.properties.average_width = round(sum([glyph.character_width * 10 for glyph in builder.glyphs]) / len(builder.glyphs))
+    builder.properties.average_width = round(statistics.fmean(glyph.character_width * 10 for glyph in builder.glyphs))
     builder.properties.charset_registry = 'ISO10646'
     builder.properties.charset_encoding = '1'
     builder.properties.generate_xlfd()
