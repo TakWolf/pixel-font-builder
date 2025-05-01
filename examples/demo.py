@@ -1,6 +1,6 @@
-import datetime
 import math
 import shutil
+from datetime import datetime
 from pathlib import Path
 
 import png
@@ -99,7 +99,7 @@ def _create_builder(
     builder.font_metric.cap_height = 7
 
     builder.meta_info.version = '1.0.0'
-    builder.meta_info.created_time = datetime.datetime.fromisoformat('2024-01-01T00:00:00Z')
+    builder.meta_info.created_time = datetime.fromisoformat('2024-01-01T00:00:00Z')
     builder.meta_info.modified_time = builder.meta_info.created_time
     builder.meta_info.family_name = f'Demo {name_num}'
     builder.meta_info.weight_name = WeightName.REGULAR

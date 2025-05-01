@@ -14,8 +14,8 @@ pip install pixel-font-builder
 ## Usage
 
 ```python
-import datetime
 import shutil
+from datetime import datetime
 
 from examples import build_dir
 from pixel_font_builder import FontBuilder, WeightName, SerifStyle, SlantStyle, WidthStyle, Glyph, opentype
@@ -37,7 +37,7 @@ def main():
     builder.font_metric.cap_height = 10
 
     builder.meta_info.version = '1.0.0'
-    builder.meta_info.created_time = datetime.datetime.fromisoformat('2024-01-01T00:00:00Z')
+    builder.meta_info.created_time = datetime.fromisoformat('2024-01-01T00:00:00Z')
     builder.meta_info.modified_time = builder.meta_info.created_time
     builder.meta_info.family_name = 'My Font'
     builder.meta_info.weight_name = WeightName.REGULAR

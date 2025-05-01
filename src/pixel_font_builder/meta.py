@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from enum import StrEnum
 from typing import Any
 
@@ -33,8 +33,8 @@ class WidthStyle(StrEnum):
 
 class MetaInfo:
     version: str
-    created_time: datetime.datetime | None
-    modified_time: datetime.datetime | None
+    created_time: datetime | None
+    modified_time: datetime | None
     family_name: str | None
     weight_name: WeightName | None
     serif_style: SerifStyle | None
@@ -53,8 +53,8 @@ class MetaInfo:
     def __init__(
             self,
             version: str = '0.0.0',
-            created_time: datetime.datetime | None = None,
-            modified_time: datetime.datetime | None = None,
+            created_time: datetime | None = None,
+            modified_time: datetime | None = None,
             family_name: str | None = None,
             weight_name: WeightName | None = None,
             serif_style: SerifStyle | None = None,
