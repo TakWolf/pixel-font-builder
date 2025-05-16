@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 import shutil
 from datetime import datetime
@@ -36,7 +38,7 @@ def _save_bitmap_to_png(bitmap: list[list[int]], file_path: Path):
 
 class GlyphFile:
     @staticmethod
-    def load(file_path: Path) -> 'GlyphFile':
+    def load(file_path: Path) -> GlyphFile:
         hex_name = file_path.stem.strip()
         code_point = -1 if hex_name == 'notdef' else int(hex_name, 16)
         return GlyphFile(file_path, code_point)

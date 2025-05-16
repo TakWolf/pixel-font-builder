@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 
 
@@ -16,7 +18,7 @@ class LineMetric:
         self.descent = descent
         self.line_gap = line_gap
 
-    def __mul__(self, other: Any) -> 'LineMetric':
+    def __mul__(self, other: Any) -> LineMetric:
         if not isinstance(other, int):
             raise TypeError(f"can't multiply 'LineMetric' by non-int of type '{type(other).__name__}'")
         return LineMetric(
@@ -58,7 +60,7 @@ class FontMetric:
         self.x_height = x_height
         self.cap_height = cap_height
 
-    def __mul__(self, other: Any) -> 'FontMetric':
+    def __mul__(self, other: Any) -> FontMetric:
         if not isinstance(other, int):
             raise TypeError(f"can't multiply 'FontMetric' by non-int of type '{type(other).__name__}'")
         return FontMetric(

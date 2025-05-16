@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 from io import StringIO
 from os import PathLike
 
 
 class FeatureFile:
     @staticmethod
-    def load(file_path: str | PathLike[str]) -> 'FeatureFile':
+    def load(file_path: str | PathLike[str]) -> FeatureFile:
         with open(file_path, 'r', encoding='utf-8') as file:
             return FeatureFile(file.read(), file_path)
 
