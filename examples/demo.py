@@ -158,8 +158,11 @@ def main():
 
     builder = _create_builder(glyph_pool, character_mapping, glyph_files, kerning_pairs)
     builder.save_otf(outputs_dir.joinpath('demo.otf'))
-    builder.save_otf(outputs_dir.joinpath('demo.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_otf(outputs_dir.joinpath('demo.otf.woff'), flavor=opentype.Flavor.WOFF)
+    builder.save_otf(outputs_dir.joinpath('demo.otf.woff2'), flavor=opentype.Flavor.WOFF2)
     builder.save_ttf(outputs_dir.joinpath('demo.ttf'))
+    builder.save_ttf(outputs_dir.joinpath('demo.ttf.woff'), flavor=opentype.Flavor.WOFF)
+    builder.save_ttf(outputs_dir.joinpath('demo.ttf.woff2'), flavor=opentype.Flavor.WOFF2)
     builder.save_bdf(outputs_dir.joinpath('demo.bdf'))
     builder.save_pcf(outputs_dir.joinpath('demo.pcf'))
 

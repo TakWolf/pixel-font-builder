@@ -109,22 +109,31 @@ def main():
     ))
 
     builder.save_otf(outputs_dir.joinpath('my-font.otf'))
-    builder.save_otf(outputs_dir.joinpath('my-font.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_otf(outputs_dir.joinpath('my-font.otf.woff'), flavor=opentype.Flavor.WOFF)
+    builder.save_otf(outputs_dir.joinpath('my-font.otf.woff2'), flavor=opentype.Flavor.WOFF2)
     builder.save_ttf(outputs_dir.joinpath('my-font.ttf'))
+    builder.save_ttf(outputs_dir.joinpath('my-font.ttf.woff'), flavor=opentype.Flavor.WOFF)
+    builder.save_ttf(outputs_dir.joinpath('my-font.ttf.woff2'), flavor=opentype.Flavor.WOFF2)
     builder.save_bdf(outputs_dir.joinpath('my-font.bdf'))
     builder.save_pcf(outputs_dir.joinpath('my-font.pcf'))
 
     builder.meta_info.family_name = 'My Font SquareDot'
     builder.opentype_config.outlines_painter = opentype.SquareDotOutlinesPainter()
     builder.save_otf(outputs_dir.joinpath('my-font-square_dot.otf'))
-    builder.save_otf(outputs_dir.joinpath('my-font-square_dot.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_otf(outputs_dir.joinpath('my-font-square_dot.otf.woff'), flavor=opentype.Flavor.WOFF)
+    builder.save_otf(outputs_dir.joinpath('my-font-square_dot.otf.woff2'), flavor=opentype.Flavor.WOFF2)
     builder.save_ttf(outputs_dir.joinpath('my-font-square_dot.ttf'))
+    builder.save_ttf(outputs_dir.joinpath('my-font-square_dot.ttf.woff'), flavor=opentype.Flavor.WOFF)
+    builder.save_ttf(outputs_dir.joinpath('my-font-square_dot.ttf.woff2'), flavor=opentype.Flavor.WOFF2)
 
     builder.meta_info.family_name = 'My Font CircleDot'
     builder.opentype_config.outlines_painter = opentype.CircleDotOutlinesPainter()
     builder.save_otf(outputs_dir.joinpath('my-font-circle_dot.otf'))
-    builder.save_otf(outputs_dir.joinpath('my-font-circle_dot.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_otf(outputs_dir.joinpath('my-font-circle_dot.otf.woff'), flavor=opentype.Flavor.WOFF)
+    builder.save_otf(outputs_dir.joinpath('my-font-circle_dot.otf.woff2'), flavor=opentype.Flavor.WOFF2)
     builder.save_ttf(outputs_dir.joinpath('my-font-circle_dot.ttf'))
+    builder.save_ttf(outputs_dir.joinpath('my-font-circle_dot.ttf.woff'), flavor=opentype.Flavor.WOFF)
+    builder.save_ttf(outputs_dir.joinpath('my-font-circle_dot.ttf.woff2'), flavor=opentype.Flavor.WOFF2)
 
 
 if __name__ == '__main__':
