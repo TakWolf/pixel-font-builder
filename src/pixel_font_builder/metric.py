@@ -29,7 +29,7 @@ class LineMetric:
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, LineMetric):
-            return False
+            return NotImplemented
         return (self.ascent == other.ascent and
                 self.descent == other.descent and
                 self.line_gap == other.line_gap)
@@ -73,7 +73,7 @@ class FontMetric:
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, FontMetric):
-            return False
+            return NotImplemented
         return (self.font_size == other.font_size and
                 self.horizontal_layout == other.horizontal_layout and
                 self.vertical_layout == other.vertical_layout and

@@ -90,7 +90,7 @@ class MetaInfo:
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, MetaInfo):
-            return False
+            return NotImplemented
         return (self.version == other.version and
                 self.created_time == other.created_time and
                 self.modified_time == other.modified_time and

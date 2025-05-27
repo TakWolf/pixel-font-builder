@@ -29,7 +29,7 @@ class Glyph:
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Glyph):
-            return False
+            return NotImplemented
         return (self.name == other.name and
                 self.horizontal_offset_x == other.horizontal_offset_x and
                 self.horizontal_offset_y == other.horizontal_offset_y and
