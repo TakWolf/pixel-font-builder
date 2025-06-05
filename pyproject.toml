@@ -23,7 +23,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "fonttools[woff]>=4.57.0",
+    "fonttools[woff]>=4.58.1",
     "bdffont>=0.0.31",
     "pcffont>=0.0.20",
 ]
