@@ -85,7 +85,6 @@ def _build_kerning_pairs() -> dict[tuple[str, str], int]:
 
 
 def _create_builder(
-        glyph_pool: dict[Path, Glyph],
         character_mapping: dict[int, str],
         glyph_files: list[GlyphFile],
         kerning_pairs: dict[tuple[str, str], int],
@@ -120,23 +119,18 @@ def _create_builder(
     builder.character_mapping.update(character_mapping)
 
     for glyph_file in glyph_files:
-        if glyph_file.file_path in glyph_pool:
-            glyph = glyph_pool[glyph_file.file_path]
-        else:
-            horizontal_offset_x = 0
-            horizontal_offset_y = (builder.font_metric.horizontal_layout.ascent + builder.font_metric.horizontal_layout.descent - glyph_file.height) // 2
-            vertical_offset_x = -math.ceil(glyph_file.width / 2)
-            vertical_offset_y = (builder.font_metric.font_size - glyph_file.height) // 2
-            glyph = Glyph(
-                name=_get_glyph_name(glyph_file.code_point),
-                horizontal_offset=(horizontal_offset_x, horizontal_offset_y),
-                advance_width=glyph_file.width,
-                vertical_offset=(vertical_offset_x, vertical_offset_y),
-                advance_height=builder.font_metric.font_size,
-                bitmap=glyph_file.bitmap,
-            )
-            glyph_pool[glyph_file.file_path] = glyph
-        builder.glyphs.append(glyph)
+        horizontal_offset_x = 0
+        horizontal_offset_y = (builder.font_metric.horizontal_layout.ascent + builder.font_metric.horizontal_layout.descent - glyph_file.height) // 2
+        vertical_offset_x = -math.ceil(glyph_file.width / 2)
+        vertical_offset_y = (builder.font_metric.font_size - glyph_file.height) // 2
+        builder.glyphs.append(Glyph(
+            name=_get_glyph_name(glyph_file.code_point),
+            horizontal_offset=(horizontal_offset_x, horizontal_offset_y),
+            advance_width=glyph_file.width,
+            vertical_offset=(vertical_offset_x, vertical_offset_y),
+            advance_height=builder.font_metric.font_size,
+            bitmap=glyph_file.bitmap,
+        ))
 
     builder.kerning_pairs.update(kerning_pairs)
 
@@ -154,9 +148,7 @@ def main():
         glyph_file.save()
     kerning_pairs = _build_kerning_pairs()
 
-    glyph_pool = {}
-
-    builder = _create_builder(glyph_pool, character_mapping, glyph_files, kerning_pairs)
+    builder = _create_builder(character_mapping, glyph_files, kerning_pairs)
     builder.save_otf(outputs_dir.joinpath('demo.otf'))
     builder.save_otf(outputs_dir.joinpath('demo.otf.woff'), flavor=opentype.Flavor.WOFF)
     builder.save_otf(outputs_dir.joinpath('demo.otf.woff2'), flavor=opentype.Flavor.WOFF2)
@@ -168,7 +160,7 @@ def main():
 
     collection_builder = FontCollectionBuilder()
     for index in range(100):
-        builder = _create_builder(glyph_pool, character_mapping, glyph_files, kerning_pairs, index)
+        builder = _create_builder(character_mapping, glyph_files, kerning_pairs, index)
         collection_builder.append(builder)
     collection_builder.save_otc(outputs_dir.joinpath('demo.otc'))
     collection_builder.save_ttc(outputs_dir.joinpath('demo.ttc'))
