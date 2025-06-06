@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import StrEnum
 
 from fontTools.fontBuilder import FontBuilder
@@ -16,7 +18,7 @@ class Flavor(StrEnum):
 
 
 def create_builder(
-        context: 'pixel_font_builder.FontBuilder',
+        context: pixel_font_builder.FontBuilder,
         is_ttf: bool,
         flavor: Flavor | None = None,
 ) -> FontBuilder:
@@ -79,7 +81,7 @@ def create_builder(
 
 
 def create_collection_builder(
-        contexts: 'pixel_font_builder.FontCollectionBuilder',
+        contexts: pixel_font_builder.FontCollectionBuilder,
         is_ttf: bool,
 ) -> TTCollection:
     collection_builder = TTCollection()

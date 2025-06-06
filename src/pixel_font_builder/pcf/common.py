@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 import statistics
 from collections import ChainMap
@@ -10,7 +12,7 @@ from pixel_font_builder.meta import WeightName, SlantStyle, WidthStyle
 _DEFAULT_CHAR = 0xFFFE
 
 
-def create_builder(context: 'pixel_font_builder.FontBuilder') -> PcfFontBuilder:
+def create_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuilder:
     config = context.pcf_config
     font_metric = context.font_metric
     meta_info = context.meta_info
