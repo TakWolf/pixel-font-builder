@@ -85,7 +85,7 @@ class OutlinesPen:
 class OutlinesPainter(Protocol):
     @abstractmethod
     def draw_outlines(self, glyph: Glyph, pen: OutlinesPen, px_to_units: int):
-        raise NotImplementedError
+        raise NotImplementedError()
 
 
 class SolidOutlinesPainter(OutlinesPainter):
