@@ -9,7 +9,7 @@ from fontTools.ttLib import TTCollection
 import pixel_font_builder
 from pixel_font_builder.opentype.feature import build_kern_feature
 from pixel_font_builder.opentype.name import create_name_strings
-from pixel_font_builder.opentype.outline import create_outline_glyphs
+from pixel_font_builder.opentype.outline import create_xtf_glyphs
 
 
 class Flavor(StrEnum):
@@ -39,7 +39,7 @@ def create_builder(
     name_strings = create_name_strings(meta_info)
     builder.setupNameTable(name_strings)
 
-    xtf_glyphs, horizontal_metrics, vertical_metrics = create_outline_glyphs(is_ttf, not is_ttf or config.glyph_data_format == 1, config.outlines_painter, name_to_glyph, config.px_to_units)
+    xtf_glyphs, horizontal_metrics, vertical_metrics = create_xtf_glyphs(is_ttf, not is_ttf or config.glyph_data_format == 1, config.outlines_painter, name_to_glyph, config.px_to_units)
     builder.setupGlyphOrder(glyph_order)
     builder.setupGlyf(xtf_glyphs) if is_ttf else builder.setupCFF('', {}, xtf_glyphs, {})
     builder.setupHorizontalMetrics(horizontal_metrics)

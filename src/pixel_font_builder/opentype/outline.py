@@ -226,7 +226,7 @@ class CircleDotOutlinesPainter(OutlinesPainter):
                     pen.close_path()
 
 
-def create_outline_glyphs(
+def create_xtf_glyphs(
         is_ttf: bool,
         is_cubic_supported: bool,
         outlines_painter: OutlinesPainter,
