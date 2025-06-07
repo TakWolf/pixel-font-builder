@@ -1,4 +1,4 @@
-fonttools[woff]==4.58.1
+fonttools[woff]==4.58.2
 bdffont==0.0.31
 pcffont==0.0.20
 
