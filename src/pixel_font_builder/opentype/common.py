@@ -65,8 +65,13 @@ def create_builder(
         usWinDescent=max(-font_metric.horizontal_layout.descent, 0),
         sxHeight=font_metric.x_height,
         sCapHeight=font_metric.cap_height,
+        yStrikeoutPosition=font_metric.strikeout_position,
+        yStrikeoutSize=font_metric.strikeout_thickness,
     )
-    builder.setupPost()
+    builder.setupPost(
+        underlinePosition=font_metric.underline_position,
+        underlineThickness=font_metric.underline_thickness,
+    )
 
     if len(kerning_pairs) > 0:
         builder.addOpenTypeFeatures(build_kern_feature(kerning_pairs, config.px_to_units))

@@ -77,8 +77,14 @@ def create_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuilder:
     builder.properties.charset_encoding = '1'
     builder.properties.generate_xlfd()
 
-    builder.properties.x_height = font_metric.x_height
-    builder.properties.cap_height = font_metric.cap_height
+    if font_metric.x_height != 0:
+        builder.properties.x_height = font_metric.x_height
+    if font_metric.cap_height != 0:
+        builder.properties.cap_height = font_metric.cap_height
+    if font_metric.underline_position != 0:
+        builder.properties.underline_position = font_metric.underline_position
+    if font_metric.underline_thickness != 0:
+        builder.properties.underline_thickness = font_metric.underline_thickness
 
     builder.properties.font_version = meta_info.version
     builder.properties.copyright = meta_info.copyright_info

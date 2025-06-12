@@ -75,8 +75,14 @@ def create_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
     font.properties.default_char = _DEFAULT_CHAR
     font.properties.font_ascent = font_metric.horizontal_layout.ascent
     font.properties.font_descent = -font_metric.horizontal_layout.descent
-    font.properties.x_height = font_metric.x_height
-    font.properties.cap_height = font_metric.cap_height
+    if font_metric.x_height != 0:
+        font.properties.x_height = font_metric.x_height
+    if font_metric.cap_height != 0:
+        font.properties.cap_height = font_metric.cap_height
+    if font_metric.underline_position != 0:
+        font.properties.underline_position = font_metric.underline_position
+    if font_metric.underline_thickness != 0:
+        font.properties.underline_thickness = font_metric.underline_thickness
 
     font.properties.font_version = meta_info.version
     if meta_info.copyright_info is not None:

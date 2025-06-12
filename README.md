@@ -35,6 +35,10 @@ def main():
     builder.font_metric.vertical_layout.descent = -8
     builder.font_metric.x_height = 7
     builder.font_metric.cap_height = 10
+    builder.font_metric.underline_position = -2
+    builder.font_metric.underline_thickness = 1
+    builder.font_metric.strikeout_position = 6
+    builder.font_metric.strikeout_thickness = 1
 
     builder.meta_info.version = '1.0.0'
     builder.meta_info.created_time = datetime.fromisoformat('2024-01-01T00:00:00Z')
