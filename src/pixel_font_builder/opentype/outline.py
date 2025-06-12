@@ -16,18 +16,15 @@ type XTFGlyph = OTFGlyph | TTFGlyph
 
 class OutlinesPen:
     is_ttf: bool
-    is_cubic_supported: bool
     pen: OTFGlyphPen | TTFGlyphPen
     current_point: tuple[float, float] | None
 
     def __init__(
             self,
             is_ttf: bool,
-            is_cubic_supported: bool,
             advance_width: int,
     ):
         self.is_ttf = is_ttf
-        self.is_cubic_supported = is_cubic_supported
         self.pen = TTFGlyphPen() if is_ttf else OTFGlyphPen(advance_width, None)
         self.current_point = None
 
@@ -44,8 +41,12 @@ class OutlinesPen:
             control_point_1: tuple[float, float],
             control_point_2: tuple[float, float],
             end_point: tuple[float, float],
+            double_max_err: float = 1,
     ):
-        self.pen.curveTo(control_point_1, control_point_2, end_point)
+        if self.is_ttf:
+            self.pen.qCurveTo(*cu2qu.curve_to_quadratic([self.current_point, control_point_1, control_point_2, end_point], double_max_err)[1:])
+        else:
+            self.pen.curveTo(control_point_1, control_point_2, end_point)
         self.current_point = end_point
 
     def quadratic_curve_to(
@@ -54,19 +55,6 @@ class OutlinesPen:
             end_point: tuple[float, float],
     ):
         self.pen.qCurveTo(control_point, end_point)
-        self.current_point = end_point
-
-    def compat_cubic_curve_to(
-            self,
-            control_point_1: tuple[float, float],
-            control_point_2: tuple[float, float],
-            end_point: tuple[float, float],
-            double_max_err: float = 1,
-    ):
-        if self.is_cubic_supported:
-            self.pen.curveTo(control_point_1, control_point_2, end_point)
-        else:
-            self.pen.qCurveTo(*cu2qu.curve_to_quadratic([self.current_point, control_point_1, control_point_2, end_point], double_max_err)[1:])
         self.current_point = end_point
 
     def end_path(self):
@@ -219,16 +207,15 @@ class CircleDotOutlinesPainter(OutlinesPainter):
                 x = (x + glyph.horizontal_offset_x + 0.5) * px_to_units
                 if color != 0:
                     pen.move_to((x, y + radius))
-                    pen.compat_cubic_curve_to((x + c, y + radius), (x + radius, y + c), (x + radius, y))
-                    pen.compat_cubic_curve_to((x + radius, y - c), (x + c, y - radius), (x, y - radius))
-                    pen.compat_cubic_curve_to((x - c, y - radius), (x - radius, y - c), (x - radius, y))
-                    pen.compat_cubic_curve_to((x - radius, y + c), (x - c, y + radius), (x, y + radius))
+                    pen.cubic_curve_to((x + c, y + radius), (x + radius, y + c), (x + radius, y))
+                    pen.cubic_curve_to((x + radius, y - c), (x + c, y - radius), (x, y - radius))
+                    pen.cubic_curve_to((x - c, y - radius), (x - radius, y - c), (x - radius, y))
+                    pen.cubic_curve_to((x - radius, y + c), (x - c, y + radius), (x, y + radius))
                     pen.close_path()
 
 
 def create_xtf_glyphs(
         is_ttf: bool,
-        is_cubic_supported: bool,
         outlines_painter: OutlinesPainter,
         name_to_glyph: dict[str, Glyph],
         px_to_units: int,
@@ -245,7 +232,7 @@ def create_xtf_glyphs(
         top_side_bearing = (glyph.calculate_bitmap_top_padding() + glyph.vertical_offset_y) * px_to_units
         vertical_metrics[glyph_name] = advance_height, top_side_bearing
 
-        pen = OutlinesPen(is_ttf, is_cubic_supported, advance_width)
+        pen = OutlinesPen(is_ttf, advance_width)
         outlines_painter.draw_outlines(glyph, pen, px_to_units)
         xtf_glyphs[glyph_name] = pen.to_glyph()
     return xtf_glyphs, horizontal_metrics, vertical_metrics

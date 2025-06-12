@@ -29,7 +29,7 @@ def create_builder(
     glyph_order, name_to_glyph = context.prepare_glyphs()
     kerning_pairs = context.kerning_pairs
 
-    builder = FontBuilder(font_metric.font_size, isTTF=is_ttf, glyphDataFormat=config.glyph_data_format)
+    builder = FontBuilder(font_metric.font_size, isTTF=is_ttf)
 
     if meta_info.created_time is not None:
         setattr(builder.font['head'], 'created', timeTools.timestampSinceEpoch(meta_info.created_time.timestamp()))
@@ -39,7 +39,7 @@ def create_builder(
     name_strings = create_name_strings(meta_info)
     builder.setupNameTable(name_strings)
 
-    xtf_glyphs, horizontal_metrics, vertical_metrics = create_xtf_glyphs(is_ttf, not is_ttf or config.glyph_data_format == 1, config.outlines_painter, name_to_glyph, config.px_to_units)
+    xtf_glyphs, horizontal_metrics, vertical_metrics = create_xtf_glyphs(is_ttf, config.outlines_painter, name_to_glyph, config.px_to_units)
     builder.setupGlyphOrder(glyph_order)
     builder.setupGlyf(xtf_glyphs) if is_ttf else builder.setupCFF('', {}, xtf_glyphs, {})
     builder.setupHorizontalMetrics(horizontal_metrics)
