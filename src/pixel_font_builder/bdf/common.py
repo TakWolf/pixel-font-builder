@@ -79,9 +79,8 @@ def create_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
         font.properties.x_height = font_metric.x_height
     if font_metric.cap_height != 0:
         font.properties.cap_height = font_metric.cap_height
-    if font_metric.underline_position != 0:
-        font.properties.underline_position = font_metric.underline_position
     if font_metric.underline_thickness != 0:
+        font.properties.underline_position = font_metric.underline_position
         font.properties.underline_thickness = font_metric.underline_thickness
 
     font.properties.font_version = meta_info.version
