@@ -43,7 +43,8 @@ def create_builder(
     builder.setupGlyphOrder(glyph_order)
     builder.setupGlyf(xtf_glyphs) if is_ttf else builder.setupCFF('', {}, xtf_glyphs, {})
     builder.setupHorizontalMetrics(horizontal_metrics)
-    builder.setupVerticalMetrics(vertical_metrics)
+    if config.has_vertical_metrics:
+        builder.setupVerticalMetrics(vertical_metrics)
 
     builder.setupCharacterMap(character_mapping)
 
@@ -52,11 +53,12 @@ def create_builder(
         descent=font_metric.horizontal_layout.descent,
         lineGap=font_metric.horizontal_layout.line_gap,
     )
-    builder.setupVerticalHeader(
-        ascent=font_metric.vertical_layout.ascent,
-        descent=font_metric.vertical_layout.descent,
-        lineGap=font_metric.vertical_layout.line_gap,
-    )
+    if config.has_vertical_metrics:
+        builder.setupVerticalHeader(
+            ascent=font_metric.vertical_layout.ascent,
+            descent=font_metric.vertical_layout.descent,
+            lineGap=font_metric.vertical_layout.line_gap,
+        )
     builder.setupOS2(
         sTypoAscender=font_metric.horizontal_layout.ascent,
         sTypoDescender=font_metric.horizontal_layout.descent,
