@@ -28,6 +28,7 @@ class SlantStyle(StrEnum):
 class WidthStyle(StrEnum):
     MONOSPACED = 'Monospaced'
     DUOSPACED = 'Duospaced'
+    CHARACTER_CELL = 'Character Cell'
     PROPORTIONAL = 'Proportional'
 
 

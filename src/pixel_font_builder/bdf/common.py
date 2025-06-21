@@ -65,6 +65,8 @@ def create_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
         font.properties.spacing = 'M'
     elif meta_info.width_style == WidthStyle.DUOSPACED:
         font.properties.spacing = 'D'
+    elif meta_info.width_style == WidthStyle.CHARACTER_CELL:
+        font.properties.spacing = 'C'
     elif meta_info.width_style == WidthStyle.PROPORTIONAL:
         font.properties.spacing = 'P'
     font.properties.average_width = round(statistics.fmean(glyph.device_width_x * 10 for glyph in font.glyphs))

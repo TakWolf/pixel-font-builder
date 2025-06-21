@@ -70,6 +70,8 @@ def create_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuilder:
         builder.properties.spacing = 'M'
     elif meta_info.width_style == WidthStyle.DUOSPACED:
         builder.properties.spacing = 'D'
+    elif meta_info.width_style == WidthStyle.CHARACTER_CELL:
+        builder.properties.spacing = 'C'
     elif meta_info.width_style == WidthStyle.PROPORTIONAL:
         builder.properties.spacing = 'P'
     builder.properties.average_width = round(statistics.fmean(glyph.character_width * 10 for glyph in builder.glyphs))
