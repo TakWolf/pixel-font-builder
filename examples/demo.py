@@ -98,7 +98,7 @@ def _create_builder(
     builder.font_metric.vertical_layout.descent = -7
     builder.font_metric.x_height = 5
     builder.font_metric.cap_height = 7
-    builder.font_metric.underline_position = -3
+    builder.font_metric.underline_position = -1
     builder.font_metric.underline_thickness = 1
     builder.font_metric.strikeout_position = 4
     builder.font_metric.strikeout_thickness = 1
