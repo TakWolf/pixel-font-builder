@@ -160,8 +160,10 @@ Use the same coordinate systems as OpenType.
 
 | Format | File Extension |
 |---|---|
-| [OpenType](https://learn.microsoft.com/en-us/typography/opentype/) | `.otf`, `.otc`, `.woff`, `.woff2` |
-| [TrueType](https://learn.microsoft.com/en-us/typography/truetype/) | `.ttf`, `.ttc`, `.woff`, `.woff2` |
+| [OpenType](https://learn.microsoft.com/en-us/typography/opentype/) | `.otf`, `.otc` |
+| [TrueType](https://learn.microsoft.com/en-us/typography/truetype/) | `.ttf`, `.ttc` |
+| [WOFF File Format 1.0](https://www.w3.org/TR/WOFF/) | `.otf.woff`, `.ttf.woff` |
+| [WOFF File Format 2.0](https://www.w3.org/TR/WOFF2/) | `.otf.woff2`, `.ttf.woff2` |
 | [Glyph Bitmap Distribution Format](https://en.wikipedia.org/wiki/Glyph_Bitmap_Distribution_Format) | `.bdf` |
 | [Portable Compiled Format](https://en.wikipedia.org/wiki/Portable_Compiled_Format) | `.pcf` |
 
@@ -173,6 +175,7 @@ Use the same coordinate systems as OpenType.
 
 ## References
 
+- [Microsoft - OpenType Specification](https://learn.microsoft.com/en-us/typography/opentype/spec/)
 - [FreeType Glyph Conventions - Glyph Metrics](https://freetype.org/freetype2/docs/glyphs/glyphs-3.html)
 - [OpenType Feature File Specification](https://adobe-type-tools.github.io/afdko/OpenTypeFeatureFileSpecification.html)
 
