@@ -80,81 +80,90 @@ class SolidOutlinesPainter(OutlinesPainter):
     @staticmethod
     def _create_outlines(bitmap: list[list[int]]) -> list[list[tuple[int, int]]]:
         # 相邻像素分组
-        point_group_list = []
+        point_groups = []
         for y, bitmap_row in enumerate(bitmap):
             for x, color in enumerate(bitmap_row):
-                if color != 0:
-                    new_point_group = {(x, y)}
-                    for i, point_group in enumerate(reversed(point_group_list)):
-                        # 遍历方向为右下，因此只需检查左上
-                        if (x - 1, y) in point_group or (x, y - 1) in point_group:
-                            point_group_list.remove(point_group)
-                            new_point_group = new_point_group.union(point_group)
-                    point_group_list.append(new_point_group)
-        # 对每组生成轮廓
+                if color == 0:
+                    continue
+
+                new_point_group = {(x, y)}
+                for point_group in reversed(point_groups):
+                    # 遍历方向为右下，因此只需检查左上
+                    if (x - 1, y) in point_group or (x, y - 1) in point_group:
+                        point_groups.remove(point_group)
+                        new_point_group.update(point_group)
+                point_groups.append(new_point_group)
+
+        # 每组生成轮廓
         outlines = []
-        for point_group in point_group_list:
+        for point_group in point_groups:
             # 按照像素拆分线段，注意绘制顺序
-            pending_line_segments = []
-            for (x, y) in point_group:
-                point_outline = [(x, y), (x + 1, y), (x + 1, y + 1), (x, y + 1)]
+            pending_segments = []
+            for x, y in point_group:
                 # 一个像素有左右上下四条边，如果该边没有相邻像素，则该边线段有效
+                point_outline = [(x, y), (x + 1, y), (x + 1, y + 1), (x, y + 1)]
                 if x <= 0 or bitmap[y][x - 1] <= 0:  # 左
-                    pending_line_segments.append([point_outline[3], point_outline[0]])
+                    pending_segments.append([point_outline[3], point_outline[0]])
                 if x >= len(bitmap[y]) - 1 or bitmap[y][x + 1] <= 0:  # 右
-                    pending_line_segments.append([point_outline[1], point_outline[2]])
+                    pending_segments.append([point_outline[1], point_outline[2]])
                 if y <= 0 or bitmap[y - 1][x] <= 0:  # 上
-                    pending_line_segments.append([point_outline[0], point_outline[1]])
+                    pending_segments.append([point_outline[0], point_outline[1]])
                 if y >= len(bitmap) - 1 or bitmap[y + 1][x] <= 0:  # 下
-                    pending_line_segments.append([point_outline[2], point_outline[3]])
+                    pending_segments.append([point_outline[2], point_outline[3]])
+
             # 连接所有的线段，注意绘制顺序
-            solved_line_segments = []
-            while len(pending_line_segments) > 0:
-                pending_line_segment = pending_line_segments.pop()
-                for i, solved_line_segment in enumerate(reversed(solved_line_segments)):
-                    left_line_segment = None
-                    right_line_segment = None
-                    # 一共4种连接情况
-                    if pending_line_segment[-1] == solved_line_segment[0]:
-                        left_line_segment = pending_line_segment
-                        right_line_segment = solved_line_segment
-                    elif pending_line_segment[-1] == solved_line_segment[-1]:
-                        solved_line_segment.reverse()
-                        left_line_segment = pending_line_segment
-                        right_line_segment = solved_line_segment
-                    elif solved_line_segment[-1] == pending_line_segment[0]:
-                        left_line_segment = solved_line_segment
-                        right_line_segment = pending_line_segment
-                    elif solved_line_segment[-1] == pending_line_segment[-1]:
-                        pending_line_segment.reverse()
-                        left_line_segment = solved_line_segment
-                        right_line_segment = pending_line_segment
+            solved_segments = []
+            while len(pending_segments) > 0:
+                pending_segment = pending_segments.pop()
+                for solved_segment in reversed(solved_segments):
+                    # 一共四种连接情况
+                    left_segment = None
+                    right_segment = None
+                    if pending_segment[-1] == solved_segment[0]:
+                        left_segment = pending_segment
+                        right_segment = solved_segment
+                    elif pending_segment[-1] == solved_segment[-1]:
+                        solved_segment.reverse()
+                        left_segment = pending_segment
+                        right_segment = solved_segment
+                    elif solved_segment[-1] == pending_segment[0]:
+                        left_segment = solved_segment
+                        right_segment = pending_segment
+                    elif solved_segment[-1] == pending_segment[-1]:
+                        pending_segment.reverse()
+                        left_segment = solved_segment
+                        right_segment = pending_segment
+
                     # 需要连接的情况
-                    if left_line_segment is not None and right_line_segment is not None:
-                        solved_line_segments.remove(solved_line_segment)
+                    if left_segment is not None and right_segment is not None:
+                        solved_segments.remove(solved_segment)
+
                         # 连接的两个点是重复的
-                        right_line_segment.pop(0)
+                        right_segment.pop(0)
+
                         # 判断连接的点是不是可省略
-                        x, y = left_line_segment[-1]
-                        xl, yl = left_line_segment[-2]
-                        xr, yr = right_line_segment[0]
+                        x, y = left_segment[-1]
+                        xl, yl = left_segment[-2]
+                        xr, yr = right_segment[0]
                         if (x == xl and x == xr) or (y == yl and y == yr):
-                            left_line_segment.pop()
-                        # 连接线段
-                        pending_line_segment = left_line_segment + right_line_segment
-                solved_line_segments.append(pending_line_segment)
+                            left_segment.pop()
+
+                        pending_segment = left_segment + right_segment
+                solved_segments.append(pending_segment)
+
             # 将连接好的线段添加到轮廓数组中，有多条线段的情况，是中间有镂空（绘制顺序与外边框相反）
-            for solved_line_segment in solved_line_segments:
+            for solved_segment in solved_segments:
                 # 首尾的两个点是重复的
-                solved_line_segment.pop(0)
+                solved_segment.pop(0)
+
                 # 判断尾点是不是可省略
-                x, y = solved_line_segment[-1]
-                xl, yl = solved_line_segment[-2]
-                xr, yr = solved_line_segment[0]
+                x, y = solved_segment[-1]
+                xl, yl = solved_segment[-2]
+                xr, yr = solved_segment[0]
                 if (x == xl and x == xr) or (y == yl and y == yr):
-                    solved_line_segment.pop()
-                # 添加到轮廓
-                outlines.append(solved_line_segment)
+                    solved_segment.pop()
+
+                outlines.append(solved_segment)
         return outlines
 
     def draw_outlines(self, glyph: Glyph, pen: OutlinesPen, px_to_units: int):
