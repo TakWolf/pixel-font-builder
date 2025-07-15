@@ -17,7 +17,7 @@ class Flavor(StrEnum):
     WOFF2 = 'woff2'
 
 
-def create_builder(
+def create_font_builder(
         context: pixel_font_builder.FontBuilder,
         is_ttf: bool,
         flavor: Flavor | None = None,
@@ -87,10 +87,10 @@ def create_builder(
     return builder
 
 
-def create_collection_builder(
+def create_font_collection_builder(
         contexts: pixel_font_builder.FontCollectionBuilder,
         is_ttf: bool,
 ) -> TTCollection:
     collection_builder = TTCollection()
-    collection_builder.fonts.extend(create_builder(context, is_ttf).font for context in contexts)
+    collection_builder.fonts.extend(create_font_builder(context, is_ttf).font for context in contexts)
     return collection_builder

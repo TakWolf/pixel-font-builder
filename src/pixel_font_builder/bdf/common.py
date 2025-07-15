@@ -12,7 +12,7 @@ from pixel_font_builder.meta import WeightName, SlantStyle, WidthStyle
 _DEFAULT_CHAR = 0xFFFE
 
 
-def create_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
+def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
     config = context.bdf_config
     font_metric = context.font_metric
     meta_info = context.meta_info
