@@ -25,7 +25,6 @@ class FeatureFile:
 def build_kern_feature(pairs: dict[tuple[str, str], int], px_to_units: int) -> str:
     text = StringIO()
     text.write('languagesystem DFLT dflt;\n')
-    text.write('languagesystem latn dflt;\n')
     text.write('\n')
     text.write('feature kern {\n')
     for (left_glyph_name, right_glyph_name), offset in sorted(pairs.items()):
