@@ -25,8 +25,8 @@ def create_font_builder(
     config = context.opentype_config
     font_metric = context.font_metric * config.px_to_units
     meta_info = context.meta_info
-    character_mapping = context.character_mapping
     glyph_order, name_to_glyph = context.prepare_glyphs()
+    character_mapping = context.character_mapping
     kerning_pairs = context.kerning_pairs
 
     builder = FontBuilder(font_metric.font_size, isTTF=is_ttf)
