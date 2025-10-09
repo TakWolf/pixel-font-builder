@@ -15,8 +15,8 @@ from pixel_font_builder.metric import FontMetric
 class FontBuilder:
     font_metric: FontMetric
     meta_info: MetaInfo
-    character_mapping: dict[int, str]
     glyphs: list[Glyph]
+    character_mapping: dict[int, str]
     kerning_pairs: dict[tuple[str, str], int]
     opentype_config: opentype.Config
     bdf_config: bdf.Config
@@ -25,8 +25,8 @@ class FontBuilder:
     def __init__(self):
         self.font_metric = FontMetric()
         self.meta_info = MetaInfo()
-        self.character_mapping = {}
         self.glyphs = []
+        self.character_mapping = {}
         self.kerning_pairs = {}
         self.opentype_config = opentype.Config()
         self.bdf_config = bdf.Config()

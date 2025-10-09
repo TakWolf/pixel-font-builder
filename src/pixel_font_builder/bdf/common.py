@@ -16,8 +16,8 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
     config = context.bdf_config
     font_metric = context.font_metric
     meta_info = context.meta_info
-    character_mapping = ChainMap({_DEFAULT_CHAR: '.notdef'}, context.character_mapping)
     _, name_to_glyph = context.prepare_glyphs()
+    character_mapping = ChainMap({_DEFAULT_CHAR: '.notdef'}, context.character_mapping)
 
     font = BdfFont(
         point_size=font_metric.font_size,

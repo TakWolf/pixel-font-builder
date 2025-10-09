@@ -16,8 +16,8 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuild
     config = context.pcf_config
     font_metric = context.font_metric
     meta_info = context.meta_info
-    character_mapping = ChainMap({_DEFAULT_CHAR: '.notdef'}, context.character_mapping)
     _, name_to_glyph = context.prepare_glyphs()
+    character_mapping = ChainMap({_DEFAULT_CHAR: '.notdef'}, context.character_mapping)
 
     builder = PcfFontBuilder()
     builder.config.font_ascent = font_metric.horizontal_layout.ascent

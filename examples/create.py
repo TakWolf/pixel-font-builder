@@ -41,10 +41,6 @@ def main():
     builder.meta_info.designer_url = 'https://takwolf.com'
     builder.meta_info.license_url = 'https://openfontlicense.org'
 
-    builder.character_mapping.update({
-        65: 'CAP_LETTER_A',
-    })
-
     builder.glyphs.append(Glyph(
         name='.notdef',
         horizontal_offset=(0, -2),
@@ -95,6 +91,10 @@ def main():
             [0, 0, 0, 0, 0, 0, 0, 0],
         ],
     ))
+
+    builder.character_mapping.update({
+        65: 'CAP_LETTER_A',
+    })
 
     builder.save_otf(outputs_dir.joinpath('my-font.otf'))
     builder.save_otf(outputs_dir.joinpath('my-font.otf.woff'), flavor=opentype.Flavor.WOFF)

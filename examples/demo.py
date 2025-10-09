@@ -62,18 +62,18 @@ def _get_glyph_name(code_point: int) -> str:
     return '.notdef' if code_point == -1 else f'u{code_point:04X}'
 
 
-def _collect_glyph_files() -> tuple[dict[int, str], list[GlyphFile]]:
-    character_mapping = {}
+def _collect_glyph_files() -> tuple[list[GlyphFile], dict[int, str]]:
     glyph_files = []
+    character_mapping = {}
     for file_path in glyphs_dir.iterdir():
         if file_path.suffix != '.png':
             continue
         glyph_file = GlyphFile.load(file_path)
+        glyph_files.append(glyph_file)
         if glyph_file.code_point != -1:
             character_mapping[glyph_file.code_point] = _get_glyph_name(glyph_file.code_point)
-        glyph_files.append(glyph_file)
     glyph_files.sort(key=lambda x: x.code_point)
-    return character_mapping, glyph_files
+    return glyph_files, character_mapping
 
 
 def _build_kerning_pairs() -> dict[tuple[str, str], int]:
@@ -85,8 +85,8 @@ def _build_kerning_pairs() -> dict[tuple[str, str], int]:
 
 
 def _create_builder(
-        character_mapping: dict[int, str],
         glyph_files: list[GlyphFile],
+        character_mapping: dict[int, str],
         kerning_pairs: dict[tuple[str, str], int],
         name_num: int = 0,
 ) -> FontBuilder:
@@ -120,8 +120,6 @@ def _create_builder(
     builder.meta_info.designer_url = 'https://takwolf.com'
     builder.meta_info.license_url = 'https://openfontlicense.org'
 
-    builder.character_mapping.update(character_mapping)
-
     for glyph_file in glyph_files:
         horizontal_offset_x = 0
         horizontal_offset_y = (builder.font_metric.horizontal_layout.ascent + builder.font_metric.horizontal_layout.descent - glyph_file.height) // 2
@@ -136,6 +134,7 @@ def _create_builder(
             bitmap=glyph_file.bitmap,
         ))
 
+    builder.character_mapping.update(character_mapping)
     builder.kerning_pairs.update(kerning_pairs)
 
     return builder
@@ -147,12 +146,12 @@ def main():
         shutil.rmtree(outputs_dir)
     outputs_dir.mkdir(parents=True)
 
-    character_mapping, glyph_files = _collect_glyph_files()
+    glyph_files, character_mapping = _collect_glyph_files()
     for glyph_file in glyph_files:
         glyph_file.save()
     kerning_pairs = _build_kerning_pairs()
 
-    builder = _create_builder(character_mapping, glyph_files, kerning_pairs)
+    builder = _create_builder(glyph_files, character_mapping, kerning_pairs)
     builder.save_otf(outputs_dir.joinpath('demo.otf'))
     builder.save_otf(outputs_dir.joinpath('demo.otf.woff'), flavor=opentype.Flavor.WOFF)
     builder.save_otf(outputs_dir.joinpath('demo.otf.woff2'), flavor=opentype.Flavor.WOFF2)
@@ -164,7 +163,7 @@ def main():
 
     collection_builder = FontCollectionBuilder()
     for index in range(100):
-        builder = _create_builder(character_mapping, glyph_files, kerning_pairs, index)
+        builder = _create_builder(glyph_files, character_mapping, kerning_pairs, index)
         collection_builder.append(builder)
     collection_builder.save_otc(outputs_dir.joinpath('demo.otc'))
     collection_builder.save_ttc(outputs_dir.joinpath('demo.ttc'))
