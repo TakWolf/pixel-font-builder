@@ -5,35 +5,25 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
-import png
-
 from examples import glyphs_dir, build_dir
 from pixel_font_builder import FontBuilder, FontCollectionBuilder, WeightName, SerifStyle, SlantStyle, WidthStyle, Glyph, opentype
 
 
-def _load_bitmap_from_png(file_path: Path) -> tuple[list[list[int]], int, int]:
-    width, height, pixels, _ = png.Reader(filename=file_path).read()
+def _load_bitmap(file_path: Path) -> tuple[list[list[int]], int, int]:
     bitmap = []
-    for pixels_row in pixels:
-        bitmap_row = []
-        for i in range(0, width * 4, 4):
-            alpha = pixels_row[i + 3]
-            bitmap_row.append(1 if alpha > 127 else 0)
-        bitmap.append(bitmap_row)
+    width = 0
+    height = 0
+    with file_path.open('r', encoding='utf-8') as file:
+        for i, line in enumerate(file):
+            line = line.strip().replace('##', '#').replace('..', '.')
+            bitmap.append([1 if c == '#' else 0 for c in line])
+
+            if i == 0:
+                width = len(line)
+            else:
+                assert width == len(line)
+            height += 1
     return bitmap, width, height
-
-
-def _save_bitmap_to_png(bitmap: list[list[int]], file_path: Path):
-    pixels = []
-    for bitmap_row in bitmap:
-        pixels_row = []
-        for color in bitmap_row:
-            pixels_row.append(0)
-            pixels_row.append(0)
-            pixels_row.append(0)
-            pixels_row.append(0 if color == 0 else 255)
-        pixels.append(pixels_row)
-    png.from_array(pixels, 'RGBA').save(file_path)
 
 
 class GlyphFile:
@@ -52,10 +42,7 @@ class GlyphFile:
     def __init__(self, file_path: Path, code_point: int):
         self.file_path = file_path
         self.code_point = code_point
-        self.bitmap, self.width, self.height = _load_bitmap_from_png(file_path)
-
-    def save(self):
-        _save_bitmap_to_png(self.bitmap, self.file_path)
+        self.bitmap, self.width, self.height = _load_bitmap(file_path)
 
 
 def _get_glyph_name(code_point: int) -> str:
@@ -66,8 +53,9 @@ def _collect_glyph_files() -> tuple[list[GlyphFile], dict[int, str]]:
     glyph_files = []
     character_mapping = {}
     for file_path in glyphs_dir.iterdir():
-        if file_path.suffix != '.png':
+        if file_path.suffix != '.txt':
             continue
+
         glyph_file = GlyphFile.load(file_path)
         glyph_files.append(glyph_file)
         if glyph_file.code_point != -1:
@@ -78,9 +66,18 @@ def _collect_glyph_files() -> tuple[list[GlyphFile], dict[int, str]]:
 
 def _build_kerning_pairs() -> dict[tuple[str, str], int]:
     kerning_pairs = {}
-    for left_letter in 'FT':
-        for right_letter in 'acdegmnopqrsuvwxyz':
+
+    for left_letter in 'FTVY':
+        for right_letter in 'acdefgjmnopqrstuvwxyz':
             kerning_pairs[(_get_glyph_name(ord(left_letter)), _get_glyph_name(ord(right_letter)))] = -1
+
+    for left_letter in 'W':
+        for right_letter in 'acdegoqs':
+            kerning_pairs[(_get_glyph_name(ord(left_letter)), _get_glyph_name(ord(right_letter)))] = -1
+
+    for left_letter, right_letter in (('A', 'T'), ('A', 'V'), ('A', 'W'), ('A', 'Y'), ('T', 'A'), ('V', 'A'), ('W', 'A'), ('Y', 'A')):
+        kerning_pairs[(_get_glyph_name(ord(left_letter)), _get_glyph_name(ord(right_letter)))] = -1
+
     return kerning_pairs
 
 
@@ -91,16 +88,16 @@ def _create_builder(
         name_num: int = 0,
 ) -> FontBuilder:
     builder = FontBuilder()
-    builder.font_metric.font_size = 11
-    builder.font_metric.horizontal_layout.ascent = 11
-    builder.font_metric.horizontal_layout.descent = -4
+    builder.font_metric.font_size = 12
+    builder.font_metric.horizontal_layout.ascent = 13
+    builder.font_metric.horizontal_layout.descent = -3
     builder.font_metric.vertical_layout.ascent = 8
-    builder.font_metric.vertical_layout.descent = -7
-    builder.font_metric.x_height = 5
-    builder.font_metric.cap_height = 7
+    builder.font_metric.vertical_layout.descent = -8
+    builder.font_metric.x_height = 6
+    builder.font_metric.cap_height = 9
     builder.font_metric.underline_position = -1
     builder.font_metric.underline_thickness = 1
-    builder.font_metric.strikeout_position = 4
+    builder.font_metric.strikeout_position = 5
     builder.font_metric.strikeout_thickness = 1
 
     builder.meta_info.version = '1.0.0'
@@ -147,8 +144,6 @@ def main():
     outputs_dir.mkdir(parents=True)
 
     glyph_files, character_mapping = _collect_glyph_files()
-    for glyph_file in glyph_files:
-        glyph_file.save()
     kerning_pairs = _build_kerning_pairs()
 
     builder = _create_builder(glyph_files, character_mapping, kerning_pairs)

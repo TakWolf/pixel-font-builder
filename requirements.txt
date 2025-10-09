@@ -3,4 +3,3 @@ bdffont==0.0.32
 pcffont==0.0.21
 
 pytest==8.4.1
-pypng==0.20220715.0
