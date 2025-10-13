@@ -1,3 +1,7 @@
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"
+
 [project]
 name = "pixel-font-builder"
 version = "0.0.40"
@@ -32,6 +36,7 @@ dev = [
     "pytest>=8.4.2",
 ]
 
-[build-system]
-requires = ["uv_build"]
-build-backend = "uv_build"
+[project.urls]
+Homepage = "https://github.com/TakWolf/pixel-font-builder"
+Source = "https://github.com/TakWolf/pixel-font-builder"
+Issues = "https://github.com/TakWolf/pixel-font-builder/issues"
