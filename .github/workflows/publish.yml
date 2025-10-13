@@ -14,16 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/checkout@v5
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
         with:
-          python-version: "3.x"
+          python-version: "3.14"
       - name: Install dependencies
-        run: |
-          python -m pip install pip --upgrade
-          python -m pip install build
+        run: uv sync
       - name: Build
-        run: python -m build
+        run: uv build
       - name: Publish
-        uses: pypa/gh-action-pypi-publish@release/v1
+        run: uv publish

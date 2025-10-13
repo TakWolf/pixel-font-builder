@@ -1,5 +1,0 @@
-fonttools[woff]==4.59.0
-bdffont==0.0.32
-pcffont==0.0.21
-
-pytest==8.4.1
