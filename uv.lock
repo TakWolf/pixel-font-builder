@@ -4,11 +4,11 @@ requires-python = ">=3.12"
 
 [[package]]
 name = "bdffont"
-version = "0.0.33"
+version = "0.0.34"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c5/49/7e3dfdc85d737589487b809b341dda64b1c25392debe7c08192c6bff6f35/bdffont-0.0.33.tar.gz", hash = "sha256:024fd7f4cee05a8859f40b46ec8eaffd943023900457863584f7660e2c700231", size = 8063, upload-time = "2025-10-13T21:15:42.31Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/de/53/057ffa4c8bbd52341ab06b06e2f31c1a21e3eef468084a22fbd4a473542a/bdffont-0.0.34.tar.gz", hash = "sha256:d33eb88c4f3d4e320f80e132d3c84d751e5ff1979d5e051f179af889f6e07fab", size = 8156, upload-time = "2025-10-14T02:53:41.567Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/56/20/0ddf05bd12e4e445d0d9c09b30d5aa27c01a9b4c47b79d2216aa66860a43/bdffont-0.0.33-py3-none-any.whl", hash = "sha256:1bcf362602dc15caa0338df13adedf65da72ce58ba06fe99b09664a7fe24cf13", size = 10209, upload-time = "2025-10-13T21:15:41.29Z" },
+    { url = "https://files.pythonhosted.org/packages/2c/a3/a3d0f178b70d507922db093dd314c7bb379a0f9bd68757dbcdcda5e7ce1d/bdffont-0.0.34-py3-none-any.whl", hash = "sha256:e467995ace2a07e053c1e4684ab0a4cfd31cb24b7b14f997bc4539a130aeebe9", size = 10256, upload-time = "2025-10-14T02:53:40.736Z" },
 ]
 
 [[package]]
@@ -200,11 +200,11 @@ wheels = [
 
 [[package]]
 name = "pcffont"
-version = "0.0.22"
+version = "0.0.23"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/26/85/71bd7e098ff9b2da55e80f3edaa63c64e8914948583567c0dc0d75941a30/pcffont-0.0.22.tar.gz", hash = "sha256:c91b188d38115a19996b9fe78e191cc6495bf0b954007f1bdb4839d24f108f98", size = 13748, upload-time = "2025-10-13T21:27:07.62Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/eb/9e/e66e4ea701e54d02ba2f9cd4ad6e3a632b8e910719fbbfc74923e1ffc665/pcffont-0.0.23.tar.gz", hash = "sha256:d509cd06cd25a86eac3b58a21361b1264f018310578aa161a3514a6de7a47068", size = 13832, upload-time = "2025-10-14T03:00:57.556Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/01/20/ebda948edb11dd35f9651cdaff44b68ef4f47114420faf3a8100eabfb4de/pcffont-0.0.22-py3-none-any.whl", hash = "sha256:8e6114dfd251ec8223173c61e8d2ad9ea565068023af34fc58b9ef5b948270a4", size = 22957, upload-time = "2025-10-13T21:27:06.567Z" },
+    { url = "https://files.pythonhosted.org/packages/59/b8/e6bda5a6e374a9dc0010b2e0c974fc0f4e8bda1c8358a666c46fead66d9b/pcffont-0.0.23-py3-none-any.whl", hash = "sha256:44c04cec2d97e86b0a2c049ad9177f1dc31843563a0bb05873b2bb65bf9a6558", size = 23006, upload-time = "2025-10-14T03:00:56.674Z" },
 ]
 
 [[package]]
@@ -224,9 +224,9 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "bdffont", specifier = ">=0.0.33" },
+    { name = "bdffont", specifier = ">=0.0.34" },
     { name = "fonttools", extras = ["woff"], specifier = ">=4.60.1" },
-    { name = "pcffont", specifier = ">=0.0.22" },
+    { name = "pcffont", specifier = ">=0.0.23" },
 ]
 
 [package.metadata.requires-dev]
