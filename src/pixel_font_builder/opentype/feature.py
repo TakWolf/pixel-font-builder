@@ -22,12 +22,12 @@ class FeatureFile:
         self.file_path = file_path
 
 
-def build_kern_feature(pairs: dict[tuple[str, str], int], px_to_units: int) -> str:
+def build_kern_feature(kerning_values: dict[tuple[str, str], int], px_to_units: int) -> str:
     text = StringIO()
     text.write('languagesystem DFLT dflt;\n')
     text.write('\n')
     text.write('feature kern {\n')
-    for (left_glyph_name, right_glyph_name), offset in sorted(pairs.items()):
+    for (left_glyph_name, right_glyph_name), offset in sorted(kerning_values.items()):
         text.write(f'    position {left_glyph_name} {right_glyph_name} {offset * px_to_units};\n')
     text.write('} kern;\n')
     return text.getvalue()

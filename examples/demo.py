@@ -64,27 +64,27 @@ def _collect_glyph_files() -> tuple[list[GlyphFile], dict[int, str]]:
     return glyph_files, character_mapping
 
 
-def _build_kerning_pairs() -> dict[tuple[str, str], int]:
-    kerning_pairs = {}
+def _build_kerning_values() -> dict[tuple[str, str], int]:
+    kerning_values = {}
 
     for left_letter in 'FTVY':
         for right_letter in 'acdefgjmnopqrstuvwxyz':
-            kerning_pairs[(_get_glyph_name(ord(left_letter)), _get_glyph_name(ord(right_letter)))] = -1
+            kerning_values[(_get_glyph_name(ord(left_letter)), _get_glyph_name(ord(right_letter)))] = -1
 
     for left_letter in 'W':
         for right_letter in 'acdegoqs':
-            kerning_pairs[(_get_glyph_name(ord(left_letter)), _get_glyph_name(ord(right_letter)))] = -1
+            kerning_values[(_get_glyph_name(ord(left_letter)), _get_glyph_name(ord(right_letter)))] = -1
 
     for left_letter, right_letter in (('A', 'T'), ('A', 'V'), ('A', 'W'), ('A', 'Y'), ('T', 'A'), ('V', 'A'), ('W', 'A'), ('Y', 'A')):
-        kerning_pairs[(_get_glyph_name(ord(left_letter)), _get_glyph_name(ord(right_letter)))] = -1
+        kerning_values[(_get_glyph_name(ord(left_letter)), _get_glyph_name(ord(right_letter)))] = -1
 
-    return kerning_pairs
+    return kerning_values
 
 
 def _create_builder(
         glyph_files: list[GlyphFile],
         character_mapping: dict[int, str],
-        kerning_pairs: dict[tuple[str, str], int],
+        kerning_values: dict[tuple[str, str], int],
         name_num: int = 0,
 ) -> FontBuilder:
     builder = FontBuilder()
@@ -132,7 +132,7 @@ def _create_builder(
         ))
 
     builder.character_mapping.update(character_mapping)
-    builder.kerning_pairs.update(kerning_pairs)
+    builder.kerning_values.update(kerning_values)
 
     return builder
 
@@ -144,9 +144,9 @@ def main():
     outputs_dir.mkdir(parents=True)
 
     glyph_files, character_mapping = _collect_glyph_files()
-    kerning_pairs = _build_kerning_pairs()
+    kerning_values = _build_kerning_values()
 
-    builder = _create_builder(glyph_files, character_mapping, kerning_pairs)
+    builder = _create_builder(glyph_files, character_mapping, kerning_values)
     builder.save_otf(outputs_dir.joinpath('demo.otf'))
     builder.save_otf(outputs_dir.joinpath('demo.otf.woff'), flavor=opentype.Flavor.WOFF)
     builder.save_otf(outputs_dir.joinpath('demo.otf.woff2'), flavor=opentype.Flavor.WOFF2)
@@ -158,7 +158,7 @@ def main():
 
     collection_builder = FontCollectionBuilder()
     for index in range(100):
-        builder = _create_builder(glyph_files, character_mapping, kerning_pairs, index)
+        builder = _create_builder(glyph_files, character_mapping, kerning_values, index)
         collection_builder.append(builder)
     collection_builder.save_otc(outputs_dir.joinpath('demo.otc'))
     collection_builder.save_ttc(outputs_dir.joinpath('demo.ttc'))

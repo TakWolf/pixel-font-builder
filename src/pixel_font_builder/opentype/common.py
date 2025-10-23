@@ -27,7 +27,7 @@ def create_font_builder(
     meta_info = context.meta_info
     glyph_order, name_to_glyph = context.prepare_glyphs()
     character_mapping = context.character_mapping
-    kerning_pairs = context.kerning_pairs
+    kerning_values = context.kerning_values
 
     builder = FontBuilder(font_metric.font_size, isTTF=is_ttf)
 
@@ -77,8 +77,8 @@ def create_font_builder(
         underlineThickness=font_metric.underline_thickness,
     )
 
-    if len(kerning_pairs) > 0:
-        builder.addOpenTypeFeatures(build_kern_feature(kerning_pairs, config.px_to_units))
+    if len(kerning_values) > 0:
+        builder.addOpenTypeFeatures(build_kern_feature(kerning_values, config.px_to_units))
 
     for feature_file in config.feature_files:
         builder.addOpenTypeFeatures(feature_file.text, feature_file.file_path)
