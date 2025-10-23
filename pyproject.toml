@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "pixel-font-builder"
-version = "0.0.41"
+version = "0.0.42"
 description = "A library that helps create pixel style fonts"
 readme = "README.md"
 license = "MIT"
