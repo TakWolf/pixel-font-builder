@@ -76,6 +76,15 @@ def create_font_builder(
         underlinePosition=font_metric.underline_position,
         underlineThickness=font_metric.underline_thickness,
     )
+    if config.head_bounding_box_override is not None:
+        head_bounding_box_override = config.head_bounding_box_override * config.px_to_units
+        builder.setupHead(
+            xMin=head_bounding_box_override.x_min,
+            yMin=head_bounding_box_override.y_min,
+            xMax=head_bounding_box_override.x_max,
+            yMax=head_bounding_box_override.y_max,
+        )
+        builder.font.recalcBBoxes = False
 
     if len(kerning_values) > 0:
         builder.addOpenTypeFeatures(build_kern_feature(glyph_order, kerning_values, config.px_to_units))
