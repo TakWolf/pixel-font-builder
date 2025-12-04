@@ -46,3 +46,57 @@ class BoundingBox:
                 self.y_min == other.y_min and
                 self.x_max == other.x_max and
                 self.y_max == other.y_max)
+
+
+class HorizontalMetric:
+    advance_width: int
+    left_side_bearing: int
+    right_side_bearing: int
+    x_extent: int
+
+    def __init__(
+            self,
+            advance_width: int,
+            left_side_bearing: int,
+            right_side_bearing: int,
+            x_extent: int,
+    ):
+        self.advance_width = advance_width
+        self.left_side_bearing = left_side_bearing
+        self.right_side_bearing = right_side_bearing
+        self.x_extent = x_extent
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, HorizontalMetric):
+            return NotImplemented
+        return (self.advance_width == other.advance_width and
+                self.left_side_bearing == other.left_side_bearing and
+                self.right_side_bearing == other.right_side_bearing and
+                self.x_extent == other.x_extent)
+
+
+class VerticalMetric:
+    advance_height: int
+    top_side_bearing: int
+    bottom_side_bearing: int
+    y_extent: int
+
+    def __init__(
+            self,
+            advance_height: int,
+            top_side_bearing: int,
+            bottom_side_bearing: int,
+            y_extent: int,
+    ):
+        self.advance_height = advance_height
+        self.top_side_bearing = top_side_bearing
+        self.bottom_side_bearing = bottom_side_bearing
+        self.y_extent = y_extent
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, VerticalMetric):
+            return NotImplemented
+        return (self.advance_height == other.advance_height and
+                self.top_side_bearing == other.top_side_bearing and
+                self.bottom_side_bearing == other.bottom_side_bearing and
+                self.y_extent == other.y_extent)
