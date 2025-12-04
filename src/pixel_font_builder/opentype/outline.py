@@ -3,20 +3,20 @@ from abc import abstractmethod
 from typing import Protocol, runtime_checkable
 
 from fontTools import cu2qu
-from fontTools.misc.psCharStrings import T2CharString as OTFGlyph
-from fontTools.pens.t2CharStringPen import T2CharStringPen as OTFGlyphPen
-from fontTools.pens.ttGlyphPen import TTGlyphPen as TTFGlyphPen
+from fontTools.misc.psCharStrings import T2CharString as OtfGlyph
+from fontTools.pens.t2CharStringPen import T2CharStringPen as OtfGlyphPen
+from fontTools.pens.ttGlyphPen import TTGlyphPen as TtfGlyphPen
 # noinspection PyProtectedMember
-from fontTools.ttLib.tables._g_l_y_f import Glyph as TTFGlyph
+from fontTools.ttLib.tables._g_l_y_f import Glyph as TtfGlyph
 
 from pixel_font_builder.glyph import Glyph
 
-type XTFGlyph = OTFGlyph | TTFGlyph
+type XtfGlyph = OtfGlyph | TtfGlyph
 
 
 class OutlinesPen:
     is_ttf: bool
-    pen: OTFGlyphPen | TTFGlyphPen
+    pen: OtfGlyphPen | TtfGlyphPen
     current_point: tuple[float, float] | None
 
     def __init__(
@@ -25,7 +25,7 @@ class OutlinesPen:
             advance_width: int,
     ):
         self.is_ttf = is_ttf
-        self.pen = TTFGlyphPen() if is_ttf else OTFGlyphPen(advance_width, None)
+        self.pen = TtfGlyphPen() if is_ttf else OtfGlyphPen(advance_width, None)
         self.current_point = None
 
     def move_to(self, point: tuple[float, float]):
@@ -65,7 +65,7 @@ class OutlinesPen:
         self.pen.closePath()
         self.current_point = None
 
-    def to_glyph(self) -> XTFGlyph:
+    def to_glyph(self) -> XtfGlyph:
         return self.pen.glyph() if self.is_ttf else self.pen.getCharString()
 
 
@@ -228,7 +228,7 @@ def create_xtf_glyphs(
         outlines_painter: OutlinesPainter,
         name_to_glyph: dict[str, Glyph],
         px_to_units: int,
-) -> tuple[dict[str, XTFGlyph], dict[str, tuple[int, int]], dict[str, tuple[int, int]]]:
+) -> tuple[dict[str, XtfGlyph], dict[str, tuple[int, int]], dict[str, tuple[int, int]]]:
     xtf_glyphs = {}
     horizontal_metrics = {}
     vertical_metrics = {}
