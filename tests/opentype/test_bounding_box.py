@@ -7,6 +7,8 @@ def test_bounding_box_1():
     assert bounding_box.y_min == 0
     assert bounding_box.x_max == 0
     assert bounding_box.y_max == 0
+    assert bounding_box.width == 0
+    assert bounding_box.height == 0
 
 
 def test_bounding_box_2():
@@ -15,3 +17,5 @@ def test_bounding_box_2():
     assert bounding_box.y_min == 20
     assert bounding_box.x_max == 30
     assert bounding_box.y_max == 40
+    assert bounding_box.width == 20
+    assert bounding_box.height == 20
