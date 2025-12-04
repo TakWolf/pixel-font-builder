@@ -30,11 +30,13 @@ def create_font_builder(
     kerning_values = context.kerning_values
 
     builder = FontBuilder(font_metric.font_size, isTTF=is_ttf)
+    tb_head = builder.font['head']
 
     if meta_info.created_time is not None:
-        setattr(builder.font['head'], 'created', timeTools.timestampSinceEpoch(meta_info.created_time.timestamp()))
+        setattr(tb_head, 'created', timeTools.timestampSinceEpoch(meta_info.created_time.timestamp()))
+
     if meta_info.modified_time is not None:
-        setattr(builder.font['head'], 'modified', timeTools.timestampSinceEpoch(meta_info.modified_time.timestamp()))
+        setattr(tb_head, 'modified', timeTools.timestampSinceEpoch(meta_info.modified_time.timestamp()))
 
     name_strings = create_name_strings(meta_info)
     builder.setupNameTable(name_strings)
