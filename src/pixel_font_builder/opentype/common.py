@@ -90,7 +90,7 @@ def create_font_builder(
         underlineThickness=font_metric.underline_thickness,
     )
 
-    if config.head_bounding_box_override is None:
+    if config.fields_override.head_bounding_box is None:
         head_bounding_box = BoundingBox(
             x_min=min((bounding_box.x_min for bounding_box in bounding_boxes.values()), default=0),
             y_min=min((bounding_box.y_min for bounding_box in bounding_boxes.values()), default=0),
@@ -98,7 +98,7 @@ def create_font_builder(
             y_max=max((bounding_box.y_max for bounding_box in bounding_boxes.values()), default=0),
         )
     else:
-        head_bounding_box = config.head_bounding_box_override * config.px_to_units
+        head_bounding_box = config.fields_override.head_bounding_box * config.px_to_units
     setattr(tb_head, 'xMin', head_bounding_box.x_min)
     setattr(tb_head, 'yMin', head_bounding_box.y_min)
     setattr(tb_head, 'xMax', head_bounding_box.x_max)
