@@ -24,6 +24,7 @@ class Config:
     px_to_units: int
     outlines_painter: OutlinesPainter
     has_vertical_metrics: bool
+    is_monospaced: bool
     fields_override: FieldsOverride
     feature_files: list[FeatureFile]
 
@@ -32,11 +33,13 @@ class Config:
             px_to_units: int = 100,
             outlines_painter: OutlinesPainter | None = None,
             has_vertical_metrics: bool = True,
+            is_monospaced: bool = False,
             fields_override: FieldsOverride | None = None,
             feature_files: list[FeatureFile] | None = None,
     ):
         self.px_to_units = px_to_units
         self.outlines_painter = Config.DEFAULT_OUTLINES_PAINTER if outlines_painter is None else outlines_painter
         self.has_vertical_metrics = has_vertical_metrics
+        self.is_monospaced = is_monospaced
         self.fields_override = FieldsOverride() if fields_override is None else fields_override
         self.feature_files = [] if feature_files is None else feature_files

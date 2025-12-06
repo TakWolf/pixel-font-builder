@@ -82,6 +82,7 @@ def create_font_builder(
     builder.setupPost(
         underlinePosition=font_metric.underline_position,
         underlineThickness=font_metric.underline_thickness,
+        isFixedPitch=1 if config.is_monospaced else 0,
     )
 
     tb_head = builder.font['head']
