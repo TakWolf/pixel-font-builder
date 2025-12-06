@@ -10,7 +10,6 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen as TtfGlyphPen
 from fontTools.ttLib.tables._g_l_y_f import Glyph as TtfGlyph
 
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.opentype.metric import BoundingBox, HorizontalMetric, VerticalMetric
 
 type XtfGlyph = OtfGlyph | TtfGlyph
 
@@ -229,39 +228,20 @@ def create_xtf_glyphs(
         outlines_painter: OutlinesPainter,
         name_to_glyph: dict[str, Glyph],
         px_to_units: int,
-) -> tuple[dict[str, XtfGlyph], dict[str, BoundingBox], dict[str, HorizontalMetric], dict[str, VerticalMetric]]:
+) -> tuple[dict[str, XtfGlyph], dict[str, tuple[int, int]], dict[str, tuple[int, int]]]:
     xtf_glyphs = {}
-    bounding_boxes = {}
     horizontal_metrics = {}
     vertical_metrics = {}
     for glyph_name, glyph in name_to_glyph.items():
-        left_padding = glyph.calculate_bitmap_left_padding()
-        right_padding = glyph.calculate_bitmap_right_padding()
-        top_padding = glyph.calculate_bitmap_top_padding()
-        bottom_padding = glyph.calculate_bitmap_bottom_padding()
-
-        x_min = (glyph.horizontal_offset_x + left_padding) * px_to_units
-        y_min = (glyph.horizontal_offset_y + bottom_padding) * px_to_units
-        x_max = (glyph.horizontal_offset_x + glyph.width - right_padding) * px_to_units
-        y_max = (glyph.horizontal_offset_y + glyph.height - top_padding) * px_to_units
-        bounding_box = BoundingBox(x_min, y_min, x_max, y_max)
-        bounding_boxes[glyph_name] = bounding_box
-
         advance_width = glyph.advance_width * px_to_units
-        left_side_bearing = (glyph.horizontal_offset_x + left_padding) * px_to_units
-        right_side_bearing = advance_width - left_side_bearing - bounding_box.width
-        x_extent = left_side_bearing + bounding_box.width
-        horizontal_metric = HorizontalMetric(advance_width, left_side_bearing, right_side_bearing, x_extent)
-        horizontal_metrics[glyph_name] = horizontal_metric
+        left_side_bearing = (glyph.horizontal_offset_x + glyph.calculate_bitmap_left_padding()) * px_to_units
+        horizontal_metrics[glyph_name] = advance_width, left_side_bearing
 
         advance_height = glyph.advance_height * px_to_units
-        top_side_bearing = (glyph.vertical_offset_y + top_padding) * px_to_units
-        bottom_side_bearing = advance_height - top_side_bearing - bounding_box.height
-        y_extent = top_side_bearing + bounding_box.height
-        vertical_metric = VerticalMetric(advance_height, top_side_bearing, bottom_side_bearing, y_extent)
-        vertical_metrics[glyph_name] = vertical_metric
+        top_side_bearing = (glyph.vertical_offset_y + glyph.calculate_bitmap_top_padding()) * px_to_units
+        vertical_metrics[glyph_name] = advance_height, top_side_bearing
 
         pen = OutlinesPen(is_ttf, advance_width)
         outlines_painter.draw_outlines(glyph, pen, px_to_units)
         xtf_glyphs[glyph_name] = pen.to_glyph()
-    return xtf_glyphs, bounding_boxes, horizontal_metrics, vertical_metrics
+    return xtf_glyphs, horizontal_metrics, vertical_metrics

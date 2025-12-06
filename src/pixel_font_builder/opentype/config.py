@@ -1,20 +1,28 @@
 from typing import Final
 
 from pixel_font_builder.opentype.feature import FeatureFile
-from pixel_font_builder.opentype.metric import BoundingBox
 from pixel_font_builder.opentype.outline import OutlinesPainter, SolidOutlinesPainter
 
 
 class FieldsOverride:
-    head_bounding_box: BoundingBox | None
+    head_x_min: int | None
+    head_y_min: int | None
+    head_x_max: int | None
+    head_y_max: int | None
     os2_x_avg_char_width: int | None
 
     def __init__(
             self,
-            head_bounding_box: BoundingBox | None = None,
+            head_x_min: int | None = None,
+            head_y_min: int | None = None,
+            head_x_max: int | None = None,
+            head_y_max: int | None = None,
             os2_x_avg_char_width: int | None = None,
     ):
-        self.head_bounding_box = head_bounding_box
+        self.head_x_min = head_x_min
+        self.head_y_min = head_y_min
+        self.head_x_max = head_x_max
+        self.head_y_max = head_y_max
         self.os2_x_avg_char_width = os2_x_avg_char_width
 
 

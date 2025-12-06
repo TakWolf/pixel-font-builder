@@ -4,11 +4,11 @@ from enum import StrEnum
 
 from fontTools.fontBuilder import FontBuilder
 from fontTools.misc import timeTools
+from fontTools.misc.arrayTools import intRect
 from fontTools.ttLib import TTCollection
 
 import pixel_font_builder
 from pixel_font_builder.opentype.feature import build_kern_feature
-from pixel_font_builder.opentype.metric import BoundingBox
 from pixel_font_builder.opentype.name import create_name_strings
 from pixel_font_builder.opentype.outline import create_xtf_glyphs
 
@@ -31,18 +31,19 @@ def create_font_builder(
     kerning_values = context.kerning_values
 
     builder = FontBuilder(font_metric.font_size, isTTF=is_ttf)
-    builder.font.recalcBBoxes = False
 
     name_strings = create_name_strings(meta_info)
     builder.setupNameTable(name_strings)
 
-    xtf_glyphs, bounding_boxes, horizontal_metrics, vertical_metrics = create_xtf_glyphs(is_ttf, config.outlines_painter, name_to_glyph, config.px_to_units)
-
+    xtf_glyphs, horizontal_metrics, vertical_metrics = create_xtf_glyphs(is_ttf, config.outlines_painter, name_to_glyph, config.px_to_units)
     builder.setupGlyphOrder(glyph_order)
-    builder.setupGlyf(xtf_glyphs) if is_ttf else builder.setupCFF('', {}, xtf_glyphs, {})
-    builder.setupHorizontalMetrics({glyph_name: (horizontal_metric.advance_width, horizontal_metric.left_side_bearing) for glyph_name, horizontal_metric in horizontal_metrics.items()})
+    if is_ttf:
+        builder.setupGlyf(xtf_glyphs)
+    else:
+        builder.setupCFF('', {}, xtf_glyphs, {})
+    builder.setupHorizontalMetrics(horizontal_metrics)
     if config.has_vertical_metrics:
-        builder.setupVerticalMetrics({glyph_name: (vertical_metric.advance_height, vertical_metric.top_side_bearing) for glyph_name, vertical_metric in vertical_metrics.items()})
+        builder.setupVerticalMetrics(vertical_metrics)
 
     builder.setupCharacterMap(character_mapping)
 
@@ -50,20 +51,12 @@ def create_font_builder(
         ascent=font_metric.horizontal_layout.ascent,
         descent=font_metric.horizontal_layout.descent,
         lineGap=font_metric.horizontal_layout.line_gap,
-        advanceWidthMax=max((horizontal_metric.advance_width for horizontal_metric in horizontal_metrics.values()), default=0),
-        minLeftSideBearing=min((horizontal_metric.left_side_bearing for horizontal_metric in horizontal_metrics.values()), default=0),
-        minRightSideBearing=min((horizontal_metric.right_side_bearing for horizontal_metric in horizontal_metrics.values()), default=0),
-        xMaxExtent=max((horizontal_metric.x_extent for horizontal_metric in horizontal_metrics.values()), default=0),
     )
     if config.has_vertical_metrics:
         builder.setupVerticalHeader(
             ascent=font_metric.vertical_layout.ascent,
             descent=font_metric.vertical_layout.descent,
             lineGap=font_metric.vertical_layout.line_gap,
-            advanceHeightMax=max((vertical_metric.advance_height for vertical_metric in vertical_metrics.values()), default=0),
-            minTopSideBearing=min((vertical_metric.top_side_bearing for vertical_metric in vertical_metrics.values()), default=0),
-            minBottomSideBearing=min((vertical_metric.bottom_side_bearing for vertical_metric in vertical_metrics.values()), default=0),
-            yMaxExtent=max((vertical_metric.y_extent for vertical_metric in vertical_metrics.values()), default=0),
         )
     builder.setupOS2(
         xAvgCharWidth=0,
@@ -90,23 +83,29 @@ def create_font_builder(
 
     if meta_info.created_time is not None:
         tb_head.created = timeTools.timestampSinceEpoch(meta_info.created_time.timestamp())
-
     if meta_info.modified_time is not None:
         tb_head.modified = timeTools.timestampSinceEpoch(meta_info.modified_time.timestamp())
 
-    if config.fields_override.head_bounding_box is None:
-        head_bounding_box = BoundingBox(
-            x_min=min((bounding_box.x_min for bounding_box in bounding_boxes.values()), default=0),
-            y_min=min((bounding_box.y_min for bounding_box in bounding_boxes.values()), default=0),
-            x_max=max((bounding_box.x_max for bounding_box in bounding_boxes.values()), default=0),
-            y_max=max((bounding_box.y_max for bounding_box in bounding_boxes.values()), default=0),
-        )
+    builder.font.recalcBBoxes = False
+    if is_ttf:
+        builder.font['maxp'].recalc(builder.font)
     else:
-        head_bounding_box = config.fields_override.head_bounding_box * config.px_to_units
-    tb_head.xMin = head_bounding_box.x_min
-    tb_head.yMin = head_bounding_box.y_min
-    tb_head.xMax = head_bounding_box.x_max
-    tb_head.yMax = head_bounding_box.y_max
+        cff = builder.font["CFF "].cff
+        for top_dict in cff.topDictIndex:
+            top_dict.recalcFontBBox()
+        tb_head.xMin, tb_head.yMin, tb_head.xMax, tb_head.yMax = intRect(cff.topDictIndex[0].FontBBox)
+    builder.font['hhea'].recalc(builder.font)
+    if config.has_vertical_metrics:
+        builder.font['vhea'].recalc(builder.font)
+
+    if config.fields_override.head_x_min is not None:
+        tb_head.xMin = config.fields_override.head_x_min * config.px_to_units
+    if config.fields_override.head_y_min is not None:
+        tb_head.yMin = config.fields_override.head_y_min * config.px_to_units
+    if config.fields_override.head_x_max is not None:
+        tb_head.xMax = config.fields_override.head_x_max * config.px_to_units
+    if config.fields_override.head_y_max is not None:
+        tb_head.yMax = config.fields_override.head_y_max * config.px_to_units
 
     if config.fields_override.os2_x_avg_char_width is None:
         tb_os2.recalcAvgCharWidth(builder.font)
