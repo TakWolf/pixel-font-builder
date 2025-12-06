@@ -7,12 +7,15 @@ from pixel_font_builder.opentype.outline import OutlinesPainter, SolidOutlinesPa
 
 class FieldsOverride:
     head_bounding_box: BoundingBox | None
+    os2_x_avg_char_width: int | None
 
     def __init__(
             self,
             head_bounding_box: BoundingBox | None = None,
+            os2_x_avg_char_width: int | None = None,
     ):
         self.head_bounding_box = head_bounding_box
+        self.os2_x_avg_char_width = os2_x_avg_char_width
 
 
 class Config:

@@ -73,6 +73,7 @@ def create_font_builder(
             yMaxExtent=max((vertical_metric.y_extent for vertical_metric in vertical_metrics.values()), default=0),
         )
     builder.setupOS2(
+        xAvgCharWidth=0,
         sTypoAscender=font_metric.horizontal_layout.ascent,
         sTypoDescender=font_metric.horizontal_layout.descent,
         sTypoLineGap=font_metric.horizontal_layout.line_gap,
@@ -103,6 +104,12 @@ def create_font_builder(
     setattr(tb_head, 'yMin', head_bounding_box.y_min)
     setattr(tb_head, 'xMax', head_bounding_box.x_max)
     setattr(tb_head, 'yMax', head_bounding_box.y_max)
+
+    if config.fields_override.os2_x_avg_char_width is None:
+        builder.font['OS/2'].recalcAvgCharWidth(builder.font)
+    else:
+        # noinspection PyPep8Naming
+        builder.font['OS/2'].xAvgCharWidth = config.fields_override.os2_x_avg_char_width * config.px_to_units
 
     if len(kerning_values) > 0:
         builder.addOpenTypeFeatures(build_kern_feature(glyph_order, kerning_values, config.px_to_units))
