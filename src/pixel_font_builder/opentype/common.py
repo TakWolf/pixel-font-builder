@@ -32,13 +32,6 @@ def create_font_builder(
 
     builder = FontBuilder(font_metric.font_size, isTTF=is_ttf)
     builder.font.recalcBBoxes = False
-    tb_head = builder.font['head']
-
-    if meta_info.created_time is not None:
-        setattr(tb_head, 'created', timeTools.timestampSinceEpoch(meta_info.created_time.timestamp()))
-
-    if meta_info.modified_time is not None:
-        setattr(tb_head, 'modified', timeTools.timestampSinceEpoch(meta_info.modified_time.timestamp()))
 
     name_strings = create_name_strings(meta_info)
     builder.setupNameTable(name_strings)
@@ -91,6 +84,15 @@ def create_font_builder(
         underlineThickness=font_metric.underline_thickness,
     )
 
+    tb_head = builder.font['head']
+    tb_os2 = builder.font['OS/2']
+
+    if meta_info.created_time is not None:
+        tb_head.created = timeTools.timestampSinceEpoch(meta_info.created_time.timestamp())
+
+    if meta_info.modified_time is not None:
+        tb_head.modified = timeTools.timestampSinceEpoch(meta_info.modified_time.timestamp())
+
     if config.fields_override.head_bounding_box is None:
         head_bounding_box = BoundingBox(
             x_min=min((bounding_box.x_min for bounding_box in bounding_boxes.values()), default=0),
@@ -100,16 +102,15 @@ def create_font_builder(
         )
     else:
         head_bounding_box = config.fields_override.head_bounding_box * config.px_to_units
-    setattr(tb_head, 'xMin', head_bounding_box.x_min)
-    setattr(tb_head, 'yMin', head_bounding_box.y_min)
-    setattr(tb_head, 'xMax', head_bounding_box.x_max)
-    setattr(tb_head, 'yMax', head_bounding_box.y_max)
+    tb_head.xMin = head_bounding_box.x_min
+    tb_head.yMin = head_bounding_box.y_min
+    tb_head.xMax = head_bounding_box.x_max
+    tb_head.yMax = head_bounding_box.y_max
 
     if config.fields_override.os2_x_avg_char_width is None:
-        builder.font['OS/2'].recalcAvgCharWidth(builder.font)
+        tb_os2.recalcAvgCharWidth(builder.font)
     else:
-        # noinspection PyPep8Naming
-        builder.font['OS/2'].xAvgCharWidth = config.fields_override.os2_x_avg_char_width * config.px_to_units
+        tb_os2.xAvgCharWidth = config.fields_override.os2_x_avg_char_width * config.px_to_units
 
     if len(kerning_values) > 0:
         builder.addOpenTypeFeatures(build_kern_feature(glyph_order, kerning_values, config.px_to_units))
