@@ -6,6 +6,7 @@ from fontTools.fontBuilder import FontBuilder
 from fontTools.misc import timeTools
 from fontTools.misc.arrayTools import intRect
 from fontTools.ttLib import TTCollection
+from fontTools.ttLib.tables.O_S_2f_2 import Panose
 
 import pixel_font_builder
 from pixel_font_builder.opentype.feature import build_kern_feature
@@ -60,6 +61,7 @@ def create_font_builder(
         )
     builder.setupOS2(
         xAvgCharWidth=0,
+        panose=Panose(),
         sTypoAscender=font_metric.horizontal_layout.ascent,
         sTypoDescender=font_metric.horizontal_layout.descent,
         sTypoLineGap=font_metric.horizontal_layout.line_gap,
@@ -75,11 +77,11 @@ def create_font_builder(
     builder.setupPost(
         underlinePosition=font_metric.underline_position,
         underlineThickness=font_metric.underline_thickness,
-        isFixedPitch=1 if config.is_monospaced else 0,
     )
 
     tb_head = builder.font['head']
     tb_os2 = builder.font['OS/2']
+    tb_post = builder.font['post']
 
     if meta_info.created_time is not None:
         tb_head.created = timeTools.timestampSinceEpoch(meta_info.created_time.timestamp())
@@ -97,6 +99,11 @@ def create_font_builder(
     builder.font['hhea'].recalc(builder.font)
     if config.has_vertical_metrics:
         builder.font['vhea'].recalc(builder.font)
+
+    if config.is_monospaced:
+        if is_ttf:
+            tb_os2.panose.bProportion = 9
+        tb_post.isFixedPitch = 1
 
     if config.fields_override.head_x_min is not None:
         tb_head.xMin = config.fields_override.head_x_min * config.px_to_units
