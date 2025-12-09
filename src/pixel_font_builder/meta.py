@@ -1,8 +1,9 @@
 from datetime import datetime
-from enum import StrEnum
+from enum import StrEnum, unique
 from typing import Any
 
 
+@unique
 class WeightName(StrEnum):
     LIGHT = 'Light'
     NORMAL = 'Normal'
@@ -12,11 +13,13 @@ class WeightName(StrEnum):
     HEAVY = 'Heavy'
 
 
+@unique
 class SerifStyle(StrEnum):
     SERIF = 'Serif'
     SANS_SERIF = 'Sans Serif'
 
 
+@unique
 class SlantStyle(StrEnum):
     NORMAL = 'Normal'
     ITALIC = 'Italic'
@@ -25,6 +28,7 @@ class SlantStyle(StrEnum):
     REVERSE_OBLIQUE = 'Reverse Oblique'
 
 
+@unique
 class WidthStyle(StrEnum):
     MONOSPACED = 'Monospaced'
     DUOSPACED = 'Duospaced'

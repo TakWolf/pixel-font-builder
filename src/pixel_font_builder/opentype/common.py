@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from enum import StrEnum
+from enum import StrEnum, unique
 
 from fontTools.fontBuilder import FontBuilder
 from fontTools.misc import timeTools
@@ -14,6 +14,7 @@ from pixel_font_builder.opentype.name import create_name_strings
 from pixel_font_builder.opentype.outline import create_xtf_glyphs
 
 
+@unique
 class Flavor(StrEnum):
     WOFF = 'woff'
     WOFF2 = 'woff2'
