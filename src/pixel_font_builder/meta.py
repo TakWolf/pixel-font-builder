@@ -5,12 +5,17 @@ from typing import Any
 
 @unique
 class WeightName(StrEnum):
-    LIGHT = 'Light'
-    NORMAL = 'Normal'
-    REGULAR = 'Regular'
-    MEDIUM = 'Medium'
-    BOLD = 'Bold'
-    HEAVY = 'Heavy'
+    THIN = 'Thin'                # 100
+    EXTRA_LIGHT = 'Extra Light'  # 200
+    LIGHT = 'Light'              # 300
+    NORMAL = 'Normal'            # 400
+    REGULAR = 'Regular'          # Same as 'Normal'
+    MEDIUM = 'Medium'            # 500
+    SEMI_BOLD = 'Semi Bold'      # 600
+    BOLD = 'Bold'                # 700
+    EXTRA_BOLD = 'Extra Bold'    # 800
+    BLACK = 'Black'              # 900
+    HEAVY = 'Heavy'              # Same as 'Black'
 
 
 @unique
