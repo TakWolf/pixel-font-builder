@@ -78,7 +78,6 @@ def create_font_builder(
     builder.setupOS2(
         xAvgCharWidth=0,
         usWeightClass=_OS2_US_WEIGHT_CLASS_VALUES.get(meta_info.weight_name, 400),
-        panose=Panose(),
         sTypoAscender=font_metric.horizontal_layout.ascent,
         sTypoDescender=font_metric.horizontal_layout.descent,
         sTypoLineGap=font_metric.horizontal_layout.line_gap,
