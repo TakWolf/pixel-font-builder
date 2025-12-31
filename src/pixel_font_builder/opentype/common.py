@@ -6,7 +6,6 @@ from fontTools.fontBuilder import FontBuilder
 from fontTools.misc import timeTools
 from fontTools.misc.arrayTools import intRect
 from fontTools.ttLib import TTCollection
-from fontTools.ttLib.tables.O_S_2f_2 import Panose
 
 import pixel_font_builder
 from pixel_font_builder.meta import WeightName
