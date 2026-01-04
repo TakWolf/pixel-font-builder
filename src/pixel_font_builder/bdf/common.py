@@ -42,7 +42,7 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
         font.properties.foundry = meta_info.manufacturer.replace('-', '_')
     font.properties.family_name = meta_info.family_name.replace('-', '_')
     font.properties.weight_name = meta_info.weight_name or WeightName.REGULAR
-    if meta_info.slant_style is None or meta_info.slant_style == SlantStyle.NORMAL:
+    if meta_info.slant_style is None or meta_info.slant_style == SlantStyle.NORMAL or meta_info.slant_style == SlantStyle.ROMAN:
         font.properties.slant = 'R'
     elif meta_info.slant_style == SlantStyle.ITALIC:
         font.properties.slant = 'I'

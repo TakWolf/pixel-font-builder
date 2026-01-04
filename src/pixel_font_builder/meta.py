@@ -26,11 +26,13 @@ class SerifStyle(StrEnum):
 
 @unique
 class SlantStyle(StrEnum):
-    NORMAL = 'Normal'
-    ITALIC = 'Italic'
-    OBLIQUE = 'Oblique'
-    REVERSE_ITALIC = 'Reverse Italic'
-    REVERSE_OBLIQUE = 'Reverse Oblique'
+    NORMAL = 'Normal'                    # Upright design
+    ROMAN = 'Roman'                      # Same as 'NORMAL'
+    ITALIC = 'Italic'                    # Italic design, slanted clockwise from the vertical
+    OBLIQUE = 'Oblique'                  # Obliqued upright design, slanted clockwise from the vertical
+    REVERSE_ITALIC = 'Reverse Italic'    # Italic design, slanted counterclockwise from the vertical
+    REVERSE_OBLIQUE = 'Reverse Oblique'  # Obliqued upright design, slanted counterclockwise from the vertical
+    OTHER = 'Other'                      # Other
 
 
 @unique
