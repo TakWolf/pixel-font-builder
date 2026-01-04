@@ -47,18 +47,19 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuild
         builder.properties.foundry = meta_info.manufacturer.replace('-', '_')
     builder.properties.family_name = meta_info.family_name.replace('-', '_')
     builder.properties.weight_name = meta_info.weight_name or WeightName.REGULAR
-    if meta_info.slant_style is None or meta_info.slant_style == SlantStyle.NORMAL or meta_info.slant_style == SlantStyle.ROMAN:
-        builder.properties.slant = 'R'
-    elif meta_info.slant_style == SlantStyle.ITALIC:
-        builder.properties.slant = 'I'
-    elif meta_info.slant_style == SlantStyle.OBLIQUE:
-        builder.properties.slant = 'O'
-    elif meta_info.slant_style == SlantStyle.REVERSE_ITALIC:
-        builder.properties.slant = 'RI'
-    elif meta_info.slant_style == SlantStyle.REVERSE_OBLIQUE:
-        builder.properties.slant = 'RO'
-    else:
-        builder.properties.slant = 'OT'
+    match meta_info.slant_style:
+        case None | SlantStyle.NORMAL | SlantStyle.ROMAN:
+            builder.properties.slant = 'R'
+        case SlantStyle.ITALIC:
+            builder.properties.slant = 'I'
+        case SlantStyle.OBLIQUE:
+            builder.properties.slant = 'O'
+        case SlantStyle.REVERSE_ITALIC:
+            builder.properties.slant = 'RI'
+        case SlantStyle.REVERSE_OBLIQUE:
+            builder.properties.slant = 'RO'
+        case SlantStyle.OTHER:
+            builder.properties.slant = 'OT'
     builder.properties.setwidth_name = 'Normal'
     if meta_info.serif_style is not None:
         builder.properties.add_style_name = meta_info.serif_style
@@ -66,14 +67,15 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuild
     builder.properties.point_size = font_metric.font_size * 10
     builder.properties.resolution_x = config.resolution_x
     builder.properties.resolution_y = config.resolution_y
-    if meta_info.width_style == WidthStyle.MONOSPACED:
-        builder.properties.spacing = 'M'
-    elif meta_info.width_style == WidthStyle.DUOSPACED:
-        builder.properties.spacing = 'D'
-    elif meta_info.width_style == WidthStyle.CHARACTER_CELL:
-        builder.properties.spacing = 'C'
-    elif meta_info.width_style == WidthStyle.PROPORTIONAL:
-        builder.properties.spacing = 'P'
+    match meta_info.width_style:
+        case WidthStyle.MONOSPACED:
+            builder.properties.spacing = 'M'
+        case WidthStyle.DUOSPACED:
+            builder.properties.spacing = 'D'
+        case WidthStyle.CHARACTER_CELL:
+            builder.properties.spacing = 'C'
+        case WidthStyle.PROPORTIONAL:
+            builder.properties.spacing = 'P'
     builder.properties.average_width = round(statistics.fmean(glyph.character_width * 10 for glyph in builder.glyphs))
     builder.properties.charset_registry = 'ISO10646'
     builder.properties.charset_encoding = '1'

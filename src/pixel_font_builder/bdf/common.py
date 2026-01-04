@@ -42,18 +42,19 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
         font.properties.foundry = meta_info.manufacturer.replace('-', '_')
     font.properties.family_name = meta_info.family_name.replace('-', '_')
     font.properties.weight_name = meta_info.weight_name or WeightName.REGULAR
-    if meta_info.slant_style is None or meta_info.slant_style == SlantStyle.NORMAL or meta_info.slant_style == SlantStyle.ROMAN:
-        font.properties.slant = 'R'
-    elif meta_info.slant_style == SlantStyle.ITALIC:
-        font.properties.slant = 'I'
-    elif meta_info.slant_style == SlantStyle.OBLIQUE:
-        font.properties.slant = 'O'
-    elif meta_info.slant_style == SlantStyle.REVERSE_ITALIC:
-        font.properties.slant = 'RI'
-    elif meta_info.slant_style == SlantStyle.REVERSE_OBLIQUE:
-        font.properties.slant = 'RO'
-    else:
-        font.properties.slant = 'OT'
+    match meta_info.slant_style:
+        case None | SlantStyle.NORMAL | SlantStyle.ROMAN:
+            font.properties.slant = 'R'
+        case SlantStyle.ITALIC:
+            font.properties.slant = 'I'
+        case SlantStyle.OBLIQUE:
+            font.properties.slant = 'O'
+        case SlantStyle.REVERSE_ITALIC:
+            font.properties.slant = 'RI'
+        case SlantStyle.REVERSE_OBLIQUE:
+            font.properties.slant = 'RO'
+        case SlantStyle.OTHER:
+            font.properties.slant = 'OT'
     font.properties.setwidth_name = 'Normal'
     if meta_info.serif_style is not None:
         font.properties.add_style_name = meta_info.serif_style
@@ -61,14 +62,15 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
     font.properties.point_size = font_metric.font_size * 10
     font.properties.resolution_x = config.resolution_x
     font.properties.resolution_y = config.resolution_y
-    if meta_info.width_style == WidthStyle.MONOSPACED:
-        font.properties.spacing = 'M'
-    elif meta_info.width_style == WidthStyle.DUOSPACED:
-        font.properties.spacing = 'D'
-    elif meta_info.width_style == WidthStyle.CHARACTER_CELL:
-        font.properties.spacing = 'C'
-    elif meta_info.width_style == WidthStyle.PROPORTIONAL:
-        font.properties.spacing = 'P'
+    match meta_info.width_style:
+        case WidthStyle.MONOSPACED:
+            font.properties.spacing = 'M'
+        case WidthStyle.DUOSPACED:
+            font.properties.spacing = 'D'
+        case WidthStyle.CHARACTER_CELL:
+            font.properties.spacing = 'C'
+        case WidthStyle.PROPORTIONAL:
+            font.properties.spacing = 'P'
     font.properties.average_width = round(statistics.fmean(glyph.device_width_x * 10 for glyph in font.glyphs))
     font.properties.charset_registry = 'ISO10646'
     font.properties.charset_encoding = '1'
