@@ -47,7 +47,7 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuild
         builder.properties.foundry = meta_info.manufacturer.replace('-', '_')
     builder.properties.family_name = meta_info.family_name.replace('-', '_')
     builder.properties.weight_name = meta_info.weight_name or WeightName.REGULAR
-    if meta_info.slant_style is None or meta_info.slant_style == SlantStyle.NORMAL:
+    if meta_info.slant_style is None or meta_info.slant_style == SlantStyle.NORMAL or meta_info.slant_style == SlantStyle.ROMAN:
         builder.properties.slant = 'R'
     elif meta_info.slant_style == SlantStyle.ITALIC:
         builder.properties.slant = 'I'
