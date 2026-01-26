@@ -22,14 +22,14 @@ classifiers = [
 ]
 
 dependencies = [
-    "fonttools[woff]>=4.61.1",
+    "fonttools[woff]>=4.62.1",
     "bdffont>=0.0.35",
     "pcffont>=0.0.24",
 ]
 
 [dependency-groups]
 dev = [
-    "pytest>=9.0.2",
+    "pytest>=9.0.3",
 ]
 
 [project.urls]
