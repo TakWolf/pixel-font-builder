@@ -2,14 +2,26 @@ from __future__ import annotations
 
 import math
 import statistics
-from collections import ChainMap
 
-from pcffont import PcfFontBuilder, PcfGlyph
+from pcffont import PcfFontBuilder, PcfGlyph, PcfBdfEncodings
 
 import pixel_font_builder
+from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.meta import WeightName, SlantStyle, WidthStyle
+from pixel_font_builder.metric import FontMetric
+from pixel_font_builder.pcf.config import Config
 
-_DEFAULT_CHAR = 0xFFFE
+
+def _create_glyphs(glyph: Glyph, encoding: int, font_metric: FontMetric, config: Config) -> PcfGlyph:
+    return PcfGlyph(
+        name=glyph.name,
+        encoding=encoding,
+        scalable_width=math.ceil((glyph.advance_width / font_metric.font_size) * (75 / config.resolution_x) * 1000),
+        character_width=glyph.advance_width,
+        dimensions=glyph.dimensions,
+        offset=glyph.horizontal_offset,
+        bitmap=glyph.bitmap,
+    )
 
 
 def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuilder:
@@ -17,31 +29,22 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuild
     font_metric = context.font_metric
     meta_info = context.meta_info
     _, name_to_glyph = context.prepare_glyphs()
-    character_mapping = ChainMap({_DEFAULT_CHAR: '.notdef'}, context.character_mapping)
+    character_mapping = context.character_mapping
 
     builder = PcfFontBuilder()
     builder.config.font_ascent = font_metric.horizontal_layout.ascent
     builder.config.font_descent = -font_metric.horizontal_layout.descent
-    builder.config.default_char = _DEFAULT_CHAR
     builder.config.draw_right_to_left = config.draw_right_to_left
     builder.config.ms_byte_first = config.ms_byte_first
     builder.config.ms_bit_first = config.ms_bit_first
     builder.config.glyph_pad_index = config.glyph_pad_index
     builder.config.scan_unit_index = config.scan_unit_index
 
+    builder.glyphs.append(_create_glyphs(name_to_glyph['.notdef'], PcfBdfEncodings.NO_ENCODING, font_metric, config))
     for code_point, glyph_name in sorted(character_mapping.items()):
         if code_point > 0xFFFF:
             break
-        glyph = name_to_glyph[glyph_name]
-        builder.glyphs.append(PcfGlyph(
-            name=glyph_name,
-            encoding=code_point,
-            scalable_width=math.ceil((glyph.advance_width / font_metric.font_size) * (75 / config.resolution_x) * 1000),
-            character_width=glyph.advance_width,
-            dimensions=glyph.dimensions,
-            offset=glyph.horizontal_offset,
-            bitmap=glyph.bitmap,
-        ))
+        builder.glyphs.append(_create_glyphs(name_to_glyph[glyph_name], code_point, font_metric, config))
 
     if meta_info.manufacturer is not None:
         builder.properties.foundry = meta_info.manufacturer.replace('-', '_')
