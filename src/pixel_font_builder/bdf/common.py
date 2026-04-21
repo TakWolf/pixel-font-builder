@@ -2,14 +2,25 @@ from __future__ import annotations
 
 import math
 import statistics
-from collections import ChainMap
 
 from bdffont import BdfFont, BdfGlyph
 
 import pixel_font_builder
+from pixel_font_builder.bdf.config import Config
+from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.meta import WeightName, SlantStyle, WidthStyle
+from pixel_font_builder.metric import FontMetric
 
-_DEFAULT_CHAR = 0xFFFE
+
+def _create_glyphs(glyph: Glyph, encoding: int, font_metric: FontMetric, config: Config) -> BdfGlyph:
+    return BdfGlyph(
+        name=glyph.name,
+        encoding=encoding,
+        scalable_width=(math.ceil((glyph.advance_width / font_metric.font_size) * (75 / config.resolution_x) * 1000), 0),
+        device_width=(glyph.advance_width, 0),
+        bounding_box=(glyph.width, glyph.height, glyph.horizontal_offset_x, glyph.horizontal_offset_y),
+        bitmap=glyph.bitmap,
+    )
 
 
 def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
@@ -17,7 +28,7 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
     font_metric = context.font_metric
     meta_info = context.meta_info
     _, name_to_glyph = context.prepare_glyphs()
-    character_mapping = ChainMap({_DEFAULT_CHAR: '.notdef'}, context.character_mapping)
+    character_mapping = context.character_mapping
 
     font = BdfFont(
         point_size=font_metric.font_size,
@@ -25,18 +36,11 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
         bounding_box=(font_metric.font_size, font_metric.horizontal_layout.line_height, 0, font_metric.horizontal_layout.descent),
     )
 
+    font.glyphs.append(_create_glyphs(name_to_glyph['.notdef'], -1, font_metric, config))
     for code_point, glyph_name in sorted(character_mapping.items()):
         if code_point > 0xFFFF and config.only_basic_plane:
             break
-        glyph = name_to_glyph[glyph_name]
-        font.glyphs.append(BdfGlyph(
-            name=glyph_name,
-            encoding=code_point,
-            scalable_width=(math.ceil((glyph.advance_width / font_metric.font_size) * (75 / config.resolution_x) * 1000), 0),
-            device_width=(glyph.advance_width, 0),
-            bounding_box=(glyph.width, glyph.height, glyph.horizontal_offset_x, glyph.horizontal_offset_y),
-            bitmap=glyph.bitmap,
-        ))
+        font.glyphs.append(_create_glyphs(name_to_glyph[glyph_name], code_point, font_metric, config))
 
     if meta_info.manufacturer is not None:
         font.properties.foundry = meta_info.manufacturer.replace('-', '_')
@@ -76,7 +80,7 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
     font.properties.charset_encoding = '1'
     font.generate_name_as_xlfd()
 
-    font.properties.default_char = _DEFAULT_CHAR
+    font.properties.default_char = -1
     font.properties.font_ascent = font_metric.horizontal_layout.ascent
     font.properties.font_descent = -font_metric.horizontal_layout.descent
     if font_metric.x_height != 0:
