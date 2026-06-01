@@ -37,8 +37,8 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuild
     builder.config.draw_right_to_left = config.draw_right_to_left
     builder.config.ms_byte_first = config.ms_byte_first
     builder.config.ms_bit_first = config.ms_bit_first
-    builder.config.glyph_pad_index = config.glyph_pad_index
-    builder.config.scan_unit_index = config.scan_unit_index
+    builder.config.glyph_pad = config.glyph_pad
+    builder.config.scan_unit = config.scan_unit
 
     builder.glyphs.append(_create_glyphs(name_to_glyph['.notdef'], PcfBdfEncodings.NO_ENCODING, font_metric, config))
     for code_point, glyph_name in sorted(character_mapping.items()):

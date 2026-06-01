@@ -5,8 +5,8 @@ class Config:
     draw_right_to_left: bool
     ms_byte_first: bool
     ms_bit_first: bool
-    glyph_pad_index: int
-    scan_unit_index: int
+    glyph_pad: int
+    scan_unit: int
 
     def __init__(
             self,
@@ -15,13 +15,13 @@ class Config:
             draw_right_to_left: bool = False,
             ms_byte_first: bool = True,
             ms_bit_first: bool = True,
-            glyph_pad_index: int = 0,
-            scan_unit_index: int = 0,
+            glyph_pad: int = 1,
+            scan_unit: int = 1,
     ):
         self.resolution_x = resolution_x
         self.resolution_y = resolution_y
         self.draw_right_to_left = draw_right_to_left
         self.ms_byte_first = ms_byte_first
         self.ms_bit_first = ms_bit_first
-        self.glyph_pad_index = glyph_pad_index
-        self.scan_unit_index = scan_unit_index
+        self.glyph_pad = glyph_pad
+        self.scan_unit = scan_unit
