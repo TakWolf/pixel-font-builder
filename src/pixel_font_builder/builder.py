@@ -38,7 +38,7 @@ class FontBuilder:
 
         for glyph in self.glyphs:
             if glyph.name in name_to_glyph:
-                raise RuntimeError(f'duplicate glyphs: {repr(glyph.name)}')
+                raise RuntimeError(f'duplicate glyphs: {glyph.name!r}')
             if glyph.name != '.notdef':
                 glyph_order.append(glyph.name)
             name_to_glyph[glyph.name] = glyph
@@ -50,13 +50,13 @@ class FontBuilder:
             if code_point < 0:
                 raise RuntimeError('code points must >= 0')
             if glyph_name not in name_to_glyph:
-                raise RuntimeError(f'missing glyph: {repr(glyph_name)}')
+                raise RuntimeError(f'missing glyph: {glyph_name!r}')
 
         for (left_glyph_name, right_glyph_name), _ in self.kerning_values.items():
             if left_glyph_name not in name_to_glyph:
-                raise RuntimeError(f'missing glyph: {repr(left_glyph_name)}')
+                raise RuntimeError(f'missing glyph: {left_glyph_name!r}')
             if right_glyph_name not in name_to_glyph:
-                raise RuntimeError(f'missing glyph: {repr(right_glyph_name)}')
+                raise RuntimeError(f'missing glyph: {right_glyph_name!r}')
 
         return glyph_order, name_to_glyph
 
