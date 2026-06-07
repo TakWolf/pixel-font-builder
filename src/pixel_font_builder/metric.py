@@ -27,6 +27,12 @@ class LineMetric:
             self.line_gap * other,
         )
 
+    def __copy__(self) -> LineMetric:
+        return self.copy()
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> LineMetric:
+        return self.deepcopy()
+
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, LineMetric):
             return NotImplemented
@@ -37,6 +43,16 @@ class LineMetric:
     @property
     def line_height(self) -> int:
         return self.ascent - self.descent
+
+    def copy(self) -> LineMetric:
+        return LineMetric(
+            self.ascent,
+            self.descent,
+            self.line_gap,
+        )
+
+    def deepcopy(self) -> LineMetric:
+        return self.copy()
 
 
 class FontMetric:
@@ -87,6 +103,12 @@ class FontMetric:
             self.strikeout_thickness * other,
         )
 
+    def __copy__(self) -> FontMetric:
+        return self.copy()
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> FontMetric:
+        return self.deepcopy()
+
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, FontMetric):
             return NotImplemented
@@ -99,3 +121,29 @@ class FontMetric:
                 self.underline_thickness == other.underline_thickness and
                 self.strikeout_position == other.strikeout_position and
                 self.strikeout_thickness == other.strikeout_thickness)
+
+    def copy(self) -> FontMetric:
+        return FontMetric(
+            self.font_size,
+            self.horizontal_layout,
+            self.vertical_layout,
+            self.x_height,
+            self.cap_height,
+            self.underline_position,
+            self.underline_thickness,
+            self.strikeout_position,
+            self.strikeout_thickness,
+        )
+
+    def deepcopy(self) -> FontMetric:
+        return FontMetric(
+            self.font_size,
+            self.horizontal_layout.deepcopy(),
+            self.vertical_layout.deepcopy(),
+            self.x_height,
+            self.cap_height,
+            self.underline_position,
+            self.underline_thickness,
+            self.strikeout_position,
+            self.strikeout_thickness,
+        )

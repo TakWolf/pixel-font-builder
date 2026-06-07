@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 from enum import StrEnum, unique
 from typing import Any
@@ -100,6 +102,12 @@ class MetaInfo:
         self.license_url = license_url
         self.sample_text = sample_text
 
+    def __copy__(self) -> MetaInfo:
+        return self.copy()
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> MetaInfo:
+        return self.deepcopy()
+
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, MetaInfo):
             return NotImplemented
@@ -120,3 +128,27 @@ class MetaInfo:
                 self.designer_url == other.designer_url and
                 self.license_url == other.license_url and
                 self.sample_text == other.sample_text)
+
+    def copy(self) -> MetaInfo:
+        return MetaInfo(
+            self.version,
+            self.created_time,
+            self.modified_time,
+            self.family_name,
+            self.weight_name,
+            self.serif_style,
+            self.slant_style,
+            self.width_style,
+            self.manufacturer,
+            self.designer,
+            self.description,
+            self.copyright_info,
+            self.license_info,
+            self.vendor_url,
+            self.designer_url,
+            self.license_url,
+            self.sample_text,
+        )
+
+    def deepcopy(self) -> MetaInfo:
+        return self.copy()

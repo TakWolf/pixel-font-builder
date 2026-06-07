@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from io import StringIO
 from os import PathLike
+from typing import Any
 
 
 class FeatureFile:
@@ -20,6 +21,27 @@ class FeatureFile:
     ):
         self.text = text
         self.file_path = file_path
+
+    def __copy__(self) -> FeatureFile:
+        return self.copy()
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> FeatureFile:
+        return self.deepcopy()
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, FeatureFile):
+            return NotImplemented
+        return (self.text == other.text and
+                self.file_path == other.file_path)
+
+    def copy(self) -> FeatureFile:
+        return FeatureFile(
+            self.text,
+            self.file_path,
+        )
+
+    def deepcopy(self) -> FeatureFile:
+        return self.copy()
 
 
 def build_kern_feature(glyph_order: list[str], kerning_values: dict[tuple[str, str], int], px_to_units: int) -> str:

@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from collections import UserList
 from os import PathLike
+from typing import Any
 
 import bdffont
 import fontTools.fontBuilder
@@ -31,6 +34,24 @@ class FontBuilder:
         self.opentype_config = opentype.Config()
         self.bdf_config = bdf.Config()
         self.pcf_config = pcf.Config()
+
+    def __copy__(self) -> FontBuilder:
+        return self.copy()
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> FontBuilder:
+        return self.deepcopy()
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, FontBuilder):
+            return NotImplemented
+        return (self.font_metric == other.font_metric and
+                self.meta_info == other.meta_info and
+                self.glyphs == other.glyphs and
+                self.character_mapping == other.character_mapping and
+                self.kerning_values == other.kerning_values and
+                self.opentype_config == other.opentype_config and
+                self.bdf_config == other.bdf_config and
+                self.pcf_config == other.pcf_config)
 
     def prepare_glyphs(self) -> tuple[list[str], dict[str, Glyph]]:
         glyph_order = ['.notdef']
@@ -92,8 +113,43 @@ class FontBuilder:
     def save_pcf(self, file_path: str | PathLike[str]):
         self.to_pcf_builder().save(file_path)
 
+    def copy(self) -> FontBuilder:
+        builder = FontBuilder()
+        builder.font_metric = self.font_metric
+        builder.meta_info = self.meta_info
+        builder.glyphs = self.glyphs
+        builder.character_mapping = self.character_mapping
+        builder.kerning_values = self.kerning_values
+        builder.opentype_config = self.opentype_config
+        builder.bdf_config = self.bdf_config
+        builder.pcf_config = self.pcf_config
+        return builder
+
+    def deepcopy(self) -> FontBuilder:
+        builder = FontBuilder()
+        builder.font_metric = self.font_metric.deepcopy()
+        builder.meta_info = self.meta_info.deepcopy()
+        builder.glyphs = [glyph.deepcopy() for glyph in self.glyphs]
+        builder.character_mapping = self.character_mapping.copy()
+        builder.kerning_values = self.kerning_values.copy()
+        builder.opentype_config = self.opentype_config.deepcopy()
+        builder.bdf_config = self.bdf_config.deepcopy()
+        builder.pcf_config = self.pcf_config.deepcopy()
+        return builder
+
 
 class FontCollectionBuilder(UserList[FontBuilder]):
+    def __copy__(self) -> FontCollectionBuilder:
+        return self.copy()
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> FontCollectionBuilder:
+        return self.deepcopy()
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, FontCollectionBuilder):
+            return NotImplemented
+        return super().__eq__(other)
+
     def to_otc_builder(self) -> fontTools.ttLib.TTCollection:
         return opentype.create_font_collection_builder(self, False)
 
@@ -113,3 +169,9 @@ class FontCollectionBuilder(UserList[FontBuilder]):
             share_tables: bool = True,
     ):
         self.to_ttc_builder().save(file_path, share_tables)
+
+    def copy(self) -> FontCollectionBuilder:
+        return FontCollectionBuilder(self)
+
+    def deepcopy(self) -> FontCollectionBuilder:
+        return FontCollectionBuilder((builder.deepcopy() for builder in self))

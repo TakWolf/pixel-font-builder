@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 
 
@@ -26,6 +28,12 @@ class Glyph:
         self.vertical_offset_x, self.vertical_offset_y = vertical_offset
         self.advance_height = advance_height
         self.bitmap = [] if bitmap is None else bitmap
+
+    def __copy__(self) -> Glyph:
+        return self.copy()
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> Glyph:
+        return self.deepcopy()
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Glyph):
@@ -101,3 +109,23 @@ class Glyph:
                 break
             padding += 1
         return padding
+
+    def copy(self) -> Glyph:
+        return Glyph(
+            self.name,
+            self.horizontal_offset,
+            self.advance_width,
+            self.vertical_offset,
+            self.advance_height,
+            self.bitmap,
+        )
+
+    def deepcopy(self) -> Glyph:
+        return Glyph(
+            self.name,
+            self.horizontal_offset,
+            self.advance_width,
+            self.vertical_offset,
+            self.advance_height,
+            [bitmap_row.copy() for bitmap_row in self.bitmap],
+        )

@@ -1,4 +1,6 @@
-from typing import Final
+from __future__ import annotations
+
+from typing import Any, Final
 
 from pixel_font_builder.opentype.feature import FeatureFile
 from pixel_font_builder.opentype.outline import OutlinesPainter, SolidOutlinesPainter
@@ -24,6 +26,33 @@ class FieldsOverride:
         self.head_x_max = head_x_max
         self.head_y_max = head_y_max
         self.os2_x_avg_char_width = os2_x_avg_char_width
+
+    def __copy__(self) -> FieldsOverride:
+        return self.copy()
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> FieldsOverride:
+        return self.deepcopy()
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, FieldsOverride):
+            return NotImplemented
+        return (self.head_x_min == other.head_x_min and
+                self.head_y_min == other.head_y_min and
+                self.head_x_max == other.head_x_max and
+                self.head_y_max == other.head_y_max and
+                self.os2_x_avg_char_width == other.os2_x_avg_char_width)
+
+    def copy(self) -> FieldsOverride:
+        return FieldsOverride(
+            self.head_x_min,
+            self.head_y_min,
+            self.head_x_max,
+            self.head_y_max,
+            self.os2_x_avg_char_width,
+        )
+
+    def deepcopy(self) -> FieldsOverride:
+        return self.copy()
 
 
 class Config:
@@ -51,3 +80,39 @@ class Config:
         self.is_monospaced = is_monospaced
         self.fields_override = FieldsOverride() if fields_override is None else fields_override
         self.feature_files = [] if feature_files is None else feature_files
+
+    def __copy__(self) -> Config:
+        return self.copy()
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> Config:
+        return self.deepcopy()
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Config):
+            return NotImplemented
+        return (self.px_to_units == other.px_to_units and
+                type(self.outlines_painter) is type(other.outlines_painter) and
+                self.has_vertical_metrics == other.has_vertical_metrics and
+                self.is_monospaced == other.is_monospaced and
+                self.fields_override == other.fields_override and
+                self.feature_files == other.feature_files)
+
+    def copy(self) -> Config:
+        return Config(
+            self.px_to_units,
+            self.outlines_painter,
+            self.has_vertical_metrics,
+            self.is_monospaced,
+            self.fields_override,
+            self.feature_files,
+        )
+
+    def deepcopy(self) -> Config:
+        return Config(
+            self.px_to_units,
+            self.outlines_painter,
+            self.has_vertical_metrics,
+            self.is_monospaced,
+            self.fields_override.deepcopy(),
+            [feature_file.deepcopy() for feature_file in self.feature_files],
+        )
