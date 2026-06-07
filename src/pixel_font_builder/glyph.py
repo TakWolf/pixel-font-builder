@@ -27,7 +27,7 @@ class Glyph:
         self.advance_width = advance_width
         self.vertical_offset_x, self.vertical_offset_y = vertical_offset
         self.advance_height = advance_height
-        self.bitmap = [] if bitmap is None else bitmap
+        self.bitmap = bitmap if bitmap is not None else []
 
     def __copy__(self) -> Glyph:
         return self.copy()

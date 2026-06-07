@@ -75,11 +75,11 @@ class Config:
             feature_files: list[FeatureFile] | None = None,
     ):
         self.px_to_units = px_to_units
-        self.outlines_painter = Config.DEFAULT_OUTLINES_PAINTER if outlines_painter is None else outlines_painter
+        self.outlines_painter = outlines_painter if outlines_painter is not None else Config.DEFAULT_OUTLINES_PAINTER
         self.has_vertical_metrics = has_vertical_metrics
         self.is_monospaced = is_monospaced
-        self.fields_override = FieldsOverride() if fields_override is None else fields_override
-        self.feature_files = [] if feature_files is None else feature_files
+        self.fields_override = fields_override if fields_override is not None else FieldsOverride()
+        self.feature_files = feature_files if feature_files is not None else []
 
     def __copy__(self) -> Config:
         return self.copy()

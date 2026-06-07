@@ -79,8 +79,8 @@ class FontMetric:
             strikeout_thickness: int = 0,
     ):
         self.font_size = font_size
-        self.horizontal_layout = LineMetric() if horizontal_layout is None else horizontal_layout
-        self.vertical_layout = LineMetric() if vertical_layout is None else vertical_layout
+        self.horizontal_layout = horizontal_layout if horizontal_layout is not None else LineMetric()
+        self.vertical_layout = vertical_layout if vertical_layout is not None else LineMetric()
         self.x_height = x_height
         self.cap_height = cap_height
         self.underline_position = underline_position
