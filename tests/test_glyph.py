@@ -1,3 +1,5 @@
+from copy import copy, deepcopy
+
 from pixel_font_builder import Glyph
 
 
@@ -73,3 +75,58 @@ def test_glyph_3():
     assert glyph.calculate_bitmap_right_padding() == 2
     assert glyph.calculate_bitmap_top_padding() == 4
     assert glyph.calculate_bitmap_bottom_padding() == 4
+
+
+def test_copy():
+    glyph_1 = Glyph(
+        name='test',
+        horizontal_offset=(1, 2),
+        advance_width=3,
+        vertical_offset=(4, 5),
+        advance_height=6,
+        bitmap=[[1, 0, 0, 1]],
+    )
+    glyph_2 = copy(glyph_1)
+
+    assert glyph_1 == glyph_2
+    assert glyph_1 is not glyph_2
+    assert glyph_1.bitmap is glyph_2.bitmap
+
+
+def test_deepcopy():
+    glyph_1 = Glyph(
+        name='test',
+        horizontal_offset=(1, 2),
+        advance_width=3,
+        vertical_offset=(4, 5),
+        advance_height=6,
+        bitmap=[[1, 0, 0, 1]],
+    )
+    glyph_2 = deepcopy(glyph_1)
+
+    assert glyph_1 == glyph_2
+    assert glyph_1 is not glyph_2
+    assert glyph_1.bitmap is not glyph_2.bitmap
+
+    for bitmap_row_1, bitmap_row_2 in zip(glyph_1.bitmap, glyph_2.bitmap):
+        assert bitmap_row_1 is not bitmap_row_2
+
+
+def test_eq():
+    glyph_1 = Glyph(
+        name='test',
+        horizontal_offset=(1, 2),
+        advance_width=3,
+        vertical_offset=(4, 5),
+        advance_height=6,
+        bitmap=[[1, 0, 0, 1]],
+    )
+    glyph_2 = Glyph(
+        name='test',
+        horizontal_offset=(1, 2),
+        advance_width=3,
+        vertical_offset=(4, 5),
+        advance_height=6,
+        bitmap=[[1, 0, 0, 1]],
+    )
+    assert glyph_1 == glyph_2
