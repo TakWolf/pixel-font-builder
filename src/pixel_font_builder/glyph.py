@@ -97,7 +97,7 @@ class Glyph:
     def calculate_bitmap_top_padding(self) -> int:
         padding = 0
         for bitmap_row in self.bitmap:
-            if any(color != 0 for color in bitmap_row):
+            if any(pixel != 0 for pixel in bitmap_row):
                 break
             padding += 1
         return padding
@@ -105,7 +105,7 @@ class Glyph:
     def calculate_bitmap_bottom_padding(self) -> int:
         padding = 0
         for bitmap_row in reversed(self.bitmap):
-            if any(color != 0 for color in bitmap_row):
+            if any(pixel != 0 for pixel in bitmap_row):
                 break
             padding += 1
         return padding

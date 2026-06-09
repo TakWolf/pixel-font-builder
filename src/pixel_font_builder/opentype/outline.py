@@ -82,8 +82,8 @@ class SolidOutlinesPainter(OutlinesPainter):
         # 相邻像素分组
         point_groups = []
         for y, bitmap_row in enumerate(bitmap):
-            for x, color in enumerate(bitmap_row):
-                if color == 0:
+            for x, pixel in enumerate(bitmap_row):
+                if pixel == 0:
                     continue
 
                 new_point_group = {(x, y)}
@@ -191,9 +191,9 @@ class SquareDotOutlinesPainter(OutlinesPainter):
         offset = (1 - self.size) / 2 * px_to_units
         for y, bitmap_row in enumerate(glyph.bitmap):
             y = (glyph.height + glyph.horizontal_offset_y - y) * px_to_units - offset
-            for x, color in enumerate(bitmap_row):
+            for x, pixel in enumerate(bitmap_row):
                 x = (x + glyph.horizontal_offset_x) * px_to_units + offset
-                if color != 0:
+                if pixel != 0:
                     pen.move_to((x, y))
                     pen.line_to((x + size, y))
                     pen.line_to((x + size, y - size))
@@ -212,9 +212,9 @@ class CircleDotOutlinesPainter(OutlinesPainter):
         c = radius * 4 / 3 * (math.sqrt(2) - 1)
         for y, bitmap_row in enumerate(glyph.bitmap):
             y = (glyph.height + glyph.horizontal_offset_y - y - 0.5) * px_to_units
-            for x, color in enumerate(bitmap_row):
+            for x, pixel in enumerate(bitmap_row):
                 x = (x + glyph.horizontal_offset_x + 0.5) * px_to_units
-                if color != 0:
+                if pixel != 0:
                     pen.move_to((x, y + radius))
                     pen.cubic_curve_to((x + c, y + radius), (x + radius, y + c), (x + radius, y))
                     pen.cubic_curve_to((x + radius, y - c), (x + c, y - radius), (x, y - radius))
