@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from pcffont import GlyphPad, ScanUnit
+
 
 class Config:
     resolution_x: int
@@ -9,8 +11,8 @@ class Config:
     draw_right_to_left: bool
     ms_byte_first: bool
     ms_bit_first: bool
-    glyph_pad: int
-    scan_unit: int
+    glyph_pad: GlyphPad
+    scan_unit: ScanUnit
 
     def __init__(
             self,
@@ -19,8 +21,8 @@ class Config:
             draw_right_to_left: bool = False,
             ms_byte_first: bool = True,
             ms_bit_first: bool = True,
-            glyph_pad: int = 1,
-            scan_unit: int = 1,
+            glyph_pad: GlyphPad = 1,
+            scan_unit: ScanUnit = 1,
     ):
         self.resolution_x = resolution_x
         self.resolution_y = resolution_y
