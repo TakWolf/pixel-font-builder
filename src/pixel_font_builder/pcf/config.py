@@ -52,8 +52,8 @@ class Config:
     def copy(self) -> Config:
         return Config(
             self.resolution_x,
-            self.resolution_y ,
-            self.draw_right_to_left ,
+            self.resolution_y,
+            self.draw_right_to_left,
             self.ms_byte_first,
             self.ms_bit_first,
             self.glyph_pad,
