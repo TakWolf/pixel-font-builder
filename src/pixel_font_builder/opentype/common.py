@@ -14,6 +14,39 @@ from pixel_font_builder.opentype.outline import create_xtf_glyphs
 
 
 @unique
+class OutlineTableMode(StrEnum):
+    # Generate standard outline data.
+    # - TTF: write glyf/loca tables with full glyph outlines.
+    # - OTF: write normal CFF table data.
+    NORMAL = 'Normal'
+
+    # Do not generate outline tables.
+    OMIT = 'Omit'
+
+    # Generate an outline table shell with zero-length table data.
+    ZERO_LENGTH = 'Zero Length'
+
+    # Generate outline tables for the full glyph order, but make glyph outlines empty.
+    # Intended for fake scalable bitmap fonts where layout metrics still come from sfnt metrics tables.
+    BLANK_GLYPHS = 'Blank Glyphs'
+
+
+@unique
+class BitmapTableMode(StrEnum):
+    # Do not generate embedded bitmap tables.
+    NONE = 'None'
+
+    # Generate standard OpenType embedded bitmap tables.
+    # Typically, EBLC + EBDT.
+    STANDARD = 'Standard'
+
+    # Generate Apple-style embedded bitmap tables.
+    # Uses the same binary structure as EBLC/EBDT, but writes bloc/bdat tags instead.
+    # Also generates a bhed table copied from head.
+    APPLE = 'Apple'
+
+
+@unique
 class Flavor(StrEnum):
     WOFF = 'woff'
     WOFF2 = 'woff2'
