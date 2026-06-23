@@ -81,25 +81,51 @@ class FontBuilder:
 
         return glyph_order, name_to_glyph
 
-    def to_otf_builder(self, flavor: opentype.Flavor | None = None) -> fontTools.fontBuilder.FontBuilder:
-        return opentype.create_font_builder(self, False, flavor)
+    def to_otf_builder(
+            self,
+            outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
+            bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
+            flavor: opentype.Flavor | None = None,
+    ) -> fontTools.fontBuilder.FontBuilder:
+        return opentype.create_font_builder(self, False, outline_table_mode, bitmap_table_mode, flavor)
 
     def save_otf(
             self,
             file_path: str | PathLike[str],
+            outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
+            bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
             flavor: opentype.Flavor | None = None,
     ):
-        self.to_otf_builder(flavor).save(file_path)
+        self.to_otf_builder(outline_table_mode, bitmap_table_mode, flavor).save(file_path)
 
-    def to_ttf_builder(self, flavor: opentype.Flavor | None = None) -> fontTools.fontBuilder.FontBuilder:
-        return opentype.create_font_builder(self, True, flavor)
+    def to_ttf_builder(
+            self,
+            outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
+            bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
+            flavor: opentype.Flavor | None = None,
+    ) -> fontTools.fontBuilder.FontBuilder:
+        return opentype.create_font_builder(self, True, outline_table_mode, bitmap_table_mode, flavor)
 
     def save_ttf(
             self,
             file_path: str | PathLike[str],
+            outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
+            bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
             flavor: opentype.Flavor | None = None,
     ):
-        self.to_ttf_builder(flavor).save(file_path)
+        self.to_ttf_builder(outline_table_mode, bitmap_table_mode, flavor).save(file_path)
+
+    def to_ms_bitmap_ttf_builder(self) -> fontTools.fontBuilder.FontBuilder:
+        return self.to_ttf_builder(opentype.OutlineTableMode.BLANK_GLYPHS, opentype.BitmapTableMode.STANDARD)
+
+    def save_ms_bitmap_ttf(self, file_path: str | PathLike[str]):
+        self.to_ms_bitmap_ttf_builder().save(file_path)
+
+    def to_otb_builder(self) -> fontTools.fontBuilder.FontBuilder:
+        return self.to_ttf_builder(opentype.OutlineTableMode.ZERO_LENGTH, opentype.BitmapTableMode.STANDARD)
+
+    def save_otb(self, file_path: str | PathLike[str]):
+        self.to_otb_builder().save(file_path)
 
     def to_bdf_builder(self) -> bdffont.BdfFont:
         return bdf.create_font_builder(self)
@@ -150,25 +176,37 @@ class FontCollectionBuilder(UserList[FontBuilder]):
             return NotImplemented
         return super().__eq__(other)
 
-    def to_otc_builder(self) -> fontTools.ttLib.TTCollection:
-        return opentype.create_font_collection_builder(self, False)
+    def to_otc_builder(
+            self,
+            outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
+            bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
+    ) -> fontTools.ttLib.TTCollection:
+        return opentype.create_font_collection_builder(self, False, outline_table_mode, bitmap_table_mode)
 
     def save_otc(
             self,
             file_path: str | PathLike[str],
+            outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
+            bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
             share_tables: bool = True,
     ):
-        self.to_otc_builder().save(file_path, share_tables)
+        self.to_otc_builder(outline_table_mode, bitmap_table_mode).save(file_path, share_tables)
 
-    def to_ttc_builder(self) -> fontTools.ttLib.TTCollection:
-        return opentype.create_font_collection_builder(self, True)
+    def to_ttc_builder(
+            self,
+            outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
+            bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
+    ) -> fontTools.ttLib.TTCollection:
+        return opentype.create_font_collection_builder(self, True, outline_table_mode, bitmap_table_mode)
 
     def save_ttc(
             self,
             file_path: str | PathLike[str],
+            outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
+            bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
             share_tables: bool = True,
     ):
-        self.to_ttc_builder().save(file_path, share_tables)
+        self.to_ttc_builder(outline_table_mode, bitmap_table_mode).save(file_path, share_tables)
 
     def copy(self) -> FontCollectionBuilder:
         return FontCollectionBuilder(self)

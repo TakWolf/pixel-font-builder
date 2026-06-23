@@ -118,6 +118,8 @@ def main():
     builder.save_ttf(outputs_dir.joinpath('my-font.ttf'))
     builder.save_ttf(outputs_dir.joinpath('my-font.ttf.woff'), flavor=opentype.Flavor.WOFF)
     builder.save_ttf(outputs_dir.joinpath('my-font.ttf.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_ms_bitmap_ttf(outputs_dir.joinpath('my-font.ms.bitmap.ttf'))
+    builder.save_otb(outputs_dir.joinpath('my-font.otb'))
     builder.save_bdf(outputs_dir.joinpath('my-font.bdf'))
     builder.save_pcf(outputs_dir.joinpath('my-font.pcf'))
 
@@ -164,6 +166,8 @@ Use the same coordinate systems as OpenType.
 | [TrueType](https://learn.microsoft.com/en-us/typography/truetype/) | `.ttf`, `.ttc` |
 | [WOFF File Format 1.0](https://www.w3.org/TR/WOFF/) | `.otf.woff`, `.ttf.woff` |
 | [WOFF File Format 2.0](https://www.w3.org/TR/WOFF2/) | `.otf.woff2`, `.ttf.woff2` |
+| [Microsoft Bitmap Only SFNT](https://fontforge.org/docs/techref/bitmaponlysfnt.html#ms) | `.ms.bitmap.ttf` |
+| [X11 OpenType Bitmap](https://fontforge.org/docs/techref/bitmaponlysfnt.html#x11-unix-linux) | `.otb` |
 | [Glyph Bitmap Distribution Format](https://en.wikipedia.org/wiki/Glyph_Bitmap_Distribution_Format) | `.bdf` |
 | [Portable Compiled Format](https://en.wikipedia.org/wiki/Portable_Compiled_Format) | `.pcf` |
 

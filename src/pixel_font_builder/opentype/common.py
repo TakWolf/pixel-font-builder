@@ -55,6 +55,8 @@ class Flavor(StrEnum):
 def create_font_builder(
         context: pixel_font_builder.FontBuilder,
         is_ttf: bool,
+        outline_table_mode: OutlineTableMode = OutlineTableMode.NORMAL,
+        bitmap_table_mode: BitmapTableMode = BitmapTableMode.NONE,
         flavor: Flavor | None = None,
 ) -> FontBuilder:
     config = context.opentype_config
@@ -167,7 +169,12 @@ def create_font_builder(
 def create_font_collection_builder(
         contexts: pixel_font_builder.FontCollectionBuilder,
         is_ttf: bool,
+        outline_table_mode: OutlineTableMode = OutlineTableMode.NORMAL,
+        bitmap_table_mode: BitmapTableMode = BitmapTableMode.NONE,
 ) -> TTCollection:
     collection_builder = TTCollection()
-    collection_builder.fonts.extend(create_font_builder(context, is_ttf).font for context in contexts)
+    collection_builder.fonts.extend(
+        create_font_builder(context, is_ttf, outline_table_mode, bitmap_table_mode).font
+        for context in contexts
+    )
     return collection_builder
