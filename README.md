@@ -178,6 +178,7 @@ Use the same coordinate systems as OpenType.
 - [Microsoft - OpenType Specification](https://learn.microsoft.com/en-us/typography/opentype/spec/)
 - [FreeType Glyph Conventions - Glyph Metrics](https://freetype.org/freetype2/docs/glyphs/glyphs-3.html)
 - [OpenType Feature File Specification](https://adobe-type-tools.github.io/afdko/OpenTypeFeatureFileSpecification.html)
+- [FontForge - Several formats for bitmap only sfnts](https://fontforge.org/docs/techref/bitmaponlysfnt.html)
 
 ## License
 
