@@ -29,6 +29,40 @@ _OS2_US_WEIGHT_CLASS_VALUES = {
 
 
 @unique
+class OutlineTableMode(StrEnum):
+    # Generate standard outline data.
+    # - TTF flavor: write normal glyf/loca tables with full glyph outlines.
+    # - OTF flavor: write normal CFF table data.
+    NORMAL = 'Normal'
+
+    # Do not generate outline tables.
+    OMIT = 'Omit'
+
+    # Generate an outline table shell with zero-length or minimal table data.
+    ZERO_LENGTH = 'Zero Length'
+
+    # Generate outline tables for the full glyph order, but all glyph outlines are blank.
+    # Metrics and glyph order remain present.
+    BLANK_GLYPHS = 'Blank Glyphs'
+
+
+@unique
+class BitmapTableMode(StrEnum):
+    # Do not generate bitmap tables.
+    NONE = 'None'
+
+    # Generate standard OpenType embedded bitmap tables.
+    # Typically, EBDT + EBLC.
+    STANDARD = 'Standard'
+
+    # Generate Apple-style bitmap tables.
+    # - Use the same binary structure as the standard embedded bitmap tables.
+    #   Write the tables under the Apple tags 'bdat' and 'bloc'.
+    # - Also generate a 'bhed' table whose bytes are identical to 'head'.
+    APPLE = 'Apple'
+
+
+@unique
 class Flavor(StrEnum):
     WOFF = 'woff'
     WOFF2 = 'woff2'
