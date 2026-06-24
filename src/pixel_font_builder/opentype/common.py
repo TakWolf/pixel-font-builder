@@ -6,11 +6,19 @@ from fontTools.fontBuilder import FontBuilder
 from fontTools.misc import timeTools
 from fontTools.misc.arrayTools import intRect
 from fontTools.ttLib import TTCollection
+from fontTools.ttLib.tables.E_B_D_T_ import table_E_B_D_T_
+from fontTools.ttLib.tables.E_B_L_C_ import table_E_B_L_C_
 
 import pixel_font_builder
+from pixel_font_builder.opentype.bitmap import create_bitmap_strike_data
 from pixel_font_builder.opentype.feature import build_kern_feature
 from pixel_font_builder.opentype.name import create_name_strings
-from pixel_font_builder.opentype.outline import create_xtf_glyphs
+from pixel_font_builder.opentype.outline import create_normal_xtf_glyphs, create_blank_xtf_glyphs
+from pixel_font_builder.opentype.patch.O_S_2f_2 import table_O_S_2f_2_apple
+from pixel_font_builder.opentype.patch._b_d_a_t import table__b_d_a_t
+from pixel_font_builder.opentype.patch._b_h_e_d import table__b_h_e_d
+from pixel_font_builder.opentype.patch._b_l_o_c import table__b_l_o_c
+from pixel_font_builder.opentype.patch._g_l_y_f import table__g_l_y_f_zero_length
 
 
 @unique
@@ -71,7 +79,10 @@ def create_font_builder(
     name_strings = create_name_strings(meta_info)
     builder.setupNameTable(name_strings)
 
-    xtf_glyphs, horizontal_metrics, vertical_metrics = create_xtf_glyphs(is_ttf, config.outlines_painter, name_to_glyph, config.px_to_units)
+    if outline_table_mode == OutlineTableMode.NORMAL:
+        xtf_glyphs, horizontal_metrics, vertical_metrics = create_normal_xtf_glyphs(is_ttf, config.outlines_painter, name_to_glyph, config.px_to_units)
+    else:
+        xtf_glyphs, horizontal_metrics, vertical_metrics = create_blank_xtf_glyphs(is_ttf, name_to_glyph, config.px_to_units)
     builder.setupGlyphOrder(glyph_order)
     if is_ttf:
         builder.setupGlyf(xtf_glyphs)
@@ -80,6 +91,24 @@ def create_font_builder(
     builder.setupHorizontalMetrics(horizontal_metrics)
     if config.has_vertical_metrics:
         builder.setupVerticalMetrics(vertical_metrics)
+
+    if bitmap_table_mode in (BitmapTableMode.STANDARD, BitmapTableMode.APPLE):
+        strike, strike_data = create_bitmap_strike_data(context.font_metric, config.has_vertical_metrics, glyph_order, name_to_glyph)
+
+        if bitmap_table_mode == BitmapTableMode.STANDARD:
+            tb_eblc = table_E_B_L_C_()
+            tb_ebdt = table_E_B_D_T_()
+        else:
+            tb_eblc = table__b_l_o_c()
+            tb_ebdt = table__b_d_a_t()
+
+        tb_eblc.version = 2.0
+        tb_eblc.strikes = [strike]
+        builder.font[tb_eblc.tableTag] = tb_eblc
+
+        tb_ebdt.version = 2.0
+        tb_ebdt.strikeData = [strike_data]
+        builder.font[tb_ebdt.tableTag] = tb_ebdt
 
     builder.setupCharacterMap(character_mapping)
 
@@ -116,7 +145,6 @@ def create_font_builder(
 
     tb_head = builder.font['head']
     tb_os2 = builder.font['OS/2']
-    tb_post = builder.font['post']
 
     if meta_info.created_time is not None:
         tb_head.created = timeTools.timestampSinceEpoch(meta_info.created_time.timestamp())
@@ -125,7 +153,9 @@ def create_font_builder(
 
     builder.font.recalcBBoxes = False
     if is_ttf:
-        builder.font['maxp'].recalc(builder.font)
+        tb_maxp = builder.font['maxp']
+        tb_maxp.recalc(builder.font)
+        tb_maxp.numGlyphs = len(glyph_order)
     else:
         cff = builder.font["CFF "].cff
         for top_dict in cff.topDictIndex:
@@ -138,7 +168,7 @@ def create_font_builder(
     if config.is_monospaced:
         if is_ttf:
             tb_os2.panose.bProportion = 9
-        tb_post.isFixedPitch = 1
+        builder.font['post'].isFixedPitch = 1
 
     if config.fields_override.head_x_min is not None:
         tb_head.xMin = config.fields_override.head_x_min * config.px_to_units
@@ -154,7 +184,40 @@ def create_font_builder(
     else:
         tb_os2.xAvgCharWidth = config.fields_override.os2_x_avg_char_width * config.px_to_units
 
-    if len(kerning_values) > 0:
+    match outline_table_mode:
+        case OutlineTableMode.OMIT:
+            if is_ttf:
+                del builder.font['glyf']
+                del builder.font['loca']
+            else:
+                del builder.font['CFF ']
+        case OutlineTableMode.ZERO_LENGTH:
+            if is_ttf:
+                builder.font['glyf'] = table__g_l_y_f_zero_length()
+            else:
+                glyph_order_backup = builder.font.glyphOrder.copy()
+                builder.font.glyphOrder.clear()
+                builder.setupCFF('', {}, {}, {})
+                builder.font.glyphOrder = glyph_order_backup
+
+    if outline_table_mode in (OutlineTableMode.OMIT, OutlineTableMode.ZERO_LENGTH):
+        del builder.font['hmtx']
+        del builder.font['hhea']
+        if config.has_vertical_metrics:
+            del builder.font['vmtx']
+            del builder.font['vhea']
+
+    if bitmap_table_mode == BitmapTableMode.APPLE:
+        tb_bhed = table__b_h_e_d.replace(tb_head)
+        builder.font[tb_bhed.tableTag] = tb_bhed
+
+        if outline_table_mode == OutlineTableMode.OMIT:
+            tb_os2 = table_O_S_2f_2_apple.replace(tb_os2)
+            builder.font[tb_os2.tableTag] = tb_os2
+
+            del builder.font[tb_head.tableTag]
+
+    if outline_table_mode == OutlineTableMode.NORMAL and len(kerning_values) > 0:
         builder.addOpenTypeFeatures(build_kern_feature(glyph_order, kerning_values, config.px_to_units))
 
     for feature_file in config.feature_files:
