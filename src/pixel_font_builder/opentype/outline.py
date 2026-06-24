@@ -6,7 +6,6 @@ from fontTools import cu2qu
 from fontTools.misc.psCharStrings import T2CharString as OtfGlyph
 from fontTools.pens.t2CharStringPen import T2CharStringPen as OtfGlyphPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen as TtfGlyphPen
-# noinspection PyProtectedMember
 from fontTools.ttLib.tables._g_l_y_f import Glyph as TtfGlyph
 
 from pixel_font_builder.glyph import Glyph
