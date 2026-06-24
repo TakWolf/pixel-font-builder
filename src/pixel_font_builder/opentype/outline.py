@@ -11,8 +11,6 @@ from fontTools.ttLib.tables._g_l_y_f import Glyph as TtfGlyph
 
 from pixel_font_builder.glyph import Glyph
 
-type XtfGlyph = OtfGlyph | TtfGlyph
-
 
 class OutlinesPen:
     is_ttf: bool
@@ -65,7 +63,7 @@ class OutlinesPen:
         self.pen.closePath()
         self.current_point = None
 
-    def to_glyph(self) -> XtfGlyph:
+    def to_glyph(self) -> OtfGlyph | TtfGlyph:
         return self.pen.glyph() if self.is_ttf else self.pen.getCharString()
 
 
@@ -228,7 +226,7 @@ def create_xtf_glyphs(
         outlines_painter: OutlinesPainter,
         name_to_glyph: dict[str, Glyph],
         px_to_units: int,
-) -> tuple[dict[str, XtfGlyph], dict[str, tuple[int, int]], dict[str, tuple[int, int]]]:
+) -> tuple[dict[str, OtfGlyph | TtfGlyph], dict[str, tuple[int, int]], dict[str, tuple[int, int]]]:
     xtf_glyphs = {}
     horizontal_metrics = {}
     vertical_metrics = {}
