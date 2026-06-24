@@ -220,7 +220,7 @@ class CircleDotOutlinesPainter(OutlinesPainter):
                     pen.close_path()
 
 
-def create_xtf_glyphs(
+def create_normal_xtf_glyphs(
         is_ttf: bool,
         outlines_painter: OutlinesPainter,
         name_to_glyph: dict[str, Glyph],
@@ -240,5 +240,25 @@ def create_xtf_glyphs(
 
         pen = OutlinesPen(is_ttf, advance_width)
         outlines_painter.draw_outlines(glyph, pen, px_to_units)
+        xtf_glyphs[glyph_name] = pen.to_glyph()
+    return xtf_glyphs, horizontal_metrics, vertical_metrics
+
+
+def create_blank_xtf_glyphs(
+        is_ttf: bool,
+        outlines_painter: OutlinesPainter,
+        name_to_glyph: dict[str, Glyph],
+        px_to_units: int,
+) -> tuple[dict[str, OtfGlyph | TtfGlyph], dict[str, tuple[int, int]], dict[str, tuple[int, int]]]:
+    blank_glyph = Glyph(name='_')
+    pen = OutlinesPen(is_ttf, 0)
+    outlines_painter.draw_outlines(blank_glyph, pen, px_to_units)
+
+    xtf_glyphs = {}
+    horizontal_metrics = {}
+    vertical_metrics = {}
+    for glyph_name, glyph in name_to_glyph.items():
+        horizontal_metrics[glyph_name] = 0, 0
+        vertical_metrics[glyph_name] = 0, 0
         xtf_glyphs[glyph_name] = pen.to_glyph()
     return xtf_glyphs, horizontal_metrics, vertical_metrics
