@@ -49,7 +49,7 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuild
     if meta_info.manufacturer is not None:
         builder.properties.foundry = meta_info.manufacturer.replace('-', '_')
     builder.properties.family_name = meta_info.family_name.replace('-', '_')
-    builder.properties.weight_name = meta_info.weight_name or WeightName.REGULAR
+    builder.properties.weight_name = (meta_info.weight_name or WeightName.REGULAR).value
     match meta_info.slant_style:
         case None | SlantStyle.NORMAL | SlantStyle.ROMAN:
             builder.properties.slant = 'R'
@@ -65,7 +65,7 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuild
             builder.properties.slant = 'OT'
     builder.properties.setwidth_name = 'Normal'
     if meta_info.serif_style is not None:
-        builder.properties.add_style_name = meta_info.serif_style
+        builder.properties.add_style_name = meta_info.serif_style.value
     builder.properties.pixel_size = font_metric.font_size
     builder.properties.point_size = font_metric.font_size * 10
     builder.properties.resolution_x = config.resolution_x

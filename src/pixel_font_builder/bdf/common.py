@@ -45,7 +45,7 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
     if meta_info.manufacturer is not None:
         font.properties.foundry = meta_info.manufacturer.replace('-', '_')
     font.properties.family_name = meta_info.family_name.replace('-', '_')
-    font.properties.weight_name = meta_info.weight_name or WeightName.REGULAR
+    font.properties.weight_name = (meta_info.weight_name or WeightName.REGULAR).value
     match meta_info.slant_style:
         case None | SlantStyle.NORMAL | SlantStyle.ROMAN:
             font.properties.slant = 'R'
@@ -61,7 +61,7 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
             font.properties.slant = 'OT'
     font.properties.setwidth_name = 'Normal'
     if meta_info.serif_style is not None:
-        font.properties.add_style_name = meta_info.serif_style
+        font.properties.add_style_name = meta_info.serif_style.value
     font.properties.pixel_size = font_metric.font_size
     font.properties.point_size = font_metric.font_size * 10
     font.properties.resolution_x = config.resolution_x

@@ -31,7 +31,7 @@ def create_name_strings(meta_info: MetaInfo) -> dict[str, str]:
     variationsPostScriptNamePrefix (nameID 25)
     """
     unique_name = meta_info.family_name.replace(' ', '-')
-    style_name = meta_info.weight_name or WeightName.REGULAR
+    style_name = (meta_info.weight_name or WeightName.REGULAR).value
     name_strings = {
         'familyName': meta_info.family_name,
         'styleName': style_name,
