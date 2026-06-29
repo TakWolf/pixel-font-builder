@@ -64,6 +64,7 @@ def test_copy():
     assert builder_1.character_mapping is builder_2.character_mapping
     assert builder_1.kerning_values is builder_2.kerning_values
     assert builder_1.opentype_config is builder_2.opentype_config
+    assert builder_1.dfont_config is builder_2.dfont_config
     assert builder_1.bdf_config is builder_2.bdf_config
     assert builder_1.pcf_config is builder_2.pcf_config
 
@@ -95,6 +96,7 @@ def test_deepcopy():
     assert builder_1.character_mapping is not builder_2.character_mapping
     assert builder_1.kerning_values is not builder_2.kerning_values
     assert builder_1.opentype_config is not builder_2.opentype_config
+    assert builder_1.dfont_config is not builder_2.dfont_config
     assert builder_1.bdf_config is not builder_2.bdf_config
     assert builder_1.pcf_config is not builder_2.pcf_config
 

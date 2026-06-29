@@ -9,7 +9,7 @@ import fontTools.fontBuilder
 import fontTools.ttLib
 import pcffont
 
-from pixel_font_builder import opentype, bdf, pcf
+from pixel_font_builder import opentype, dfont, bdf, pcf
 from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.meta import MetaInfo
 from pixel_font_builder.metric import FontMetric
@@ -22,6 +22,7 @@ class FontBuilder:
     character_mapping: dict[int, str]
     kerning_values: dict[tuple[str, str], int]
     opentype_config: opentype.Config
+    dfont_config: dfont.Config
     bdf_config: bdf.Config
     pcf_config: pcf.Config
 
@@ -32,6 +33,7 @@ class FontBuilder:
         self.character_mapping = {}
         self.kerning_values = {}
         self.opentype_config = opentype.Config()
+        self.dfont_config = dfont.Config()
         self.bdf_config = bdf.Config()
         self.pcf_config = pcf.Config()
 
@@ -50,6 +52,7 @@ class FontBuilder:
                 self.character_mapping == other.character_mapping and
                 self.kerning_values == other.kerning_values and
                 self.opentype_config == other.opentype_config and
+                self.dfont_config == other.dfont_config and
                 self.bdf_config == other.bdf_config and
                 self.pcf_config == other.pcf_config)
 
@@ -127,6 +130,12 @@ class FontBuilder:
     def save_otb(self, file_path: str | PathLike[str]):
         self.to_otb_builder().save(file_path)
 
+    def to_dfont_builder(self) -> dfont.DFontBuilder:
+        return dfont.create_font_builder(self)
+    
+    def save_dfont(self, file_path: str | PathLike[str]):
+        self.to_dfont_builder().save(file_path)
+
     def to_bdf_builder(self) -> bdffont.BdfFont:
         return bdf.create_font_builder(self)
 
@@ -147,6 +156,7 @@ class FontBuilder:
         builder.character_mapping = self.character_mapping
         builder.kerning_values = self.kerning_values
         builder.opentype_config = self.opentype_config
+        builder.dfont_config = self.dfont_config
         builder.bdf_config = self.bdf_config
         builder.pcf_config = self.pcf_config
         return builder
@@ -159,6 +169,7 @@ class FontBuilder:
         builder.character_mapping = self.character_mapping.copy()
         builder.kerning_values = self.kerning_values.copy()
         builder.opentype_config = self.opentype_config.deepcopy()
+        builder.dfont_config = self.dfont_config.deepcopy()
         builder.bdf_config = self.bdf_config.deepcopy()
         builder.pcf_config = self.pcf_config.deepcopy()
         return builder

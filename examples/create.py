@@ -104,6 +104,7 @@ def main():
     builder.save_ttf(outputs_dir.joinpath('my-font.ttf.woff2'), flavor=opentype.Flavor.WOFF2)
     builder.save_ms_bitmap_ttf(outputs_dir.joinpath('my-font.ms.bitmap.ttf'))
     builder.save_otb(outputs_dir.joinpath('my-font.otb'))
+    builder.save_dfont(outputs_dir.joinpath('my-font.dfont'))
     builder.save_bdf(outputs_dir.joinpath('my-font.bdf'))
     builder.save_pcf(outputs_dir.joinpath('my-font.pcf'))
 
