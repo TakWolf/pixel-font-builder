@@ -10,14 +10,62 @@ class WeightName(StrEnum):
     THIN = 'Thin'                # 100
     EXTRA_LIGHT = 'Extra Light'  # 200
     LIGHT = 'Light'              # 300
-    NORMAL = 'Normal'            # 400
-    REGULAR = 'Regular'          # Same as 'Normal'
+    REGULAR = 'Regular'          # 400
+    NORMAL = 'Normal'            # Same as 'Regular'
     MEDIUM = 'Medium'            # 500
     SEMI_BOLD = 'Semi Bold'      # 600
     BOLD = 'Bold'                # 700
     EXTRA_BOLD = 'Extra Bold'    # 800
     BLACK = 'Black'              # 900
     HEAVY = 'Heavy'              # Same as 'Black'
+
+    @staticmethod
+    def from_number(number: int) -> WeightName:
+        match number:
+            case 100:
+                return WeightName.THIN
+            case 200:
+                return WeightName.EXTRA_LIGHT
+            case 300:
+                return WeightName.LIGHT
+            case 400:
+                return WeightName.REGULAR
+            case 500:
+                return WeightName.MEDIUM
+            case 600:
+                return WeightName.SEMI_BOLD
+            case 700:
+                return WeightName.BOLD
+            case 800:
+                return WeightName.EXTRA_BOLD
+            case 900:
+                return WeightName.BLACK
+            case _:
+                raise ValueError(f'unsupported weight number: {number}')
+
+    @property
+    def number(self) -> int:
+        match self:
+            case WeightName.THIN:
+                return 100
+            case WeightName.EXTRA_LIGHT:
+                return 200
+            case WeightName.LIGHT:
+                return 300
+            case WeightName.REGULAR | WeightName.NORMAL:
+                return 400
+            case WeightName.MEDIUM:
+                return 500
+            case WeightName.SEMI_BOLD:
+                return 600
+            case WeightName.BOLD:
+                return 700
+            case WeightName.EXTRA_BOLD:
+                return 800
+            case WeightName.BLACK | WeightName.HEAVY:
+                return 900
+            case _:
+                raise AssertionError()
 
 
 @unique

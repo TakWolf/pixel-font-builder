@@ -8,24 +8,9 @@ from fontTools.misc.arrayTools import intRect
 from fontTools.ttLib import TTCollection
 
 import pixel_font_builder
-from pixel_font_builder.meta import WeightName
 from pixel_font_builder.opentype.feature import build_kern_feature
 from pixel_font_builder.opentype.name import create_name_strings
 from pixel_font_builder.opentype.outline import create_xtf_glyphs
-
-_OS2_US_WEIGHT_CLASS_VALUES = {
-    WeightName.THIN: 100,
-    WeightName.EXTRA_LIGHT: 200,
-    WeightName.LIGHT: 300,
-    WeightName.NORMAL: 400,
-    WeightName.REGULAR: 400,
-    WeightName.MEDIUM: 500,
-    WeightName.SEMI_BOLD: 600,
-    WeightName.BOLD: 700,
-    WeightName.EXTRA_BOLD: 800,
-    WeightName.BLACK: 900,
-    WeightName.HEAVY: 900,
-}
 
 
 @unique
@@ -76,7 +61,7 @@ def create_font_builder(
         )
     builder.setupOS2(
         xAvgCharWidth=0,
-        usWeightClass=_OS2_US_WEIGHT_CLASS_VALUES.get(meta_info.weight_name, 400),
+        usWeightClass=meta_info.weight_name.number if meta_info.weight_name is not None else 400,
         sTypoAscender=font_metric.horizontal_layout.ascent,
         sTypoDescender=font_metric.horizontal_layout.descent,
         sTypoLineGap=font_metric.horizontal_layout.line_gap,
