@@ -224,7 +224,7 @@ def create_font_builder(
         builder.addOpenTypeFeatures(feature_file.text, feature_file.file_path)
 
     if flavor is not None:
-        builder.font.flavor = flavor
+        builder.font.flavor = flavor.value
 
     return builder
 
