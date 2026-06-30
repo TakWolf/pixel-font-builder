@@ -41,3 +41,8 @@ Issues = "https://github.com/TakWolf/pixel-font-builder/issues"
 [build-system]
 requires = ["uv_build"]
 build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
