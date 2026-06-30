@@ -57,7 +57,6 @@ def test_deepcopy():
 
     assert config_1 == config_2
     assert config_1 is not config_2
-    assert config_1.outlines_painter is config_2.outlines_painter
     assert config_1.fields_override is not config_2.fields_override
     assert config_1.feature_files is not config_2.feature_files
 

@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import math
 from abc import abstractmethod
-from typing import Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 from fontTools import cu2qu
 from fontTools.misc.psCharStrings import T2CharString as OtfGlyph
@@ -68,12 +70,35 @@ class OutlinesPen:
 
 @runtime_checkable
 class OutlinesPainter(Protocol):
+    def __copy__(self) -> OutlinesPainter:
+        return self.copy()
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> OutlinesPainter:
+        return self.deepcopy()
+
+    @abstractmethod
+    def __eq__(self, other: Any) -> bool:
+        raise NotImplementedError()
+
     @abstractmethod
     def draw_outlines(self, glyph: Glyph, pen: OutlinesPen, px_to_units: int):
         raise NotImplementedError()
 
+    @abstractmethod
+    def copy(self) -> OutlinesPainter:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def deepcopy(self) -> OutlinesPainter:
+        raise NotImplementedError()
+
 
 class SolidOutlinesPainter(OutlinesPainter):
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, SolidOutlinesPainter):
+            return NotImplemented
+        return True
+
     @staticmethod
     def _create_outlines(bitmap: list[list[int]]) -> list[list[tuple[int, int]]]:
         # 相邻像素分组
@@ -176,12 +201,23 @@ class SolidOutlinesPainter(OutlinesPainter):
                     pen.line_to((x, y))
             pen.close_path()
 
+    def copy(self) -> SolidOutlinesPainter:
+        return self
+
+    def deepcopy(self) -> SolidOutlinesPainter:
+        return self.copy()
+
 
 class SquareDotOutlinesPainter(OutlinesPainter):
     size: float
 
     def __init__(self, size: float = 0.8):
         self.size = size
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, SquareDotOutlinesPainter):
+            return NotImplemented
+        return self.size == other.size
 
     def draw_outlines(self, glyph: Glyph, pen: OutlinesPen, px_to_units: int):
         size = self.size * px_to_units
@@ -197,12 +233,23 @@ class SquareDotOutlinesPainter(OutlinesPainter):
                     pen.line_to((x, y - size))
                     pen.close_path()
 
+    def copy(self) -> SquareDotOutlinesPainter:
+        return SquareDotOutlinesPainter(self.size)
+
+    def deepcopy(self) -> SquareDotOutlinesPainter:
+        return self.copy()
+
 
 class CircleDotOutlinesPainter(OutlinesPainter):
     radius: float
 
     def __init__(self, radius: float = 0.4):
         self.radius = radius
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, CircleDotOutlinesPainter):
+            return NotImplemented
+        return self.radius == other.radius
 
     def draw_outlines(self, glyph: Glyph, pen: OutlinesPen, px_to_units: int):
         radius = self.radius * px_to_units
@@ -218,6 +265,12 @@ class CircleDotOutlinesPainter(OutlinesPainter):
                     pen.cubic_curve_to((x - c, y - radius), (x - radius, y - c), (x - radius, y))
                     pen.cubic_curve_to((x - radius, y + c), (x - c, y + radius), (x, y + radius))
                     pen.close_path()
+
+    def copy(self) -> CircleDotOutlinesPainter:
+        return CircleDotOutlinesPainter(self.radius)
+
+    def deepcopy(self) -> CircleDotOutlinesPainter:
+        return self.copy()
 
 
 def create_normal_xtf_glyphs(

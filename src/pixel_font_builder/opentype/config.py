@@ -91,7 +91,7 @@ class Config:
         if not isinstance(other, Config):
             return NotImplemented
         return (self.px_to_units == other.px_to_units and
-                type(self.outlines_painter) is type(other.outlines_painter) and
+                self.outlines_painter == other.outlines_painter and
                 self.has_vertical_metrics == other.has_vertical_metrics and
                 self.is_monospaced == other.is_monospaced and
                 self.fields_override == other.fields_override and
@@ -110,7 +110,7 @@ class Config:
     def deepcopy(self) -> Config:
         return Config(
             self.px_to_units,
-            self.outlines_painter,
+            self.outlines_painter.deepcopy(),
             self.has_vertical_metrics,
             self.is_monospaced,
             self.fields_override.deepcopy(),
