@@ -1,6 +1,6 @@
 [project]
 name = "pixel-font-builder"
-version = "0.0.52"
+version = "0.0.53"
 description = "A library that helps create pixel style fonts"
 readme = "README.md"
 license = "MIT"
