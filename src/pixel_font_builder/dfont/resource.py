@@ -177,11 +177,12 @@ class Resource:
             resource_map.extend(struct.pack('>HH', len(type_resources) - 1, reference_list_offsets[resource_type]))
 
         for resource_type in resource_types:
-            for index, resource in ((index, resource) for index, resource in enumerate(resources) if resource.type == resource_type):
-                name_offset = name_offsets.get(id(resource), -1)
-                resource_map.extend(struct.pack('>hhB', resource.id, name_offset, resource.attributes))
-                resource_map.extend(_pack_uint24(resource_offsets[index]))
-                resource_map.extend(b'\x00' * 4)
+            for index, resource in enumerate(resources):
+                if resource.type == resource_type:
+                    name_offset = name_offsets.get(id(resource), -1)
+                    resource_map.extend(struct.pack('>hhB', resource.id, name_offset, resource.attributes))
+                    resource_map.extend(_pack_uint24(resource_offsets[index]))
+                    resource_map.extend(b'\x00' * 4)
 
         resource_map.extend(name_data)
         map_length = len(resource_map)
