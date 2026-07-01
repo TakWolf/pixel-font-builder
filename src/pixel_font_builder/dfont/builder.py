@@ -43,9 +43,12 @@ class DFontBuilder:
 
     def build_resources(self) -> list[Resource]:
         if 'name' in self.font:
-            family_name = self.font['name'].getBestFamilyName()
+            tb_name = self.font['name']
+            family_name = tb_name.getBestFamilyName()
+            postscript_name = tb_name.getDebugName(6)
         else:
             family_name = None
+            postscript_name = None
 
         resources = [
             Resource.create_sfnt(self.sfnt_resource_id, self.font, family_name),
@@ -70,6 +73,7 @@ class DFontBuilder:
             self.width_max,
             self.is_monospaced,
             family_name,
+            postscript_name,
         ))
 
         return resources

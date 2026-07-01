@@ -70,6 +70,7 @@ class Resource:
             width_max: int,
             is_monospaced: bool,
             family_name: str | None,
+            postscript_name: str | None,
     ) -> Resource:
         line_height = max(ascent - descent, 1)
         font_size = font_size if 0 < font_size < 256 else 0
@@ -117,7 +118,7 @@ class Resource:
         data.extend(struct.pack('>HLL', 0x0005, 0, 0))
         data.extend(bytes([1]) * 48)
         data.extend(struct.pack('>H', 1))
-        data.extend(_encode_pascal_string(family_name))
+        data.extend(_encode_pascal_string(postscript_name))
 
         data[offsets_start:offsets_start + 12] = struct.pack('>LLL', width_offset, 0, style_offset)
 
