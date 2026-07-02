@@ -153,9 +153,7 @@ def create_font_builder(
 
     builder.font.recalcBBoxes = False
     if is_ttf:
-        tb_maxp = builder.font['maxp']
-        tb_maxp.recalc(builder.font)
-        tb_maxp.numGlyphs = len(glyph_order)
+        builder.font['maxp'].recalc(builder.font)
     else:
         cff = builder.font["CFF "].cff
         for top_dict in cff.topDictIndex:
