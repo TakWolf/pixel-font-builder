@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import Any, Final
 
 from pixel_font_builder.opentype.feature import FeatureFile
-from pixel_font_builder.opentype.outline import OutlinesPainter, SolidOutlinesPainter
+from pixel_font_builder.opentype.outline.painter.base import OutlinesPainter
+from pixel_font_builder.opentype.outline.painter.solid import SolidOutlinesPainter
 
 
 class FieldsOverride:

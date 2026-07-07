@@ -13,7 +13,7 @@ import pixel_font_builder
 from pixel_font_builder.opentype.bitmap import create_bitmap_strike_data
 from pixel_font_builder.opentype.feature import build_kern_feature
 from pixel_font_builder.opentype.name import create_name_strings
-from pixel_font_builder.opentype.outline import create_normal_xtf_glyphs, create_blank_xtf_glyphs
+from pixel_font_builder.opentype.outline.common import create_normal_xtf_glyphs, create_blank_xtf_glyphs
 from pixel_font_builder.opentype.patch.O_S_2f_2 import table_O_S_2f_2_apple
 from pixel_font_builder.opentype.patch._b_d_a_t import table__b_d_a_t
 from pixel_font_builder.opentype.patch._b_h_e_d import table__b_h_e_d
