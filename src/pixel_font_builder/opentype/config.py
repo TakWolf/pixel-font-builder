@@ -33,7 +33,7 @@ class FieldsOverride:
     def __deepcopy__(self, memo: dict[int, Any]) -> FieldsOverride:
         return self.deepcopy()
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, FieldsOverride):
             return NotImplemented
         return (self.head_x_min == other.head_x_min and
@@ -87,7 +87,7 @@ class Config:
     def __deepcopy__(self, memo: dict[int, Any]) -> Config:
         return self.deepcopy()
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Config):
             return NotImplemented
         return (self.px_to_units == other.px_to_units and

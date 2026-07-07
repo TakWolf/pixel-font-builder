@@ -43,7 +43,7 @@ class FontBuilder:
     def __deepcopy__(self, memo: dict[int, Any]) -> FontBuilder:
         return self.deepcopy()
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, FontBuilder):
             return NotImplemented
         return (self.font_metric == other.font_metric and
@@ -182,7 +182,7 @@ class FontCollectionBuilder(UserList[FontBuilder]):
     def __deepcopy__(self, memo: dict[int, Any]) -> FontCollectionBuilder:
         return self.deepcopy()
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, FontCollectionBuilder):
             return NotImplemented
         return super().__eq__(other)

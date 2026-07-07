@@ -35,7 +35,7 @@ class Glyph:
     def __deepcopy__(self, memo: dict[int, Any]) -> Glyph:
         return self.deepcopy()
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Glyph):
             return NotImplemented
         return (self.name == other.name and

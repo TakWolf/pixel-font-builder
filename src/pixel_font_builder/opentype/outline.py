@@ -77,7 +77,7 @@ class OutlinesPainter(Protocol):
         return self.deepcopy()
 
     @abstractmethod
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         raise NotImplementedError()
 
     @abstractmethod
@@ -94,7 +94,7 @@ class OutlinesPainter(Protocol):
 
 
 class SolidOutlinesPainter(OutlinesPainter):
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, SolidOutlinesPainter):
             return NotImplemented
         return True
@@ -214,7 +214,7 @@ class SquareDotOutlinesPainter(OutlinesPainter):
     def __init__(self, size: float = 0.8):
         self.size = size
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, SquareDotOutlinesPainter):
             return NotImplemented
         return self.size == other.size
@@ -246,7 +246,7 @@ class CircleDotOutlinesPainter(OutlinesPainter):
     def __init__(self, radius: float = 0.4):
         self.radius = radius
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, CircleDotOutlinesPainter):
             return NotImplemented
         return self.radius == other.radius

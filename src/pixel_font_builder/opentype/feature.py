@@ -28,7 +28,7 @@ class FeatureFile:
     def __deepcopy__(self, memo: dict[int, Any]) -> FeatureFile:
         return self.deepcopy()
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, FeatureFile):
             return NotImplemented
         return (self.text == other.text and

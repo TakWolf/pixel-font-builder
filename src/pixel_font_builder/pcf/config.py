@@ -38,7 +38,7 @@ class Config:
     def __deepcopy__(self, memo: dict[int, Any]) -> Config:
         return self.deepcopy()
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Config):
             return NotImplemented
         return (self.resolution_x == other.resolution_x and

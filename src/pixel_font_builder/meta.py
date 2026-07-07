@@ -156,7 +156,7 @@ class MetaInfo:
     def __deepcopy__(self, memo: dict[int, Any]) -> MetaInfo:
         return self.deepcopy()
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, MetaInfo):
             return NotImplemented
         return (self.version == other.version and

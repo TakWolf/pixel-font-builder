@@ -33,7 +33,7 @@ class LineMetric:
     def __deepcopy__(self, memo: dict[int, Any]) -> LineMetric:
         return self.deepcopy()
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, LineMetric):
             return NotImplemented
         return (self.ascent == other.ascent and
@@ -109,7 +109,7 @@ class FontMetric:
     def __deepcopy__(self, memo: dict[int, Any]) -> FontMetric:
         return self.deepcopy()
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, FontMetric):
             return NotImplemented
         return (self.font_size == other.font_size and
