@@ -280,7 +280,7 @@ wheels = [
 
 [[package]]
 name = "pixel-font-builder"
-version = "0.0.53"
+version = "0.0.54"
 source = { editable = "." }
 dependencies = [
     { name = "bdffont" },
