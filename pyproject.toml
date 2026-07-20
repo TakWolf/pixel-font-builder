@@ -24,8 +24,8 @@ classifiers = [
 
 dependencies = [
     "fonttools[woff]>=4.63.0",
-    "bdffont>=0.0.40",
-    "pcffont>=0.0.32",
+    "bdffont>=0.0.41",
+    "pcffont>=0.0.33",
 ]
 
 [dependency-groups]
