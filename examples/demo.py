@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 
 from examples import glyphs_dir, build_dir
-from pixel_font_builder import FontBuilder, FontCollectionBuilder, WeightName, SerifStyle, SlantStyle, WidthStyle, Glyph, opentype
+from pixel_font_builder import FontBuilder, FontCollectionBuilder, WeightName, SerifStyle, SlantStyle, WidthStyle, Glyph
 
 
 def _load_bitmap(file_path: Path) -> tuple[list[list[int]], int, int]:
@@ -148,11 +148,11 @@ def main():
 
     builder = _create_builder(glyph_files, character_mapping, kerning_values)
     builder.save_otf(outputs_dir.joinpath('demo.otf'))
-    builder.save_otf(outputs_dir.joinpath('demo.otf.woff'), flavor=opentype.Flavor.WOFF)
-    builder.save_otf(outputs_dir.joinpath('demo.otf.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_otf_woff(outputs_dir.joinpath('demo.otf.woff'))
+    builder.save_otf_woff2(outputs_dir.joinpath('demo.otf.woff2'))
     builder.save_ttf(outputs_dir.joinpath('demo.ttf'))
-    builder.save_ttf(outputs_dir.joinpath('demo.ttf.woff'), flavor=opentype.Flavor.WOFF)
-    builder.save_ttf(outputs_dir.joinpath('demo.ttf.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_ttf_woff(outputs_dir.joinpath('demo.ttf.woff'))
+    builder.save_ttf_woff2(outputs_dir.joinpath('demo.ttf.woff2'))
     builder.save_ms_bitmap_ttf(outputs_dir.joinpath('demo.ms.bitmap.ttf'))
     builder.save_otb(outputs_dir.joinpath('demo.otb'))
     builder.save_dfont(outputs_dir.joinpath('demo.dfont'))

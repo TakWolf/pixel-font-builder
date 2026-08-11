@@ -97,11 +97,11 @@ def main():
     })
 
     builder.save_otf(outputs_dir.joinpath('my-font.otf'))
-    builder.save_otf(outputs_dir.joinpath('my-font.otf.woff'), flavor=opentype.Flavor.WOFF)
-    builder.save_otf(outputs_dir.joinpath('my-font.otf.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_otf_woff(outputs_dir.joinpath('my-font.otf.woff'))
+    builder.save_otf_woff2(outputs_dir.joinpath('my-font.otf.woff2'))
     builder.save_ttf(outputs_dir.joinpath('my-font.ttf'))
-    builder.save_ttf(outputs_dir.joinpath('my-font.ttf.woff'), flavor=opentype.Flavor.WOFF)
-    builder.save_ttf(outputs_dir.joinpath('my-font.ttf.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_ttf_woff(outputs_dir.joinpath('my-font.ttf.woff'))
+    builder.save_ttf_woff2(outputs_dir.joinpath('my-font.ttf.woff2'))
     builder.save_ms_bitmap_ttf(outputs_dir.joinpath('my-font.ms.bitmap.ttf'))
     builder.save_otb(outputs_dir.joinpath('my-font.otb'))
     builder.save_dfont(outputs_dir.joinpath('my-font.dfont'))
@@ -111,20 +111,20 @@ def main():
     builder.meta_info.family_name = 'My Font SquareDot'
     builder.opentype_config.outlines_painter = opentype.SquareDotOutlinesPainter()
     builder.save_otf(outputs_dir.joinpath('my-font-square_dot.otf'))
-    builder.save_otf(outputs_dir.joinpath('my-font-square_dot.otf.woff'), flavor=opentype.Flavor.WOFF)
-    builder.save_otf(outputs_dir.joinpath('my-font-square_dot.otf.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_otf_woff(outputs_dir.joinpath('my-font-square_dot.otf.woff'))
+    builder.save_otf_woff2(outputs_dir.joinpath('my-font-square_dot.otf.woff2'))
     builder.save_ttf(outputs_dir.joinpath('my-font-square_dot.ttf'))
-    builder.save_ttf(outputs_dir.joinpath('my-font-square_dot.ttf.woff'), flavor=opentype.Flavor.WOFF)
-    builder.save_ttf(outputs_dir.joinpath('my-font-square_dot.ttf.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_ttf_woff(outputs_dir.joinpath('my-font-square_dot.ttf.woff'))
+    builder.save_ttf_woff2(outputs_dir.joinpath('my-font-square_dot.ttf.woff2'))
 
     builder.meta_info.family_name = 'My Font CircleDot'
     builder.opentype_config.outlines_painter = opentype.CircleDotOutlinesPainter()
     builder.save_otf(outputs_dir.joinpath('my-font-circle_dot.otf'))
-    builder.save_otf(outputs_dir.joinpath('my-font-circle_dot.otf.woff'), flavor=opentype.Flavor.WOFF)
-    builder.save_otf(outputs_dir.joinpath('my-font-circle_dot.otf.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_otf_woff(outputs_dir.joinpath('my-font-circle_dot.otf.woff'))
+    builder.save_otf_woff2(outputs_dir.joinpath('my-font-circle_dot.otf.woff2'))
     builder.save_ttf(outputs_dir.joinpath('my-font-circle_dot.ttf'))
-    builder.save_ttf(outputs_dir.joinpath('my-font-circle_dot.ttf.woff'), flavor=opentype.Flavor.WOFF)
-    builder.save_ttf(outputs_dir.joinpath('my-font-circle_dot.ttf.woff2'), flavor=opentype.Flavor.WOFF2)
+    builder.save_ttf_woff(outputs_dir.joinpath('my-font-circle_dot.ttf.woff'))
+    builder.save_ttf_woff2(outputs_dir.joinpath('my-font-circle_dot.ttf.woff2'))
 
 
 if __name__ == '__main__':

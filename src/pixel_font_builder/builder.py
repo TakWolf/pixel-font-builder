@@ -101,6 +101,36 @@ class FontBuilder:
     ):
         self.to_otf_builder(outline_table_mode, bitmap_table_mode, flavor).save(file_path)
 
+    def to_otf_woff_builder(
+            self,
+            outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
+            bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
+    ) -> fontTools.fontBuilder.FontBuilder:
+        return self.to_otf_builder(outline_table_mode, bitmap_table_mode, opentype.Flavor.WOFF)
+
+    def save_otf_woff(
+            self,
+            file_path: str | PathLike[str],
+            outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
+            bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
+    ):
+        self.to_otf_woff_builder(outline_table_mode, bitmap_table_mode).save(file_path)
+
+    def to_otf_woff2_builder(
+            self,
+            outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
+            bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
+    ) -> fontTools.fontBuilder.FontBuilder:
+        return self.to_otf_builder(outline_table_mode, bitmap_table_mode, opentype.Flavor.WOFF2)
+
+    def save_otf_woff2(
+            self,
+            file_path: str | PathLike[str],
+            outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
+            bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
+    ):
+        self.to_otf_woff2_builder(outline_table_mode, bitmap_table_mode).save(file_path)
+
     def to_ttf_builder(
             self,
             outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
@@ -117,6 +147,36 @@ class FontBuilder:
             flavor: opentype.Flavor | None = None,
     ):
         self.to_ttf_builder(outline_table_mode, bitmap_table_mode, flavor).save(file_path)
+
+    def to_ttf_woff_builder(
+            self,
+            outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
+            bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
+    ) -> fontTools.fontBuilder.FontBuilder:
+        return self.to_ttf_builder(outline_table_mode, bitmap_table_mode, opentype.Flavor.WOFF)
+
+    def save_ttf_woff(
+            self,
+            file_path: str | PathLike[str],
+            outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
+            bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
+    ):
+        self.to_ttf_woff_builder(outline_table_mode, bitmap_table_mode).save(file_path)
+
+    def to_ttf_woff2_builder(
+            self,
+            outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
+            bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
+    ) -> fontTools.fontBuilder.FontBuilder:
+        return self.to_ttf_builder(outline_table_mode, bitmap_table_mode, opentype.Flavor.WOFF2)
+
+    def save_ttf_woff2(
+            self,
+            file_path: str | PathLike[str],
+            outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
+            bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
+    ):
+        self.to_ttf_woff2_builder(outline_table_mode, bitmap_table_mode).save(file_path)
 
     def to_ms_bitmap_ttf_builder(self) -> fontTools.fontBuilder.FontBuilder:
         return self.to_ttf_builder(opentype.OutlineTableMode.BLANK_GLYPHS, opentype.BitmapTableMode.STANDARD)
