@@ -187,11 +187,13 @@ class Resource:
         resource_map.extend(name_data)
         map_length = len(resource_map)
         data_length = map_offset - _DATA_OFFSET
+        header = struct.pack('>IIII', _DATA_OFFSET, map_offset, data_length, map_length)
+        resource_map[:16] = header
 
         stream.write(resource_map)
         end_offset = stream.tell()
         stream.seek(0)
-        stream.write(struct.pack('>IIII', _DATA_OFFSET, map_offset, data_length, map_length))
+        stream.write(header)
         stream.seek(end_offset)
 
     type: str
