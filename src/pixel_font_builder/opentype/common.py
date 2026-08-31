@@ -9,6 +9,7 @@ from fontTools.ttLib import TTCollection
 from fontTools.ttLib.tables.E_B_D_T_ import table_E_B_D_T_
 from fontTools.ttLib.tables.E_B_L_C_ import table_E_B_L_C_
 from fontTools.ttLib.tables._b_d_a_t import table__b_d_a_t
+from fontTools.ttLib.tables._b_h_e_d import table__b_h_e_d
 from fontTools.ttLib.tables._b_l_o_c import table__b_l_o_c
 
 import pixel_font_builder
@@ -16,7 +17,6 @@ from pixel_font_builder.opentype.bitmap import create_bitmap_strike_data
 from pixel_font_builder.opentype.feature import build_kern_feature
 from pixel_font_builder.opentype.name import create_name_strings
 from pixel_font_builder.opentype.outline.common import create_normal_xtf_glyphs, create_blank_xtf_glyphs
-from pixel_font_builder.opentype.patch._b_h_e_d import table__b_h_e_d
 from pixel_font_builder.opentype.patch._g_l_y_f import table__g_l_y_f_zero_length
 
 
@@ -205,7 +205,10 @@ def create_font_builder(
             del builder.font['vhea']
 
     if bitmap_table_mode == BitmapTableMode.APPLE:
-        tb_bhed = table__b_h_e_d.replace(tb_head)
+        tb_bhed = table__b_h_e_d()
+        tb_bhed_props = tb_head.__dict__.copy()
+        tb_bhed_props.pop('tableTag')
+        tb_bhed.__dict__.update(tb_bhed_props)
         builder.font[tb_bhed.tableTag] = tb_bhed
 
         if outline_table_mode == OutlineTableMode.OMIT:
