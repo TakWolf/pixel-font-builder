@@ -14,7 +14,6 @@ from pixel_font_builder.opentype.bitmap import create_bitmap_strike_data
 from pixel_font_builder.opentype.feature import build_kern_feature
 from pixel_font_builder.opentype.name import create_name_strings
 from pixel_font_builder.opentype.outline.common import create_normal_xtf_glyphs, create_blank_xtf_glyphs
-from pixel_font_builder.opentype.patch.O_S_2f_2 import table_O_S_2f_2_apple
 from pixel_font_builder.opentype.patch._b_d_a_t import table__b_d_a_t
 from pixel_font_builder.opentype.patch._b_h_e_d import table__b_h_e_d
 from pixel_font_builder.opentype.patch._b_l_o_c import table__b_l_o_c
@@ -210,9 +209,6 @@ def create_font_builder(
         builder.font[tb_bhed.tableTag] = tb_bhed
 
         if outline_table_mode == OutlineTableMode.OMIT:
-            tb_os2 = table_O_S_2f_2_apple.replace(tb_os2)
-            builder.font[tb_os2.tableTag] = tb_os2
-
             del builder.font[tb_head.tableTag]
 
     if outline_table_mode == OutlineTableMode.NORMAL and len(kerning_values) > 0:
