@@ -6,6 +6,7 @@ from fontTools.fontBuilder import FontBuilder
 from fontTools.misc import timeTools
 from fontTools.misc.arrayTools import intRect
 from fontTools.ttLib import TTCollection
+from fontTools.ttLib.tables import DefaultTable
 from fontTools.ttLib.tables.E_B_D_T_ import table_E_B_D_T_
 from fontTools.ttLib.tables.E_B_L_C_ import table_E_B_L_C_
 from fontTools.ttLib.tables._b_d_a_t import table__b_d_a_t
@@ -17,7 +18,6 @@ from pixel_font_builder.opentype.bitmap import create_bitmap_strike_data
 from pixel_font_builder.opentype.feature import build_kern_feature
 from pixel_font_builder.opentype.name import create_name_strings
 from pixel_font_builder.opentype.outline.common import create_normal_xtf_glyphs, create_blank_xtf_glyphs
-from pixel_font_builder.opentype.patch._g_l_y_f import table__g_l_y_f_zero_length
 
 
 @unique
@@ -190,7 +190,10 @@ def create_font_builder(
                 del builder.font['CFF ']
         case OutlineTableMode.ZERO_LENGTH:
             if is_ttf:
-                builder.font['glyf'] = table__g_l_y_f_zero_length()
+                tb_glyf = DefaultTable.DefaultTable('glyf')
+                tb_glyf.data = b''
+                builder.font[tb_glyf.tableTag] = tb_glyf
+                builder.font['loca'].set([0])
             else:
                 glyph_order_backup = builder.font.glyphOrder.copy()
                 builder.font.glyphOrder.clear()
