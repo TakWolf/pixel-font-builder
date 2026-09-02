@@ -3,13 +3,15 @@ from __future__ import annotations
 import math
 import statistics
 
-from pcffont import PcfFontBuilder, PcfGlyph, PcfBdfEncodings
+from pcffont import PcfFontBuilder, PcfGlyph
 
 import pixel_font_builder
 from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.meta import WeightName, SlantStyle, WidthStyle
 from pixel_font_builder.metric import FontMetric
 from pixel_font_builder.pcf.config import Config
+
+_DEFAULT_CHAR = 0xFFFE
 
 
 def _create_glyphs(glyph: Glyph, encoding: int, font_metric: FontMetric, config: Config) -> PcfGlyph:
@@ -31,16 +33,20 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuild
     _, name_to_glyph = context.prepare_glyphs()
     character_mapping = context.character_mapping
 
+    if _DEFAULT_CHAR in character_mapping:
+        raise RuntimeError(f'encoding 0x{_DEFAULT_CHAR:04X} is reserved for the PCF default glyph')
+
     builder = PcfFontBuilder()
     builder.config.font_ascent = font_metric.horizontal_layout.ascent
     builder.config.font_descent = -font_metric.horizontal_layout.descent
+    builder.config.default_char = _DEFAULT_CHAR
     builder.config.draw_right_to_left = config.draw_right_to_left
     builder.config.ms_byte_first = config.ms_byte_first
     builder.config.ms_bit_first = config.ms_bit_first
     builder.config.glyph_pad = config.glyph_pad
     builder.config.scan_unit = config.scan_unit
 
-    builder.glyphs.append(_create_glyphs(name_to_glyph['.notdef'], PcfBdfEncodings.NO_ENCODING, font_metric, config))
+    builder.glyphs.append(_create_glyphs(name_to_glyph['.notdef'], _DEFAULT_CHAR, font_metric, config))
     for code_point, glyph_name in sorted(character_mapping.items()):
         if code_point > 0xFFFF:
             break
