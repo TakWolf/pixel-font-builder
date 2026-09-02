@@ -67,7 +67,7 @@ def main():
         ],
     ))
     builder.glyphs.append(Glyph(
-        name='CAP_LETTER_A',
+        name='LATIN_CAPITAL_LETTER_A',
         horizontal_offset=(0, -2),
         advance_width=8,
         vertical_offset=(-4, 0),
@@ -92,9 +92,7 @@ def main():
         ],
     ))
 
-    builder.character_mapping.update({
-        65: 'CAP_LETTER_A',
-    })
+    builder.character_mapping[0x0041] = 'LATIN_CAPITAL_LETTER_A'
 
     builder.save_otf(outputs_dir.joinpath('my-font.otf'))
     builder.save_otf_woff(outputs_dir.joinpath('my-font.otf.woff'))
