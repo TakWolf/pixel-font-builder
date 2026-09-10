@@ -5,7 +5,7 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
-from examples import glyphs_dir, build_dir
+from examples import GLYPHS_DIR, BUILD_DIR
 from pixel_font_builder import FontBuilder, FontCollectionBuilder, WeightName, SerifStyle, SlantStyle, WidthStyle, Glyph
 
 
@@ -52,7 +52,7 @@ def _get_glyph_name(code_point: int) -> str:
 def _collect_glyph_files() -> tuple[list[GlyphFile], dict[int, str]]:
     glyph_files = []
     character_mapping = {}
-    for file_path in glyphs_dir.iterdir():
+    for file_path in GLYPHS_DIR.iterdir():
         if file_path.suffix != '.txt':
             continue
 
@@ -138,7 +138,7 @@ def _create_builder(
 
 
 def main():
-    outputs_dir = build_dir.joinpath('demo')
+    outputs_dir = BUILD_DIR.joinpath('demo')
     if outputs_dir.exists():
         shutil.rmtree(outputs_dir)
     outputs_dir.mkdir(parents=True)

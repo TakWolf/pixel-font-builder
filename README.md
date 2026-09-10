@@ -17,12 +17,12 @@ pip install pixel-font-builder
 import shutil
 from datetime import datetime
 
-from examples import build_dir
+from examples import BUILD_DIR
 from pixel_font_builder import FontBuilder, WeightName, SerifStyle, SlantStyle, WidthStyle, Glyph, opentype
 
 
 def main():
-    outputs_dir = build_dir.joinpath('create')
+    outputs_dir = BUILD_DIR.joinpath('create')
     if outputs_dir.exists():
         shutil.rmtree(outputs_dir)
     outputs_dir.mkdir(parents=True)
