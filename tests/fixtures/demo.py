@@ -1,18 +1,18 @@
 from __future__ import annotations
 
 import math
-import shutil
 from datetime import datetime
 from pathlib import Path
 
-from examples import GLYPHS_DIR, BUILD_DIR
+import pytest
+
 from pixel_font_builder import FontBuilder, FontCollectionBuilder, WeightName, SerifStyle, SlantStyle, WidthStyle, Glyph
 
 
-def _load_bitmap(file_path: Path) -> tuple[list[list[int]], int, int]:
-    bitmap = []
+def _load_bitmap(file_path: Path) -> tuple[int, int, list[list[int]]]:
     width = 0
     height = 0
+    bitmap = []
     with file_path.open('r', encoding='utf-8') as file:
         for i, line in enumerate(file):
             line = line.strip().replace('##', '#').replace('..', '.')
@@ -23,45 +23,55 @@ def _load_bitmap(file_path: Path) -> tuple[list[list[int]], int, int]:
             else:
                 assert width == len(line)
             height += 1
-    return bitmap, width, height
+    return width, height, bitmap
 
 
-class GlyphFile:
+class GlyphInfo:
     @staticmethod
-    def load(file_path: Path) -> GlyphFile:
+    def load(file_path: Path) -> GlyphInfo:
         hex_name = file_path.stem.strip()
         code_point = -1 if hex_name == 'notdef' else int(hex_name, 16)
-        return GlyphFile(file_path, code_point)
+        width, height, bitmap = _load_bitmap(file_path)
+        return GlyphInfo(code_point, width, height, bitmap)
 
-    file_path: Path
     code_point: int
-    bitmap: list[list[int]]
     width: int
     height: int
+    bitmap: list[list[int]]
 
-    def __init__(self, file_path: Path, code_point: int) -> None:
-        self.file_path = file_path
+    def __init__(
+            self,
+            code_point: int,
+            width: int,
+            height: int,
+            bitmap: list[list[int]],
+    ) -> None:
         self.code_point = code_point
-        self.bitmap, self.width, self.height = _load_bitmap(file_path)
+        self.width = width
+        self.height = height
+        self.bitmap = bitmap
 
 
 def _get_glyph_name(code_point: int) -> str:
     return '.notdef' if code_point == -1 else f'u{code_point:04X}'
 
 
-def _collect_glyph_files() -> tuple[list[GlyphFile], dict[int, str]]:
-    glyph_files = []
+def _collect_glyph_infos(glyphs_dir: Path) -> tuple[list[GlyphInfo], dict[int, str]]:
+    glyph_infos = []
     character_mapping = {}
-    for file_path in GLYPHS_DIR.iterdir():
+
+    for file_path in glyphs_dir.iterdir():
         if file_path.suffix != '.txt':
             continue
 
-        glyph_file = GlyphFile.load(file_path)
-        glyph_files.append(glyph_file)
-        if glyph_file.code_point != -1:
-            character_mapping[glyph_file.code_point] = _get_glyph_name(glyph_file.code_point)
-    glyph_files.sort(key=lambda x: x.code_point)
-    return glyph_files, character_mapping
+        glyph_info = GlyphInfo.load(file_path)
+        glyph_infos.append(glyph_info)
+
+        if glyph_info.code_point != -1:
+            character_mapping[glyph_info.code_point] = _get_glyph_name(glyph_info.code_point)
+
+    glyph_infos.sort(key=lambda x: x.code_point)
+    return glyph_infos, character_mapping
 
 
 def _build_kerning_values() -> dict[tuple[str, str], int]:
@@ -81,12 +91,11 @@ def _build_kerning_values() -> dict[tuple[str, str], int]:
     return kerning_values
 
 
-def _create_builder(
-        glyph_files: list[GlyphFile],
-        character_mapping: dict[int, str],
-        kerning_values: dict[tuple[str, str], int],
-        name_num: int = 0,
-) -> FontBuilder:
+@pytest.fixture(scope='session')
+def demo_builder(assets_dir: Path) -> FontBuilder:
+    glyph_infos, character_mapping = _collect_glyph_infos(assets_dir.joinpath('glyphs'))
+    kerning_values = _build_kerning_values()
+
     builder = FontBuilder()
     builder.font_metric.font_size = 12
     builder.font_metric.horizontal_layout.ascent = 13
@@ -103,7 +112,7 @@ def _create_builder(
     builder.meta_info.version = '1.0.0'
     builder.meta_info.created_time = datetime.fromisoformat('2024-01-01T00:00:00Z')
     builder.meta_info.modified_time = builder.meta_info.created_time
-    builder.meta_info.family_name = f'Demo {name_num}'
+    builder.meta_info.family_name = 'Demo'
     builder.meta_info.weight_name = WeightName.REGULAR
     builder.meta_info.serif_style = SerifStyle.SANS_SERIF
     builder.meta_info.slant_style = SlantStyle.NORMAL
@@ -117,18 +126,18 @@ def _create_builder(
     builder.meta_info.designer_url = 'https://takwolf.com'
     builder.meta_info.license_url = 'https://openfontlicense.org'
 
-    for glyph_file in glyph_files:
+    for glyph_info in glyph_infos:
         horizontal_offset_x = 0
-        horizontal_offset_y = (builder.font_metric.horizontal_layout.ascent + builder.font_metric.horizontal_layout.descent - glyph_file.height) // 2
-        vertical_offset_x = -math.ceil(glyph_file.width / 2)
-        vertical_offset_y = (builder.font_metric.font_size - glyph_file.height) // 2
+        horizontal_offset_y = (builder.font_metric.horizontal_layout.ascent + builder.font_metric.horizontal_layout.descent - glyph_info.height) // 2
+        vertical_offset_x = -math.ceil(glyph_info.width / 2)
+        vertical_offset_y = (builder.font_metric.font_size - glyph_info.height) // 2
         builder.glyphs.append(Glyph(
-            name=_get_glyph_name(glyph_file.code_point),
+            name=_get_glyph_name(glyph_info.code_point),
             horizontal_offset=(horizontal_offset_x, horizontal_offset_y),
-            advance_width=glyph_file.width,
+            advance_width=glyph_info.width,
             vertical_offset=(vertical_offset_x, vertical_offset_y),
             advance_height=builder.font_metric.font_size,
-            bitmap=glyph_file.bitmap,
+            bitmap=glyph_info.bitmap,
         ))
 
     builder.character_mapping.update(character_mapping)
@@ -137,35 +146,12 @@ def _create_builder(
     return builder
 
 
-def main() -> None:
-    outputs_dir = BUILD_DIR.joinpath('demo')
-    if outputs_dir.exists():
-        shutil.rmtree(outputs_dir)
-    outputs_dir.mkdir(parents=True)
-
-    glyph_files, character_mapping = _collect_glyph_files()
-    kerning_values = _build_kerning_values()
-
-    builder = _create_builder(glyph_files, character_mapping, kerning_values)
-    builder.save_otf(outputs_dir.joinpath('demo.otf'))
-    builder.save_otf_woff(outputs_dir.joinpath('demo.otf.woff'))
-    builder.save_otf_woff2(outputs_dir.joinpath('demo.otf.woff2'))
-    builder.save_ttf(outputs_dir.joinpath('demo.ttf'))
-    builder.save_ttf_woff(outputs_dir.joinpath('demo.ttf.woff'))
-    builder.save_ttf_woff2(outputs_dir.joinpath('demo.ttf.woff2'))
-    builder.save_ms_bitmap_ttf(outputs_dir.joinpath('demo.ms.bitmap.ttf'))
-    builder.save_otb(outputs_dir.joinpath('demo.otb'))
-    builder.save_dfont(outputs_dir.joinpath('demo.dfont'))
-    builder.save_bdf(outputs_dir.joinpath('demo.bdf'))
-    builder.save_pcf(outputs_dir.joinpath('demo.pcf'))
-
+@pytest.fixture(scope='session')
+def demo_collection_builder(demo_builder: FontBuilder) -> FontCollectionBuilder:
     collection_builder = FontCollectionBuilder()
     for index in range(100):
-        builder = _create_builder(glyph_files, character_mapping, kerning_values, index)
+        builder = demo_builder.copy()
+        builder.meta_info = builder.meta_info.copy()
+        builder.meta_info.family_name = f'Demo {index}'
         collection_builder.append(builder)
-    collection_builder.save_otc(outputs_dir.joinpath('demo.otc'))
-    collection_builder.save_ttc(outputs_dir.joinpath('demo.ttc'))
-
-
-if __name__ == '__main__':
-    main()
+    return collection_builder
