@@ -4,6 +4,32 @@ from typing import Any
 
 
 class Glyph:
+    """A glyph bitmap and its horizontal and vertical layout metrics.
+
+    The bitmap uses image coordinates: rows run from top to bottom and columns
+    run from left to right. Each matrix element represents one pixel, and all
+    offsets and advances are expressed in the same pixel-grid units.
+
+    ``horizontal_offset`` is the position of the bitmap bounding box's
+    bottom-left corner relative to the horizontal writing origin. Its x value
+    is positive to the right, and its y value is positive upward from the
+    baseline. The bitmap therefore occupies
+    ``[offset_x, offset_x + width]`` horizontally and
+    ``[offset_y, offset_y + height]`` vertically. ``advance_width`` is the
+    distance to the next horizontal writing origin.
+
+    ``vertical_offset`` is the position of the bitmap bounding box's top-left
+    corner relative to the vertical writing origin, following the OpenType
+    vertical bitmap-bearing convention. Its x value is positive to the right,
+    and its y value is positive downward in the vertical writing direction.
+    ``advance_height`` is the distance to the next vertical writing origin in
+    that direction.
+
+    Offsets position the complete bitmap; they do not remove transparent rows
+    or columns. Padding inside the bitmap remains part of its dimensions and is
+    accounted for separately when deriving outline side bearings.
+    """
+
     name: str
     horizontal_offset_x: int
     horizontal_offset_y: int
