@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Final
 
-from pixel_font_builder.opentype.feature import FeatureFile
+from pixel_font_builder.opentype.feature.source.base import FeatureSource
 from pixel_font_builder.opentype.outline.painter.base import OutlinesPainter
 from pixel_font_builder.opentype.outline.painter.solid import SolidOutlinesPainter
 
@@ -64,7 +64,7 @@ class Config:
     has_vertical_metrics: bool
     is_monospaced: bool
     fields_override: FieldsOverride
-    feature_files: list[FeatureFile]
+    features: FeatureSource | None
 
     def __init__(
             self,
@@ -73,14 +73,14 @@ class Config:
             has_vertical_metrics: bool = True,
             is_monospaced: bool = False,
             fields_override: FieldsOverride | None = None,
-            feature_files: list[FeatureFile] | None = None,
+            features: FeatureSource | None = None,
     ) -> None:
         self.px_to_units = px_to_units
         self.outlines_painter = outlines_painter if outlines_painter is not None else Config.DEFAULT_OUTLINES_PAINTER
         self.has_vertical_metrics = has_vertical_metrics
         self.is_monospaced = is_monospaced
         self.fields_override = fields_override if fields_override is not None else FieldsOverride()
-        self.feature_files = feature_files if feature_files is not None else []
+        self.features = features
 
     def __copy__(self) -> Config:
         return self.copy()
@@ -96,7 +96,7 @@ class Config:
                 self.has_vertical_metrics == other.has_vertical_metrics and
                 self.is_monospaced == other.is_monospaced and
                 self.fields_override == other.fields_override and
-                self.feature_files == other.feature_files)
+                self.features == other.features)
 
     def copy(self) -> Config:
         return Config(
@@ -105,7 +105,7 @@ class Config:
             self.has_vertical_metrics,
             self.is_monospaced,
             self.fields_override,
-            self.feature_files,
+            self.features,
         )
 
     def deepcopy(self) -> Config:
@@ -115,5 +115,5 @@ class Config:
             self.has_vertical_metrics,
             self.is_monospaced,
             self.fields_override.deepcopy(),
-            [feature_file.deepcopy() for feature_file in self.feature_files],
+            self.features.deepcopy() if self.features is not None else None,
         )

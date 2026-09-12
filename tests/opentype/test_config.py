@@ -1,7 +1,7 @@
 from copy import copy, deepcopy
 from pathlib import Path
 
-from pixel_font_builder.opentype import FieldsOverride, FeatureFile, Config, SolidOutlinesPainter
+from pixel_font_builder.opentype import Config, FieldsOverride, SolidOutlinesPainter, FeatureFile
 
 
 def test_copy() -> None:
@@ -17,12 +17,7 @@ def test_copy() -> None:
             head_y_max=4,
             os2_x_avg_char_width=5,
         ),
-        feature_files=[
-            FeatureFile(
-                text='test',
-                file_path=Path('test.fea'),
-            ),
-        ],
+        features=FeatureFile(Path('main.fea')),
     )
     config_2 = copy(config_1)
 
@@ -30,7 +25,7 @@ def test_copy() -> None:
     assert config_1 is not config_2
     assert config_1.outlines_painter is config_2.outlines_painter
     assert config_1.fields_override is config_2.fields_override
-    assert config_1.feature_files is config_2.feature_files
+    assert config_1.features is config_2.features
 
 
 def test_deepcopy() -> None:
@@ -46,22 +41,15 @@ def test_deepcopy() -> None:
             head_y_max=4,
             os2_x_avg_char_width=5,
         ),
-        feature_files=[
-            FeatureFile(
-                text='test',
-                file_path=Path('test.fea'),
-            ),
-        ],
+        features=FeatureFile(Path('main.fea')),
     )
     config_2 = deepcopy(config_1)
 
     assert config_1 == config_2
     assert config_1 is not config_2
+    assert config_1.outlines_painter is config_2.outlines_painter
     assert config_1.fields_override is not config_2.fields_override
-    assert config_1.feature_files is not config_2.feature_files
-
-    for feature_file_1, feature_file_2 in zip(config_1.feature_files, config_2.feature_files):
-        assert feature_file_1 is not feature_file_2
+    assert config_1.features is not config_2.features
 
 
 def test_eq() -> None:
@@ -77,12 +65,7 @@ def test_eq() -> None:
             head_y_max=4,
             os2_x_avg_char_width=5,
         ),
-        feature_files=[
-            FeatureFile(
-                text='test',
-                file_path=Path('test.fea'),
-            ),
-        ],
+        features=FeatureFile(Path('main.fea')),
     )
     config_2 = Config(
         px_to_units=1,
@@ -96,11 +79,6 @@ def test_eq() -> None:
             head_y_max=4,
             os2_x_avg_char_width=5,
         ),
-        feature_files=[
-            FeatureFile(
-                text='test',
-                file_path=Path('test.fea'),
-            ),
-        ],
+        features=FeatureFile(Path('main.fea')),
     )
     assert config_1 == config_2
