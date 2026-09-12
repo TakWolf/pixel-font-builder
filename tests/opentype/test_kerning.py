@@ -1,7 +1,9 @@
 import pytest
+from fontTools.feaLib import ast
 
 from pixel_font_builder import FontBuilder, Glyph
 from pixel_font_builder.opentype import OutlineTableMode
+from pixel_font_builder.opentype.kerning import create_kern_feature
 
 
 @pytest.fixture
@@ -27,6 +29,25 @@ def builder() -> FontBuilder:
     })
 
     return builder
+
+
+def test_create_kern_feature() -> None:
+    feature = create_kern_feature({
+        ('b', 'a'): -1,
+        ('a', 'b'): -2,
+    }, 100)
+
+    assert feature.name == 'kern'
+    assert isinstance(feature.statements[0], ast.ScriptStatement)
+    assert feature.statements[0].script == 'DFLT'
+    assert isinstance(feature.statements[1], ast.LanguageStatement)
+    assert feature.statements[1].language == 'dflt'
+
+    pair_positions = feature.statements[2:]
+    assert [(statement.glyphs1.glyph, statement.glyphs2.glyph, statement.valuerecord1.xAdvance) for statement in pair_positions] == [
+        ('b', 'a', -100),
+        ('a', 'b', -200),
+    ]
 
 
 def test_kerning_uses_scaled_pair_positioning(builder: FontBuilder) -> None:

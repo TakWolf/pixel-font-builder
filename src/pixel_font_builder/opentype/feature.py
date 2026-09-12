@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from io import StringIO
 from os import PathLike
 from typing import Any
 
@@ -42,14 +41,3 @@ class FeatureFile:
 
     def deepcopy(self) -> FeatureFile:
         return self.copy()
-
-
-def build_kern_feature(kerning_values: dict[tuple[str, str], int], px_to_units: int) -> str:
-    text = StringIO()
-    text.write('languagesystem DFLT dflt;\n')
-    text.write('\n')
-    text.write('feature kern {\n')
-    for (left_glyph_name, right_glyph_name), offset in kerning_values.items():
-        text.write(f'    position {left_glyph_name} {right_glyph_name} {offset * px_to_units};\n')
-    text.write('} kern;\n')
-    return text.getvalue()

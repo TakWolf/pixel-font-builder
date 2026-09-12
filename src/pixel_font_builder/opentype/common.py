@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from enum import StrEnum, unique
 
+from fontTools.feaLib import ast
+from fontTools.feaLib.builder import addOpenTypeFeatures
 from fontTools.fontBuilder import FontBuilder
 from fontTools.misc import timeTools
 from fontTools.misc.arrayTools import intRect
@@ -15,7 +17,7 @@ from fontTools.ttLib.tables._b_l_o_c import table__b_l_o_c
 
 import pixel_font_builder
 from pixel_font_builder.opentype.bitmap import create_bitmap_strike_data
-from pixel_font_builder.opentype.feature import build_kern_feature
+from pixel_font_builder.opentype.kerning import create_kern_feature
 from pixel_font_builder.opentype.name import create_name_strings
 from pixel_font_builder.opentype.outline.common import create_normal_xtf_glyphs, create_blank_xtf_glyphs
 
@@ -218,7 +220,9 @@ def create_font_builder(
             del builder.font[tb_head.tableTag]
 
     if outline_table_mode == OutlineTableMode.NORMAL and len(kerning_values) > 0:
-        builder.addOpenTypeFeatures(build_kern_feature(kerning_values, config.px_to_units))
+        feature_file = ast.FeatureFile()
+        feature_file.statements.append(create_kern_feature(kerning_values, config.px_to_units))
+        addOpenTypeFeatures(builder.font, feature_file)
 
     for feature_file in config.feature_files:
         builder.addOpenTypeFeatures(feature_file.text, feature_file.file_path)
