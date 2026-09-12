@@ -39,7 +39,7 @@ class GlyphFile:
     width: int
     height: int
 
-    def __init__(self, file_path: Path, code_point: int):
+    def __init__(self, file_path: Path, code_point: int) -> None:
         self.file_path = file_path
         self.code_point = code_point
         self.bitmap, self.width, self.height = _load_bitmap(file_path)
@@ -137,7 +137,7 @@ def _create_builder(
     return builder
 
 
-def main():
+def main() -> None:
     outputs_dir = BUILD_DIR.joinpath('demo')
     if outputs_dir.exists():
         shutil.rmtree(outputs_dir)

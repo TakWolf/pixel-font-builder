@@ -26,7 +26,7 @@ class FontBuilder:
     bdf_config: bdf.Config
     pcf_config: pcf.Config
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.font_metric = FontMetric()
         self.meta_info = MetaInfo()
         self.glyphs = []
@@ -98,7 +98,7 @@ class FontBuilder:
             outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
             bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
             flavor: opentype.Flavor | None = None,
-    ):
+    ) -> None:
         self.to_otf_builder(outline_table_mode, bitmap_table_mode, flavor).save(file_path)
 
     def to_otf_woff_builder(
@@ -113,7 +113,7 @@ class FontBuilder:
             file_path: str | PathLike[str],
             outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
             bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
-    ):
+    ) -> None:
         self.to_otf_woff_builder(outline_table_mode, bitmap_table_mode).save(file_path)
 
     def to_otf_woff2_builder(
@@ -128,7 +128,7 @@ class FontBuilder:
             file_path: str | PathLike[str],
             outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
             bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
-    ):
+    ) -> None:
         self.to_otf_woff2_builder(outline_table_mode, bitmap_table_mode).save(file_path)
 
     def to_ttf_builder(
@@ -145,7 +145,7 @@ class FontBuilder:
             outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
             bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
             flavor: opentype.Flavor | None = None,
-    ):
+    ) -> None:
         self.to_ttf_builder(outline_table_mode, bitmap_table_mode, flavor).save(file_path)
 
     def to_ttf_woff_builder(
@@ -160,7 +160,7 @@ class FontBuilder:
             file_path: str | PathLike[str],
             outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
             bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
-    ):
+    ) -> None:
         self.to_ttf_woff_builder(outline_table_mode, bitmap_table_mode).save(file_path)
 
     def to_ttf_woff2_builder(
@@ -175,37 +175,37 @@ class FontBuilder:
             file_path: str | PathLike[str],
             outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
             bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
-    ):
+    ) -> None:
         self.to_ttf_woff2_builder(outline_table_mode, bitmap_table_mode).save(file_path)
 
     def to_ms_bitmap_ttf_builder(self) -> fontTools.fontBuilder.FontBuilder:
         return self.to_ttf_builder(opentype.OutlineTableMode.BLANK_GLYPHS, opentype.BitmapTableMode.STANDARD)
 
-    def save_ms_bitmap_ttf(self, file_path: str | PathLike[str]):
+    def save_ms_bitmap_ttf(self, file_path: str | PathLike[str]) -> None:
         self.to_ms_bitmap_ttf_builder().save(file_path)
 
     def to_otb_builder(self) -> fontTools.fontBuilder.FontBuilder:
         return self.to_ttf_builder(opentype.OutlineTableMode.ZERO_LENGTH, opentype.BitmapTableMode.STANDARD)
 
-    def save_otb(self, file_path: str | PathLike[str]):
+    def save_otb(self, file_path: str | PathLike[str]) -> None:
         self.to_otb_builder().save(file_path)
 
     def to_dfont_builder(self) -> dfont.DFontBuilder:
         return dfont.create_font_builder(self)
     
-    def save_dfont(self, file_path: str | PathLike[str]):
+    def save_dfont(self, file_path: str | PathLike[str]) -> None:
         self.to_dfont_builder().save(file_path)
 
     def to_bdf_builder(self) -> bdffont.BdfFont:
         return bdf.create_font_builder(self)
 
-    def save_bdf(self, file_path: str | PathLike[str]):
+    def save_bdf(self, file_path: str | PathLike[str]) -> None:
         self.to_bdf_builder().save(file_path)
 
     def to_pcf_builder(self) -> pcffont.PcfFontBuilder:
         return pcf.create_font_builder(self)
 
-    def save_pcf(self, file_path: str | PathLike[str]):
+    def save_pcf(self, file_path: str | PathLike[str]) -> None:
         self.to_pcf_builder().save(file_path)
 
     def copy(self) -> FontBuilder:
@@ -260,7 +260,7 @@ class FontCollectionBuilder(UserList[FontBuilder]):
             outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
             bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
             share_tables: bool = True,
-    ):
+    ) -> None:
         self.to_otc_builder(outline_table_mode, bitmap_table_mode).save(file_path, share_tables)
 
     def to_ttc_builder(
@@ -276,7 +276,7 @@ class FontCollectionBuilder(UserList[FontBuilder]):
             outline_table_mode: opentype.OutlineTableMode = opentype.OutlineTableMode.NORMAL,
             bitmap_table_mode: opentype.BitmapTableMode = opentype.BitmapTableMode.NONE,
             share_tables: bool = True,
-    ):
+    ) -> None:
         self.to_ttc_builder(outline_table_mode, bitmap_table_mode).save(file_path, share_tables)
 
     def copy(self) -> FontCollectionBuilder:

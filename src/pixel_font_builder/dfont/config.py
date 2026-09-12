@@ -9,7 +9,7 @@ class Config:
     def __init__(
             self,
             is_monospaced: bool = False,
-    ):
+    ) -> None:
         self.is_monospaced = is_monospaced
 
     def __copy__(self) -> Config:

@@ -3,7 +3,7 @@ from copy import copy, deepcopy
 from pixel_font_builder.dfont import Config
 
 
-def test_copy():
+def test_copy() -> None:
     config_1 = Config(
         is_monospaced=True,
     )
@@ -16,7 +16,7 @@ def test_copy():
     assert config_1 is not config_3
 
 
-def test_eq():
+def test_eq() -> None:
     config_1 = Config(
         is_monospaced=True,
     )

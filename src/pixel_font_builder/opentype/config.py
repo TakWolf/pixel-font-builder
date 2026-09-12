@@ -21,7 +21,7 @@ class FieldsOverride:
             head_x_max: int | None = None,
             head_y_max: int | None = None,
             os2_x_avg_char_width: int | None = None,
-    ):
+    ) -> None:
         self.head_x_min = head_x_min
         self.head_y_min = head_y_min
         self.head_x_max = head_x_max
@@ -74,7 +74,7 @@ class Config:
             is_monospaced: bool = False,
             fields_override: FieldsOverride | None = None,
             feature_files: list[FeatureFile] | None = None,
-    ):
+    ) -> None:
         self.px_to_units = px_to_units
         self.outlines_painter = outlines_painter if outlines_painter is not None else Config.DEFAULT_OUTLINES_PAINTER
         self.has_vertical_metrics = has_vertical_metrics

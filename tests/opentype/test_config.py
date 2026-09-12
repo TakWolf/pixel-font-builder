@@ -4,7 +4,7 @@ from pathlib import Path
 from pixel_font_builder.opentype import FieldsOverride, FeatureFile, Config, SolidOutlinesPainter
 
 
-def test_copy():
+def test_copy() -> None:
     config_1 = Config(
         px_to_units=1,
         outlines_painter=SolidOutlinesPainter(),
@@ -33,7 +33,7 @@ def test_copy():
     assert config_1.feature_files is config_2.feature_files
 
 
-def test_deepcopy():
+def test_deepcopy() -> None:
     config_1 = Config(
         px_to_units=1,
         outlines_painter=SolidOutlinesPainter(),
@@ -64,7 +64,7 @@ def test_deepcopy():
         assert feature_file_1 is not feature_file_2
 
 
-def test_eq():
+def test_eq() -> None:
     config_1 = Config(
         px_to_units=1,
         outlines_painter=SolidOutlinesPainter(),

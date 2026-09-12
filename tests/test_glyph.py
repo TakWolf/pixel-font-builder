@@ -3,7 +3,7 @@ from copy import copy, deepcopy
 from pixel_font_builder import Glyph
 
 
-def test_glyph_1():
+def test_glyph_1() -> None:
     glyph = Glyph(
         name='test',
         horizontal_offset=(1, 2),
@@ -48,7 +48,7 @@ def test_glyph_1():
     assert glyph.vertical_offset_y == 10
 
 
-def test_glyph_2():
+def test_glyph_2() -> None:
     glyph = Glyph(name='test')
     assert glyph.horizontal_offset == (0, 0)
     assert glyph.advance_width == 0
@@ -61,7 +61,7 @@ def test_glyph_2():
     assert glyph.calculate_bitmap_bottom_padding() == 0
 
 
-def test_glyph_3():
+def test_glyph_3() -> None:
     glyph = Glyph(
         name='test',
         bitmap=[
@@ -77,7 +77,7 @@ def test_glyph_3():
     assert glyph.calculate_bitmap_bottom_padding() == 4
 
 
-def test_copy():
+def test_copy() -> None:
     glyph_1 = Glyph(
         name='test',
         horizontal_offset=(1, 2),
@@ -93,7 +93,7 @@ def test_copy():
     assert glyph_1.bitmap is glyph_2.bitmap
 
 
-def test_deepcopy():
+def test_deepcopy() -> None:
     glyph_1 = Glyph(
         name='test',
         horizontal_offset=(1, 2),
@@ -112,7 +112,7 @@ def test_deepcopy():
         assert bitmap_row_1 is not bitmap_row_2
 
 
-def test_eq():
+def test_eq() -> None:
     glyph_1 = Glyph(
         name='test',
         horizontal_offset=(1, 2),

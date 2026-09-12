@@ -3,7 +3,7 @@ from copy import copy, deepcopy
 from pixel_font_builder.opentype import FieldsOverride
 
 
-def test_copy():
+def test_copy() -> None:
     fields_override_1 = FieldsOverride(
         head_x_min=1,
         head_y_min=2,
@@ -20,7 +20,7 @@ def test_copy():
     assert fields_override_1 is not fields_override_3
 
 
-def test_eq():
+def test_eq() -> None:
     fields_override_1 = FieldsOverride(
         head_x_min=1,
         head_y_min=2,

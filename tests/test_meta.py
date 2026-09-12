@@ -4,7 +4,7 @@ from datetime import datetime
 from pixel_font_builder import WeightName, SerifStyle, SlantStyle, WidthStyle, MetaInfo
 
 
-def test_copy():
+def test_copy() -> None:
     meta_info_1 = MetaInfo(
         version='1.2.3',
         created_time=datetime.fromisoformat('2000-01-01T00:00:00Z'),
@@ -33,7 +33,7 @@ def test_copy():
     assert meta_info_1 is not meta_info_3
 
 
-def test_eq():
+def test_eq() -> None:
     meta_info_1 = MetaInfo(
         version='1.2.3',
         created_time=datetime.fromisoformat('2000-01-01T00:00:00Z'),

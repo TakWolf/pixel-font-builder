@@ -5,11 +5,11 @@ from typing import Any, Protocol, runtime_checkable
 @runtime_checkable
 class OutlinesPen(Protocol):
     @abstractmethod
-    def move_to(self, point: tuple[float, float]):
+    def move_to(self, point: tuple[float, float]) -> None:
         raise NotImplementedError()
 
     @abstractmethod
-    def line_to(self, point: tuple[float, float]):
+    def line_to(self, point: tuple[float, float]) -> None:
         raise NotImplementedError()
 
     @abstractmethod
@@ -18,7 +18,7 @@ class OutlinesPen(Protocol):
             control_point_1: tuple[float, float],
             control_point_2: tuple[float, float],
             end_point: tuple[float, float],
-    ):
+    ) -> None:
         raise NotImplementedError()
 
     @abstractmethod
@@ -26,15 +26,15 @@ class OutlinesPen(Protocol):
             self,
             control_point: tuple[float, float],
             end_point: tuple[float, float],
-    ):
+    ) -> None:
         raise NotImplementedError()
 
     @abstractmethod
-    def end_path(self):
+    def end_path(self) -> None:
         raise NotImplementedError()
 
     @abstractmethod
-    def close_path(self):
+    def close_path(self) -> None:
         raise NotImplementedError()
 
     @abstractmethod

@@ -3,7 +3,7 @@ from copy import copy, deepcopy
 from pixel_font_builder import FontBuilder, Glyph
 
 
-def test_prepare_glyphs():
+def test_prepare_glyphs() -> None:
     builder = FontBuilder()
     builder.glyphs.extend([
         Glyph(name='.notdef'),
@@ -37,7 +37,7 @@ def test_prepare_glyphs():
     ]
 
 
-def test_copy():
+def test_copy() -> None:
     builder_1 = FontBuilder()
     builder_1.glyphs.extend([
         Glyph(name='.notdef'),
@@ -69,7 +69,7 @@ def test_copy():
     assert builder_1.pcf_config is builder_2.pcf_config
 
 
-def test_deepcopy():
+def test_deepcopy() -> None:
     builder_1 = FontBuilder()
     builder_1.glyphs.extend([
         Glyph(name='.notdef'),
@@ -104,7 +104,7 @@ def test_deepcopy():
         assert glyph_1 is not glyph_2
 
 
-def test_eq():
+def test_eq() -> None:
     builder_1 = FontBuilder()
     builder_1.glyphs.extend([
         Glyph(name='.notdef'),

@@ -23,7 +23,7 @@ class Config:
             ms_bit_first: bool = True,
             glyph_pad: GlyphPad = 1,
             scan_unit: ScanUnit = 1,
-    ):
+    ) -> None:
         self.resolution_x = resolution_x
         self.resolution_y = resolution_y
         self.draw_right_to_left = draw_right_to_left

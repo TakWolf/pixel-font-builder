@@ -18,7 +18,7 @@ class FeatureFile:
             self,
             text: str,
             file_path: str | PathLike[str] | None = None,
-    ):
+    ) -> None:
         self.text = text
         self.file_path = file_path
 

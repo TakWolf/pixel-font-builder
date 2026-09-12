@@ -13,7 +13,7 @@ class LineMetric:
             ascent: int = 0,
             descent: int = 0,
             line_gap: int = 0,
-    ):
+    ) -> None:
         self.ascent = ascent
         self.descent = descent
         self.line_gap = line_gap
@@ -77,7 +77,7 @@ class FontMetric:
             underline_thickness: int = 0,
             strikeout_position: int = 0,
             strikeout_thickness: int = 0,
-    ):
+    ) -> None:
         self.font_size = font_size
         self.horizontal_layout = horizontal_layout if horizontal_layout is not None else LineMetric()
         self.vertical_layout = vertical_layout if vertical_layout is not None else LineMetric()

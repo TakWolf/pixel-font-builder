@@ -5,7 +5,7 @@ from examples import BUILD_DIR
 from pixel_font_builder import FontBuilder, WeightName, SerifStyle, SlantStyle, WidthStyle, Glyph, opentype
 
 
-def main():
+def main() -> None:
     outputs_dir = BUILD_DIR.joinpath('create')
     if outputs_dir.exists():
         shutil.rmtree(outputs_dir)

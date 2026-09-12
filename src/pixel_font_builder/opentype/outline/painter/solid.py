@@ -83,7 +83,7 @@ class SolidOutlinesPainter(OutlinesPainter):
             return NotImplemented
         return True
 
-    def draw_outlines(self, glyph: Glyph, pen: OutlinesPen, px_to_units: int):
+    def draw_outlines(self, glyph: Glyph, pen: OutlinesPen, px_to_units: int) -> None:
         outlines = SolidOutlinesPainter.create_pixel_outlines(glyph.bitmap)
         for outline in outlines:
             for index, (x, y) in enumerate(outline):

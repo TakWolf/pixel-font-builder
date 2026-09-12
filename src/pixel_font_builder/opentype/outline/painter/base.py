@@ -20,7 +20,7 @@ class OutlinesPainter(Protocol):
         raise NotImplementedError()
 
     @abstractmethod
-    def draw_outlines(self, glyph: Glyph, pen: OutlinesPen, px_to_units: int):
+    def draw_outlines(self, glyph: Glyph, pen: OutlinesPen, px_to_units: int) -> None:
         raise NotImplementedError()
 
     @abstractmethod

@@ -131,7 +131,7 @@ class MetaInfo:
             designer_url: str | None = None,
             license_url: str | None = None,
             sample_text: str | None = None,
-    ):
+    ) -> None:
         self.version = version
         self.created_time = created_time
         self.modified_time = modified_time

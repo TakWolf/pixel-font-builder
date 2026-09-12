@@ -14,7 +14,7 @@ def _normalize_pixel_outlines(outlines: list[list[tuple[int, int]]]) -> list[lis
     return outlines
 
 
-def test_create_pixel_outlines():
+def test_create_pixel_outlines() -> None:
     assert _normalize_pixel_outlines(SolidOutlinesPainter.create_pixel_outlines([])) == []
     assert _normalize_pixel_outlines(SolidOutlinesPainter.create_pixel_outlines([
         [1],
@@ -96,7 +96,7 @@ def test_create_pixel_outlines():
     ]
 
 
-def test_copy():
+def test_copy() -> None:
     painter_1 = SolidOutlinesPainter()
     painter_2 = copy(painter_1)
     painter_3 = deepcopy(painter_1)
@@ -107,7 +107,7 @@ def test_copy():
     assert painter_1 is painter_3
 
 
-def test_eq():
+def test_eq() -> None:
     painter_1 = SolidOutlinesPainter()
     painter_2 = SolidOutlinesPainter()
     assert painter_1 == painter_2

@@ -21,7 +21,7 @@ class Glyph:
             vertical_offset: tuple[int, int] = (0, 0),
             advance_height: int = 0,
             bitmap: list[list[int]] | None = None,
-    ):
+    ) -> None:
         self.name = name
         self.horizontal_offset_x, self.horizontal_offset_y = horizontal_offset
         self.advance_width = advance_width
@@ -52,7 +52,7 @@ class Glyph:
         return self.horizontal_offset_x, self.horizontal_offset_y
 
     @horizontal_offset.setter
-    def horizontal_offset(self, value: tuple[int, int]):
+    def horizontal_offset(self, value: tuple[int, int]) -> None:
         self.horizontal_offset_x, self.horizontal_offset_y = value
 
     @property
@@ -60,7 +60,7 @@ class Glyph:
         return self.vertical_offset_x, self.vertical_offset_y
 
     @vertical_offset.setter
-    def vertical_offset(self, value: tuple[int, int]):
+    def vertical_offset(self, value: tuple[int, int]) -> None:
         self.vertical_offset_x, self.vertical_offset_y = value
 
     @property

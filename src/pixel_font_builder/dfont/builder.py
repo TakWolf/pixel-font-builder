@@ -31,7 +31,7 @@ class DFontBuilder:
             width_max: int = 0,
             is_monospaced: bool = False,
             sfnt_resource_id: int = _DEFAULT_RESOURCE_ID,
-    ):
+    ) -> None:
         self.font = font
         self.font_size = font_size
         self.ascent = ascent
@@ -78,7 +78,7 @@ class DFontBuilder:
 
         return resources
 
-    def dump(self, stream: BinaryIO):
+    def dump(self, stream: BinaryIO) -> None:
         resources = self.build_resources()
         Resource.dump(stream, resources)
 
@@ -87,6 +87,6 @@ class DFontBuilder:
         self.dump(stream)
         return stream.getvalue()
 
-    def save(self, file_path: str | PathLike[str]):
+    def save(self, file_path: str | PathLike[str]) -> None:
         with open(file_path, 'wb') as file:
             self.dump(file)

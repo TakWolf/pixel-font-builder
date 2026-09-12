@@ -13,7 +13,7 @@ class Config:
             resolution_x: int = 75,
             resolution_y: int = 75,
             only_basic_plane: bool = False,
-    ):
+    ) -> None:
         self.resolution_x = resolution_x
         self.resolution_y = resolution_y
         self.only_basic_plane = only_basic_plane

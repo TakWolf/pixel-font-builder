@@ -3,7 +3,7 @@ from copy import copy, deepcopy
 from pixel_font_builder import FontBuilder, FontCollectionBuilder
 
 
-def test_copy():
+def test_copy() -> None:
     collection_builder_1 = FontCollectionBuilder([
         FontBuilder(),
         FontBuilder(),
@@ -17,7 +17,7 @@ def test_copy():
         assert builder_1 is builder_2
 
 
-def test_deepcopy():
+def test_deepcopy() -> None:
     collection_builder_1 = FontCollectionBuilder([
         FontBuilder(),
         FontBuilder(),
@@ -31,7 +31,7 @@ def test_deepcopy():
         assert builder_1 is not builder_2
 
 
-def test_eq():
+def test_eq() -> None:
     collection_builder_1 = FontCollectionBuilder([
         FontBuilder(),
         FontBuilder(),

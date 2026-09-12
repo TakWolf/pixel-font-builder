@@ -3,7 +3,7 @@ from copy import copy, deepcopy
 from pixel_font_builder import LineMetric, FontMetric
 
 
-def test_font_metric_1():
+def test_font_metric_1() -> None:
     font_metric = FontMetric()
     assert font_metric.font_size == 0
     assert font_metric.horizontal_layout.ascent == 0
@@ -22,7 +22,7 @@ def test_font_metric_1():
     assert font_metric.strikeout_thickness == 0
 
 
-def test_font_metric_2():
+def test_font_metric_2() -> None:
     font_metric = FontMetric(
         font_size=10,
         horizontal_layout=LineMetric(
@@ -59,7 +59,7 @@ def test_font_metric_2():
     assert font_metric.strikeout_thickness == 20
 
 
-def test_copy():
+def test_copy() -> None:
     font_metric_1 = FontMetric(
         font_size=10,
         horizontal_layout=LineMetric(
@@ -87,7 +87,7 @@ def test_copy():
     assert font_metric_1.vertical_layout is font_metric_2.vertical_layout
 
 
-def test_deepcopy():
+def test_deepcopy() -> None:
     font_metric_1 = FontMetric(
         font_size=10,
         horizontal_layout=LineMetric(
@@ -115,7 +115,7 @@ def test_deepcopy():
     assert font_metric_1.vertical_layout is not font_metric_2.vertical_layout
 
 
-def test_eq():
+def test_eq() -> None:
     font_metric_1 = FontMetric(
         font_size=10,
         horizontal_layout=LineMetric(

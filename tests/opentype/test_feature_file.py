@@ -4,7 +4,7 @@ from pathlib import Path
 from pixel_font_builder.opentype import FeatureFile
 
 
-def test_load(tmp_path: Path):
+def test_load(tmp_path: Path) -> None:
     text = 'Hello World!'
 
     test_fea_file_path = tmp_path.joinpath('test.fea')
@@ -14,7 +14,7 @@ def test_load(tmp_path: Path):
     assert feature_file.text == text
 
 
-def test_copy():
+def test_copy() -> None:
     feature_file_1 = FeatureFile(
         text='test',
         file_path=Path('test.fea'),
@@ -28,7 +28,7 @@ def test_copy():
     assert feature_file_1 is not feature_file_3
 
 
-def test_eq():
+def test_eq() -> None:
     feature_file_1 = FeatureFile(
         text='test',
         file_path=Path('test.fea'),
