@@ -44,12 +44,12 @@ class FeatureFile:
         return self.copy()
 
 
-def build_kern_feature(glyph_order: list[str], kerning_values: dict[tuple[str, str], int], px_to_units: int) -> str:
+def build_kern_feature(kerning_values: dict[tuple[str, str], int], px_to_units: int) -> str:
     text = StringIO()
     text.write('languagesystem DFLT dflt;\n')
     text.write('\n')
     text.write('feature kern {\n')
-    for (left_glyph_name, right_glyph_name), offset in sorted(kerning_values.items(), key=lambda x: (glyph_order.index(x[0][0]), glyph_order.index(x[0][1]))):
+    for (left_glyph_name, right_glyph_name), offset in kerning_values.items():
         text.write(f'    position {left_glyph_name} {right_glyph_name} {offset * px_to_units};\n')
     text.write('} kern;\n')
     return text.getvalue()

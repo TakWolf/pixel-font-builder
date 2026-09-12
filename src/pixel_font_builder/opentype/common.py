@@ -218,7 +218,7 @@ def create_font_builder(
             del builder.font[tb_head.tableTag]
 
     if outline_table_mode == OutlineTableMode.NORMAL and len(kerning_values) > 0:
-        builder.addOpenTypeFeatures(build_kern_feature(glyph_order, kerning_values, config.px_to_units))
+        builder.addOpenTypeFeatures(build_kern_feature(kerning_values, config.px_to_units))
 
     for feature_file in config.feature_files:
         builder.addOpenTypeFeatures(feature_file.text, feature_file.file_path)
