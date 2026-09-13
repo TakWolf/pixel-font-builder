@@ -207,11 +207,6 @@ def create_font_builder(
     if config.has_vertical_metrics:
         builder.font['vhea'].recalc(builder.font)
 
-    if config.is_monospaced:
-        if is_ttf:
-            tb_os2.panose.bProportion = 9
-        builder.font['post'].isFixedPitch = 1
-
     if config.fields_override.head_x_min is not None:
         tb_head.xMin = config.fields_override.head_x_min * config.px_to_units
     if config.fields_override.head_y_min is not None:

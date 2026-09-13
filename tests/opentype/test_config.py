@@ -9,7 +9,6 @@ def test_copy() -> None:
         px_to_units=1,
         outlines_painter=SolidOutlinesPainter(),
         has_vertical_metrics=False,
-        is_monospaced=True,
         fields_override=FieldsOverride(
             head_x_min=1,
             head_y_min=2,
@@ -33,7 +32,6 @@ def test_deepcopy() -> None:
         px_to_units=1,
         outlines_painter=SolidOutlinesPainter(),
         has_vertical_metrics=False,
-        is_monospaced=True,
         fields_override=FieldsOverride(
             head_x_min=1,
             head_y_min=2,
@@ -57,7 +55,6 @@ def test_eq() -> None:
         px_to_units=1,
         outlines_painter=SolidOutlinesPainter(),
         has_vertical_metrics=False,
-        is_monospaced=True,
         fields_override=FieldsOverride(
             head_x_min=1,
             head_y_min=2,
@@ -71,7 +68,6 @@ def test_eq() -> None:
         px_to_units=1,
         outlines_painter=SolidOutlinesPainter(),
         has_vertical_metrics=False,
-        is_monospaced=True,
         fields_override=FieldsOverride(
             head_x_min=1,
             head_y_min=2,
