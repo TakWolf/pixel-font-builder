@@ -62,6 +62,7 @@ class Config:
     px_to_units: int
     outlines_painter: OutlinesPainter
     has_vertical_metrics: bool
+    is_fixed_pitch: bool
     fields_override: FieldsOverride
     features: FeatureSource | None
 
@@ -70,12 +71,14 @@ class Config:
             px_to_units: int = 100,
             outlines_painter: OutlinesPainter | None = None,
             has_vertical_metrics: bool = True,
+            is_fixed_pitch: bool = False,
             fields_override: FieldsOverride | None = None,
             features: FeatureSource | None = None,
     ) -> None:
         self.px_to_units = px_to_units
         self.outlines_painter = outlines_painter if outlines_painter is not None else Config.DEFAULT_OUTLINES_PAINTER
         self.has_vertical_metrics = has_vertical_metrics
+        self.is_fixed_pitch = is_fixed_pitch
         self.fields_override = fields_override if fields_override is not None else FieldsOverride()
         self.features = features
 
@@ -91,6 +94,7 @@ class Config:
         return (self.px_to_units == other.px_to_units and
                 self.outlines_painter == other.outlines_painter and
                 self.has_vertical_metrics == other.has_vertical_metrics and
+                self.is_fixed_pitch == other.is_fixed_pitch and
                 self.fields_override == other.fields_override and
                 self.features == other.features)
 
@@ -99,6 +103,7 @@ class Config:
             self.px_to_units,
             self.outlines_painter,
             self.has_vertical_metrics,
+            self.is_fixed_pitch,
             self.fields_override,
             self.features,
         )
@@ -108,6 +113,7 @@ class Config:
             self.px_to_units,
             self.outlines_painter.deepcopy(),
             self.has_vertical_metrics,
+            self.is_fixed_pitch,
             self.fields_override.deepcopy(),
             self.features.deepcopy() if self.features is not None else None,
         )

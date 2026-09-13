@@ -117,7 +117,9 @@ def create_font_builder(
             if outline_table_mode == OutlineTableMode.NORMAL:
                 config.outlines_painter.draw_outlines(glyph, pen, config.px_to_units)
             otf_glyphs[glyph_name] = pen.to_glyph()
-        builder.setupCFF('', {}, otf_glyphs, {})
+        builder.setupCFF('', {
+            'isFixedPitch': config.is_fixed_pitch,
+        }, otf_glyphs, {})
 
         name_to_otf_bounds = {glyph_name: otf_glyph.calcBounds(None) for glyph_name, otf_glyph in otf_glyphs.items()}
 
@@ -185,6 +187,7 @@ def create_font_builder(
     builder.setupPost(
         underlinePosition=font_metric.underline_position,
         underlineThickness=font_metric.underline_thickness,
+        isFixedPitch=int(config.is_fixed_pitch),
     )
 
     tb_head = builder.font['head']
