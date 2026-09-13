@@ -34,10 +34,6 @@ def test_glyph_1() -> None:
     assert glyph.width == 7
     assert glyph.height == 9
     assert glyph.dimensions == (7, 9)
-    assert glyph.calculate_bitmap_left_padding() == 1
-    assert glyph.calculate_bitmap_right_padding() == 2
-    assert glyph.calculate_bitmap_top_padding() == 3
-    assert glyph.calculate_bitmap_bottom_padding() == 1
 
     glyph.horizontal_offset = (7, 8)
     assert glyph.horizontal_offset_x == 7
@@ -55,26 +51,6 @@ def test_glyph_2() -> None:
     assert glyph.vertical_offset == (0, 0)
     assert glyph.advance_height == 0
     assert glyph.dimensions == (0, 0)
-    assert glyph.calculate_bitmap_left_padding() == 0
-    assert glyph.calculate_bitmap_right_padding() == 0
-    assert glyph.calculate_bitmap_top_padding() == 0
-    assert glyph.calculate_bitmap_bottom_padding() == 0
-
-
-def test_glyph_3() -> None:
-    glyph = Glyph(
-        name='test',
-        bitmap=[
-            [0, 0],
-            [0, 0],
-            [0, 0],
-            [0, 0],
-        ],
-    )
-    assert glyph.calculate_bitmap_left_padding() == 2
-    assert glyph.calculate_bitmap_right_padding() == 2
-    assert glyph.calculate_bitmap_top_padding() == 4
-    assert glyph.calculate_bitmap_bottom_padding() == 4
 
 
 def test_copy() -> None:

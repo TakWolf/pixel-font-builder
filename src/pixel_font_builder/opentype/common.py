@@ -6,6 +6,7 @@ from fontTools.feaLib.builder import addOpenTypeFeatures
 from fontTools.fontBuilder import FontBuilder
 from fontTools.misc import timeTools
 from fontTools.misc.arrayTools import intRect
+from fontTools.misc.roundTools import otRound
 from fontTools.ttLib import TTCollection
 from fontTools.ttLib.tables import DefaultTable
 from fontTools.ttLib.tables.E_B_D_T_ import table_E_B_D_T_
@@ -19,7 +20,8 @@ from pixel_font_builder.opentype.bitmap import create_bitmap_strike_data
 from pixel_font_builder.opentype.feature.common import build_feature_ast
 from pixel_font_builder.opentype.kerning import create_kern_feature
 from pixel_font_builder.opentype.name import create_name_strings
-from pixel_font_builder.opentype.outline.common import create_normal_xtf_glyphs, create_blank_xtf_glyphs
+from pixel_font_builder.opentype.outline.pen.otf import OtfOutlinesPen
+from pixel_font_builder.opentype.outline.pen.ttf import TtfOutlinesPen
 
 
 @unique
@@ -80,18 +82,61 @@ def create_font_builder(
     name_strings = create_name_strings(meta_info)
     builder.setupNameTable(name_strings)
 
-    if outline_table_mode == OutlineTableMode.NORMAL:
-        xtf_glyphs, horizontal_metrics, vertical_metrics = create_normal_xtf_glyphs(is_ttf, config.outlines_painter, name_to_glyph, config.px_to_units)
-    else:
-        xtf_glyphs, horizontal_metrics, vertical_metrics = create_blank_xtf_glyphs(is_ttf, name_to_glyph, config.px_to_units)
     builder.setupGlyphOrder(glyph_order)
+    builder.setupCharacterMap(character_mapping)
+
     if is_ttf:
-        builder.setupGlyf(xtf_glyphs)
+        ttf_glyphs = {}
+        for glyph_name, glyph in name_to_glyph.items():
+            pen = TtfOutlinesPen()
+            if outline_table_mode == OutlineTableMode.NORMAL:
+                config.outlines_painter.draw_outlines(glyph, pen, config.px_to_units)
+            ttf_glyphs[glyph_name] = pen.to_glyph()
+        builder.setupGlyf(ttf_glyphs)
+
+        horizontal_metrics = {}
+        for glyph_name, ttf_glyph in ttf_glyphs.items():
+            glyph = name_to_glyph[glyph_name]
+            advance_width = glyph.advance_width * config.px_to_units
+            left_side_bearing = ttf_glyph.xMin if ttf_glyph.numberOfContours > 0 else 0
+            horizontal_metrics[glyph_name] = advance_width, left_side_bearing
+        builder.setupHorizontalMetrics(horizontal_metrics)
+
+        if config.has_vertical_metrics:
+            vertical_metrics = {}
+            for glyph_name, ttf_glyph in ttf_glyphs.items():
+                glyph = name_to_glyph[glyph_name]
+                advance_height = glyph.advance_height * config.px_to_units
+                top_side_bearing = (glyph.height + glyph.horizontal_offset_y + glyph.vertical_offset_y) * config.px_to_units - ttf_glyph.yMax if ttf_glyph.numberOfContours > 0 else 0
+                vertical_metrics[glyph_name] = advance_height, top_side_bearing
+            builder.setupVerticalMetrics(vertical_metrics)
     else:
-        builder.setupCFF('', {}, xtf_glyphs, {})
-    builder.setupHorizontalMetrics(horizontal_metrics)
-    if config.has_vertical_metrics:
-        builder.setupVerticalMetrics(vertical_metrics)
+        otf_glyphs = {}
+        for glyph_name, glyph in name_to_glyph.items():
+            pen = OtfOutlinesPen(glyph.advance_width * config.px_to_units)
+            if outline_table_mode == OutlineTableMode.NORMAL:
+                config.outlines_painter.draw_outlines(glyph, pen, config.px_to_units)
+            otf_glyphs[glyph_name] = pen.to_glyph()
+        builder.setupCFF('', {}, otf_glyphs, {})
+
+        name_to_otf_bounds = {glyph_name: otf_glyph.calcBounds(None) for glyph_name, otf_glyph in otf_glyphs.items()}
+
+        horizontal_metrics = {}
+        for glyph_name, otf_bounds in name_to_otf_bounds.items():
+            glyph = name_to_glyph[glyph_name]
+            advance_width = glyph.advance_width * config.px_to_units
+            left_side_bearing = otRound(otf_bounds[0]) if otf_bounds is not None else 0
+            horizontal_metrics[glyph_name] = advance_width, left_side_bearing
+        builder.setupHorizontalMetrics(horizontal_metrics)
+
+        if config.has_vertical_metrics:
+            vertical_metrics = {}
+            for glyph_name, otf_bounds in name_to_otf_bounds.items():
+                glyph = name_to_glyph[glyph_name]
+                advance_height = glyph.advance_height * config.px_to_units
+                top_side_bearing = otRound((glyph.height + glyph.horizontal_offset_y + glyph.vertical_offset_y) * config.px_to_units - otf_bounds[3]) if otf_bounds is not None else 0
+                vertical_metrics[glyph_name] = advance_height, top_side_bearing
+            builder.setupVerticalMetrics(vertical_metrics)
 
     if bitmap_table_mode in (BitmapTableMode.STANDARD, BitmapTableMode.APPLE):
         strike, strike_data = create_bitmap_strike_data(context.font_metric, config.has_vertical_metrics, glyph_order, name_to_glyph)
@@ -110,8 +155,6 @@ def create_font_builder(
         tb_ebdt.version = 2.0
         tb_ebdt.strikeData = [strike_data]
         builder.font[tb_ebdt.tableTag] = tb_ebdt
-
-    builder.setupCharacterMap(character_mapping)
 
     builder.setupHorizontalHeader(
         ascent=font_metric.horizontal_layout.ascent,

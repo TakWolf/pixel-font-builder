@@ -26,8 +26,7 @@ class Glyph:
     that direction.
 
     Offsets position the complete bitmap; they do not remove transparent rows
-    or columns. Padding inside the bitmap remains part of its dimensions and is
-    accounted for separately when deriving outline side bearings.
+    or columns. Padding inside the bitmap remains part of its dimensions.
     """
 
     name: str
@@ -103,38 +102,6 @@ class Glyph:
     @property
     def dimensions(self) -> tuple[int, int]:
         return self.width, self.height
-
-    def calculate_bitmap_left_padding(self) -> int:
-        padding = 0
-        for i in range(self.width):
-            if any(bitmap_row[i] != 0 for bitmap_row in self.bitmap):
-                break
-            padding += 1
-        return padding
-
-    def calculate_bitmap_right_padding(self) -> int:
-        padding = 0
-        for i in range(self.width):
-            if any(bitmap_row[-1 - i] != 0 for bitmap_row in self.bitmap):
-                break
-            padding += 1
-        return padding
-
-    def calculate_bitmap_top_padding(self) -> int:
-        padding = 0
-        for bitmap_row in self.bitmap:
-            if any(pixel != 0 for pixel in bitmap_row):
-                break
-            padding += 1
-        return padding
-
-    def calculate_bitmap_bottom_padding(self) -> int:
-        padding = 0
-        for bitmap_row in reversed(self.bitmap):
-            if any(pixel != 0 for pixel in bitmap_row):
-                break
-            padding += 1
-        return padding
 
     def copy(self) -> Glyph:
         return Glyph(
