@@ -1,3 +1,4 @@
+import re
 from copy import copy, deepcopy
 from pathlib import Path
 
@@ -92,7 +93,7 @@ def test_parse_absolute_path_ignores_include_directory(tmp_path: Path) -> None:
     ],
 )
 def test_parse_rejects_unrepresentable_include_path(invalid_path: str) -> None:
-    with pytest.raises(ValueError, match='invalid feature include path'):
+    with pytest.raises(ValueError, match=re.escape('invalid feature include path')):
         FeatureIncludes([invalid_path]).parse(['a', 'b'])
 
 
