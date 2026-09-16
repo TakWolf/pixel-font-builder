@@ -1,3 +1,5 @@
+from collections.abc import Mapping, Sequence
+
 from fontTools.ttLib.tables.BitmapGlyphMetrics import BigGlyphMetrics, SmallGlyphMetrics
 from fontTools.ttLib.tables.E_B_D_T_ import ebdt_bitmap_format_1, ebdt_bitmap_format_2, ebdt_bitmap_format_5, ebdt_bitmap_format_6, ebdt_bitmap_format_7
 from fontTools.ttLib.tables.E_B_L_C_ import BitmapSizeTable, SbitLineMetrics, Strike, eblc_index_sub_table_1, eblc_index_sub_table_2, eblc_index_sub_table_5
@@ -12,7 +14,7 @@ GroupSignature = tuple[bool, int]
 
 def _create_horizontal_sbit_line_metrics(
         horizontal_layout: LineMetric,
-        name_to_glyph: dict[str, Glyph],
+        name_to_glyph: Mapping[str, Glyph],
 ) -> SbitLineMetrics:
     line_metrics = SbitLineMetrics()
     line_metrics.ascender = horizontal_layout.ascent
@@ -32,7 +34,7 @@ def _create_horizontal_sbit_line_metrics(
 
 def _create_vertical_sbit_line_metrics(
         vertical_layout: LineMetric,
-        name_to_glyph: dict[str, Glyph],
+        name_to_glyph: Mapping[str, Glyph],
 ) -> SbitLineMetrics:
     line_metrics = SbitLineMetrics()
     line_metrics.ascender = vertical_layout.ascent
@@ -53,7 +55,7 @@ def _create_vertical_sbit_line_metrics(
 def _create_bitmap_size_table(
         font_metric: FontMetric,
         has_vertical_metrics: bool,
-        name_to_glyph: dict[str, Glyph],
+        name_to_glyph: Mapping[str, Glyph],
 ) -> BitmapSizeTable:
     bitmap_size_table = BitmapSizeTable()
     bitmap_size_table.colorRef = 0
@@ -132,7 +134,7 @@ def _create_bitmap_format(glyph: Glyph, image_format: int) -> GlyphBitmapFormat:
     return bitmap_glyph
 
 
-def _select_image_format(glyphs: list[Glyph], use_big_metrics: bool) -> int:
+def _select_image_format(glyphs: Sequence[Glyph], use_big_metrics: bool) -> int:
     byte_aligned = all(glyph.width % 8 == 0 for glyph in glyphs)
     if use_big_metrics:
         return 6 if byte_aligned else 7
@@ -164,7 +166,7 @@ def _group_signature(glyph: Glyph, use_big_metrics: bool) -> GroupSignature:
     return use_big_metrics, image_format
 
 
-def _uses_consecutive_glyph_ids(glyph_names: list[str], name_to_glyph_id: dict[str, int]) -> bool:
+def _uses_consecutive_glyph_ids(glyph_names: Sequence[str], name_to_glyph_id: Mapping[str, int]) -> bool:
     glyph_ids = [name_to_glyph_id[glyph_name] for glyph_name in glyph_names]
     return glyph_ids == list(range(glyph_ids[0], glyph_ids[-1] + 1))
 
@@ -172,9 +174,9 @@ def _uses_consecutive_glyph_ids(glyph_names: list[str], name_to_glyph_id: dict[s
 def _append_index_sub_table(
         strike: Strike,
         use_big_metrics: bool,
-        glyphs: list[Glyph],
-        glyph_names: list[str],
-        name_to_glyph_id: dict[str, int],
+        glyphs: Sequence[Glyph],
+        glyph_names: Sequence[str],
+        name_to_glyph_id: Mapping[str, int],
 ) -> int:
     image_format = _select_image_format(glyphs, use_big_metrics)
     if use_big_metrics:
@@ -214,8 +216,8 @@ def _append_index_sub_table(
 def create_bitmap_strike_data(
         font_metric: FontMetric,
         has_vertical_metrics: bool,
-        glyph_order: list[str],
-        name_to_glyph: dict[str, Glyph],
+        glyph_order: Sequence[str],
+        name_to_glyph: Mapping[str, Glyph],
 ) -> tuple[Strike, dict[str, GlyphBitmapFormat]]:
     use_big_metrics = has_vertical_metrics
     name_to_glyph_id = {glyph_name: glyph_id for glyph_id, glyph_name in enumerate(glyph_order)}

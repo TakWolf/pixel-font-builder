@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from fontTools.feaLib import ast
 
 
-def create_kern_feature(kerning_values: dict[tuple[str, str], int], px_to_units: int) -> ast.FeatureBlock:
+def create_kern_feature(kerning_values: Mapping[tuple[str, str], int], px_to_units: int) -> ast.FeatureBlock:
     feature = ast.FeatureBlock('kern')
     feature.statements.append(ast.ScriptStatement('DFLT'))
     feature.statements.append(ast.LanguageStatement('dflt'))

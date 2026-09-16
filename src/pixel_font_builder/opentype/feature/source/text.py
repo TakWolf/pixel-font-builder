@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from io import StringIO
 from os import PathLike, fspath
-from typing import Iterable
 
 from fontTools.feaLib import ast
 from fontTools.feaLib.parser import Parser

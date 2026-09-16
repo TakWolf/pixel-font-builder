@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import struct
+from collections.abc import Sequence
 from io import BytesIO
 from typing import BinaryIO
 
@@ -127,7 +128,7 @@ class Resource:
         return Resource('FOND', id, data, family_name)
 
     @staticmethod
-    def dump(stream: BinaryIO, resources: list[Resource]) -> None:
+    def dump(stream: BinaryIO, resources: Sequence[Resource]) -> None:
         stream.write(b'\x00' * _DATA_OFFSET)
         resource_offsets = []
         for resource in resources:
