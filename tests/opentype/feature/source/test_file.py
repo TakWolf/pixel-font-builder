@@ -62,6 +62,34 @@ def test_parse_nested_include_from_entry_directory(tmp_path: Path) -> None:
     assert feature_names == ['salt']
 
 
+def test_parse_nested_include_from_explicit_include_directory(tmp_path: Path) -> None:
+    include_dir = tmp_path.joinpath('features')
+    include_dir.mkdir()
+    include_dir.joinpath('classes.fea').write_text('@Letters = [a];', 'utf-8')
+    sub_dir = include_dir.joinpath('sub')
+    sub_dir.mkdir()
+    sub_dir.joinpath('salt.fea').write_text('include(classes.fea); feature salt { sub @Letters by b; } salt;', 'utf-8')
+    entry_dir = tmp_path.joinpath('entries')
+    entry_dir.mkdir()
+    feature_path = entry_dir.joinpath('main.fea')
+    feature_path.write_text('include(sub/salt.fea);', 'utf-8')
+
+    feature_ast = parse_feature_inputs(
+        FeatureFile(
+            feature_path,
+            include_dir=include_dir,
+        ).create_inputs(),
+        ['a', 'b'],
+    )
+
+    feature_names = [
+        statement.name
+        for statement in feature_ast.statements
+        if isinstance(statement, ast.FeatureBlock)
+    ]
+    assert feature_names == ['salt']
+
+
 def test_parse_error_uses_entry_file_path(tmp_path: Path) -> None:
     feature_path = tmp_path.joinpath('main.fea')
     feature_path.write_text('feature salt { sub a by; } salt;', 'utf-8')
@@ -77,7 +105,10 @@ def test_parse_error_uses_entry_file_path(tmp_path: Path) -> None:
 
 
 def test_copy() -> None:
-    feature_file_1 = FeatureFile(Path('test.fea'))
+    feature_file_1 = FeatureFile(
+        path=Path('test.fea'),
+        include_dir=Path('fea'),
+    )
     feature_file_2 = copy(feature_file_1)
     feature_file_3 = deepcopy(feature_file_1)
 
@@ -88,6 +119,12 @@ def test_copy() -> None:
 
 
 def test_eq() -> None:
-    feature_file_1 = FeatureFile(Path('test.fea'))
-    feature_file_2 = FeatureFile(Path('test.fea'))
+    feature_file_1 = FeatureFile(
+        path=Path('test.fea'),
+        include_dir=Path('fea'),
+    )
+    feature_file_2 = FeatureFile(
+        path=Path('test.fea'),
+        include_dir=Path('fea'),
+    )
     assert feature_file_1 == feature_file_2

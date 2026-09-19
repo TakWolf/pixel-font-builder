@@ -61,6 +61,31 @@ def test_parse_nested_include_from_virtual_filename_directory(tmp_path: Path) ->
     assert feature_names == ['salt']
 
 
+def test_parse_nested_include_from_explicit_include_directory(tmp_path: Path) -> None:
+    include_dir = tmp_path.joinpath('features')
+    include_dir.mkdir()
+    include_dir.joinpath('classes.fea').write_text('@Letters = [a];', 'utf-8')
+    sub_dir = include_dir.joinpath('sub')
+    sub_dir.mkdir()
+    sub_dir.joinpath('salt.fea').write_text('include(classes.fea); feature salt { sub @Letters by b; } salt;', 'utf-8')
+
+    feature_ast = parse_feature_inputs(
+        FeatureText(
+            'include(sub/salt.fea);',
+            filename=tmp_path.joinpath('virtual-main.fea'),
+            include_dir=include_dir,
+        ).create_inputs(),
+        ['a', 'b'],
+    )
+
+    feature_names = [
+        statement.name
+        for statement in feature_ast.statements
+        if isinstance(statement, ast.FeatureBlock)
+    ]
+    assert feature_names == ['salt']
+
+
 def test_parse_relative_include_from_current_working_directory(
         tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
@@ -98,8 +123,9 @@ def test_parse_error_uses_virtual_filename(tmp_path: Path) -> None:
 
 def test_copy() -> None:
     feature_text_1 = FeatureText(
-        'test',
+        text='test',
         filename=Path('test.fea'),
+        include_dir=Path('fea'),
     )
     feature_text_2 = copy(feature_text_1)
     feature_text_3 = deepcopy(feature_text_1)
@@ -112,11 +138,13 @@ def test_copy() -> None:
 
 def test_eq() -> None:
     feature_text_1 = FeatureText(
-        'test',
+        text='test',
         filename=Path('test.fea'),
+        include_dir=Path('fea'),
     )
     feature_text_2 = FeatureText(
-        'test',
+        text='test',
         filename=Path('test.fea'),
+        include_dir=Path('fea'),
     )
     assert feature_text_1 == feature_text_2
