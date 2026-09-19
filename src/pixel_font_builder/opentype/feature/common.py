@@ -2,6 +2,7 @@ from collections.abc import Iterable
 
 from fontTools.feaLib import ast
 
+from pixel_font_builder.opentype.feature.source.parser import parse_feature_inputs
 from pixel_font_builder.opentype.feature.source.source import FeatureSource
 
 
@@ -17,7 +18,7 @@ def build_feature_ast(
         glyph_names: Iterable[str],
         generated_kern_feature: ast.FeatureBlock | None = None,
 ) -> ast.FeatureFile:
-    feature_ast = features.parse(glyph_names) if features is not None else ast.FeatureFile()
+    feature_ast = parse_feature_inputs(features.create_inputs(), glyph_names) if features is not None else ast.FeatureFile()
     if generated_kern_feature is not None and not _claims_feature(feature_ast, 'kern'):
         feature_ast.statements.append(generated_kern_feature)
     return feature_ast

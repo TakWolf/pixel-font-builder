@@ -1,20 +1,17 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from os import PathLike, fspath
+from os import PathLike
 
-from fontTools.feaLib import ast
-from fontTools.feaLib.parser import Parser
-
+from pixel_font_builder.opentype.feature.source.input import FeatureInput, FeatureFileInput
 from pixel_font_builder.opentype.feature.source.source import FeatureSource
 
 
 class FeatureFile(FeatureSource):
-    """A FEA program loaded from a real entry file.
+    """A FEA source backed by one real entry file.
 
-    Relative ``include()`` paths use the entry file's directory as one common
-    root. Nested includes keep using that root instead of the directory of the
-    file containing the nested ``include()`` statement.
+    FontTools uses the entry file's directory as the common root for relative
+    ``include()`` paths, including nested includes.
     """
 
     path: str | PathLike[str]
@@ -27,8 +24,8 @@ class FeatureFile(FeatureSource):
             return NotImplemented
         return self.path == other.path
 
-    def parse(self, glyph_names: Iterable[str]) -> ast.FeatureFile:
-        return Parser(fspath(self.path), glyph_names).parse()
+    def create_inputs(self) -> Iterable[FeatureInput]:
+        yield FeatureFileInput(self.path)
 
     def copy(self) -> FeatureFile:
         return FeatureFile(self.path)

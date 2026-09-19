@@ -4,16 +4,16 @@ from abc import abstractmethod
 from collections.abc import Iterable
 from typing import Any, Protocol, runtime_checkable
 
-from fontTools.feaLib import ast
+from pixel_font_builder.opentype.feature.source.input import FeatureInput
 
 
 @runtime_checkable
 class FeatureSource(Protocol):
-    """A complete FEA program source parsed as one compilation unit.
+    """An ordered source of FEA inputs parsed as one compilation unit.
 
-    Relative ``include()`` paths follow FontTools rules. They use one common
-    root for the complete program and are not resolved relative to each
-    including file. Concrete sources define how that root is selected.
+    All inputs share one parser and therefore one symbol scope. Definitions such
+    as glyph classes and lookups can be referenced by later inputs. Each input
+    independently defines how its relative ``include()`` paths are resolved.
     """
 
     def __copy__(self) -> FeatureSource:
@@ -27,7 +27,12 @@ class FeatureSource(Protocol):
         raise NotImplementedError()
 
     @abstractmethod
-    def parse(self, glyph_names: Iterable[str]) -> ast.FeatureFile:
+    def create_inputs(self) -> Iterable[FeatureInput]:
+        """Create ordered input descriptions for one compilation unit.
+
+        Later inputs can reference definitions from earlier inputs because all
+        returned inputs are parsed with one shared parser and symbol scope.
+        """
         raise NotImplementedError()
 
     @abstractmethod

@@ -6,12 +6,14 @@ from fontTools.feaLib import ast
 from fontTools.feaLib.error import FeatureLibError
 
 from pixel_font_builder.opentype import FeatureText
+from pixel_font_builder.opentype.feature.source.parser import parse_feature_inputs
 
 
 def test_parse() -> None:
-    feature_ast = FeatureText(
-        text='feature salt { sub a by b; } salt;',
-    ).parse(['a', 'b'])
+    feature_ast = parse_feature_inputs(
+        FeatureText('feature salt { sub a by b; } salt;').create_inputs(),
+        ['a', 'b'],
+    )
 
     assert len(feature_ast.statements) == 1
     assert isinstance(feature_ast.statements[0], ast.FeatureBlock)
@@ -21,10 +23,13 @@ def test_parse() -> None:
 def test_parse_relative_include_from_virtual_filename(tmp_path: Path) -> None:
     tmp_path.joinpath('classes.fea').write_text('@Letters = [a];', 'utf-8')
 
-    feature_ast = FeatureText(
-        text='include(classes.fea); feature salt { sub @Letters by b; } salt;',
-        filename=tmp_path.joinpath('virtual-main.fea'),
-    ).parse(['a', 'b'])
+    feature_ast = parse_feature_inputs(
+        FeatureText(
+            'include(classes.fea); feature salt { sub @Letters by b; } salt;',
+            filename=tmp_path.joinpath('virtual-main.fea'),
+        ).create_inputs(),
+        ['a', 'b'],
+    )
 
     feature_names = [
         statement.name
@@ -40,10 +45,13 @@ def test_parse_nested_include_from_virtual_filename_directory(tmp_path: Path) ->
     sub_dir.mkdir()
     sub_dir.joinpath('salt.fea').write_text('include(classes.fea); feature salt { sub @Letters by b; } salt;', 'utf-8')
 
-    feature_ast = FeatureText(
-        text='include(sub/salt.fea);',
-        filename=tmp_path.joinpath('virtual-main.fea'),
-    ).parse(['a', 'b'])
+    feature_ast = parse_feature_inputs(
+        FeatureText(
+            'include(sub/salt.fea);',
+            filename=tmp_path.joinpath('virtual-main.fea'),
+        ).create_inputs(),
+        ['a', 'b'],
+    )
 
     feature_names = [
         statement.name
@@ -60,9 +68,10 @@ def test_parse_relative_include_from_current_working_directory(
     monkeypatch.chdir(tmp_path)
     tmp_path.joinpath('classes.fea').write_text('@Letters = [a];', 'utf-8')
 
-    feature_ast = FeatureText(
-        text='include(classes.fea); feature salt { sub @Letters by b; } salt;',
-    ).parse(['a', 'b'])
+    feature_ast = parse_feature_inputs(
+        FeatureText('include(classes.fea); feature salt { sub @Letters by b; } salt;').create_inputs(),
+        ['a', 'b'],
+    )
 
     feature_names = [
         statement.name
@@ -76,18 +85,20 @@ def test_parse_error_uses_virtual_filename(tmp_path: Path) -> None:
     filename = tmp_path.joinpath('virtual-main.fea')
 
     with pytest.raises(FeatureLibError) as info:
-        FeatureText(
-            text='feature salt { sub a by; } salt;',
-            filename=filename,
-        ).parse(['a', 'b'])
-
+        parse_feature_inputs(
+            FeatureText(
+                'feature salt { sub a by; } salt;',
+                filename=filename,
+            ).create_inputs(),
+            ['a', 'b'],
+        )
     assert info.value.location is not None
     assert info.value.location.file == str(filename)
 
 
 def test_copy() -> None:
     feature_text_1 = FeatureText(
-        text='test',
+        'test',
         filename=Path('test.fea'),
     )
     feature_text_2 = copy(feature_text_1)
@@ -101,11 +112,11 @@ def test_copy() -> None:
 
 def test_eq() -> None:
     feature_text_1 = FeatureText(
-        text='test',
+        'test',
         filename=Path('test.fea'),
     )
     feature_text_2 = FeatureText(
-        text='test',
+        'test',
         filename=Path('test.fea'),
     )
     assert feature_text_1 == feature_text_2

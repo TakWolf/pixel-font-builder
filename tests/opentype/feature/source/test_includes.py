@@ -7,6 +7,7 @@ from fontTools.feaLib import ast
 from fontTools.feaLib.error import FeatureLibError
 
 from pixel_font_builder.opentype import FeatureIncludes
+from pixel_font_builder.opentype.feature.source.parser import parse_feature_inputs
 
 
 def test_parse_multiple_files_in_order_with_shared_glyph_class(tmp_path: Path) -> None:
@@ -14,10 +15,12 @@ def test_parse_multiple_files_in_order_with_shared_glyph_class(tmp_path: Path) -
     tmp_path.joinpath('salt.fea').write_text('feature salt { sub @Letters by b; } salt;', 'utf-8')
     tmp_path.joinpath('ss01.fea').write_text('feature ss01 { sub b by a; } ss01;', 'utf-8')
 
-    feature_ast = FeatureIncludes(
-        paths=['classes.fea', 'salt.fea', 'ss01.fea'],
-        include_dir=tmp_path,
-    ).parse(['a', 'b'])
+    feature_ast = parse_feature_inputs(
+        FeatureIncludes([
+            'classes.fea', 'salt.fea', 'ss01.fea',
+        ], include_dir=tmp_path).create_inputs(),
+        ['a', 'b'],
+    )
 
     feature_names = [
         statement.name
@@ -33,10 +36,10 @@ def test_parse_nested_include_from_common_include_directory(tmp_path: Path) -> N
     sub_dir.mkdir()
     sub_dir.joinpath('salt.fea').write_text('include(classes.fea); feature salt { sub @Letters by b; } salt;', 'utf-8')
 
-    feature_ast = FeatureIncludes(
-        paths=['sub/salt.fea'],
-        include_dir=tmp_path,
-    ).parse(['a', 'b'])
+    feature_ast = parse_feature_inputs(
+        FeatureIncludes(['sub/salt.fea'], include_dir=tmp_path).create_inputs(),
+        ['a', 'b'],
+    )
 
     feature_names = [
         statement.name
@@ -53,7 +56,10 @@ def test_parse_relative_paths_from_current_working_directory(
     monkeypatch.chdir(tmp_path)
     tmp_path.joinpath('salt.fea').write_text('feature salt { sub a by b; } salt;', 'utf-8')
 
-    feature_ast = FeatureIncludes(['salt.fea']).parse(['a', 'b'])
+    feature_ast = parse_feature_inputs(
+        FeatureIncludes(['salt.fea']).create_inputs(),
+        ['a', 'b'],
+    )
 
     feature_names = [
         statement.name
@@ -71,10 +77,10 @@ def test_parse_absolute_path_ignores_include_directory(tmp_path: Path) -> None:
     other_dir = tmp_path.joinpath('other')
     other_dir.mkdir()
 
-    feature_ast = FeatureIncludes(
-        [feature_path],
-        include_dir=other_dir,
-    ).parse(['a', 'b'])
+    feature_ast = parse_feature_inputs(
+        FeatureIncludes([feature_path], include_dir=other_dir).create_inputs(),
+        ['a', 'b'],
+    )
 
     feature_names = [
         statement.name
@@ -94,7 +100,10 @@ def test_parse_absolute_path_ignores_include_directory(tmp_path: Path) -> None:
 )
 def test_parse_rejects_unrepresentable_include_path(invalid_path: str) -> None:
     with pytest.raises(ValueError, match=re.escape('invalid feature include path')):
-        FeatureIncludes([invalid_path]).parse(['a', 'b'])
+        parse_feature_inputs(
+            FeatureIncludes([invalid_path]).create_inputs(),
+            ['a', 'b'],
+        )
 
 
 def test_parse_error_uses_included_file_path(tmp_path: Path) -> None:
@@ -102,20 +111,20 @@ def test_parse_error_uses_included_file_path(tmp_path: Path) -> None:
     feature_path.write_text('feature salt { sub a by; } salt;', 'utf-8')
 
     with pytest.raises(FeatureLibError) as info:
-        FeatureIncludes([feature_path]).parse(['a', 'b'])
+        parse_feature_inputs(
+            FeatureIncludes([feature_path]).create_inputs(),
+            ['a', 'b'],
+        )
 
     assert info.value.location is not None
     assert info.value.location.file == str(feature_path)
 
 
 def test_copy() -> None:
-    feature_includes_1 = FeatureIncludes(
-        paths=[
-            Path('test-1.fea'),
-            Path('test-2.fea'),
-        ],
-        include_dir=Path('fea'),
-    )
+    feature_includes_1 = FeatureIncludes([
+        Path('test-1.fea'),
+        Path('test-2.fea')
+    ], include_dir=Path('fea'))
     feature_includes_2 = copy(feature_includes_1)
 
     assert feature_includes_1 == feature_includes_2
@@ -124,13 +133,10 @@ def test_copy() -> None:
 
 
 def test_deepcopy() -> None:
-    feature_includes_1 = FeatureIncludes(
-        paths=[
-            Path('test-1.fea'),
-            Path('test-2.fea'),
-        ],
-        include_dir=Path('fea'),
-    )
+    feature_includes_1 = FeatureIncludes([
+        Path('test-1.fea'),
+        Path('test-2.fea')
+    ], include_dir=Path('fea'))
     feature_includes_2 = deepcopy(feature_includes_1)
 
     assert feature_includes_1 == feature_includes_2
@@ -139,18 +145,12 @@ def test_deepcopy() -> None:
 
 
 def test_eq() -> None:
-    feature_includes_1 = FeatureIncludes(
-        paths=[
-            Path('test-1.fea'),
-            Path('test-2.fea'),
-        ],
-        include_dir=Path('fea'),
-    )
-    feature_includes_2 = FeatureIncludes(
-        paths=[
-            Path('test-1.fea'),
-            Path('test-2.fea'),
-        ],
-        include_dir=Path('fea'),
-    )
+    feature_includes_1 = FeatureIncludes([
+        Path('test-1.fea'),
+        Path('test-2.fea')
+    ], include_dir=Path('fea'))
+    feature_includes_2 = FeatureIncludes([
+        Path('test-1.fea'),
+        Path('test-2.fea')
+    ], include_dir=Path('fea'))
     assert feature_includes_1 == feature_includes_2
