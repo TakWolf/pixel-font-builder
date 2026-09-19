@@ -3,6 +3,7 @@ from pixel_font_builder.opentype.config import FieldsOverride, Config
 from pixel_font_builder.opentype.feature.source.file import FeatureFile
 from pixel_font_builder.opentype.feature.source.includes import FeatureIncludes
 from pixel_font_builder.opentype.feature.source.input import FeatureInput, FeatureTextInput, FeatureFileInput
+from pixel_font_builder.opentype.feature.source.program import FeatureProgram
 from pixel_font_builder.opentype.feature.source.source import FeatureSource
 from pixel_font_builder.opentype.feature.source.text import FeatureText
 from pixel_font_builder.opentype.outline.painter.circle_dot import CircleDotOutlinesPainter
