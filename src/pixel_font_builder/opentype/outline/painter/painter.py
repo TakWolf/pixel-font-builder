@@ -4,7 +4,7 @@ from abc import abstractmethod
 from typing import Any, Protocol, runtime_checkable
 
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.opentype.outline.pen.base import OutlinesPen
+from pixel_font_builder.opentype.outline.pen.pen import OutlinesPen
 
 
 @runtime_checkable

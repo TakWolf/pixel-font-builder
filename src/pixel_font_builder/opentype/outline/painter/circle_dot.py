@@ -3,8 +3,8 @@ from __future__ import annotations
 import math
 
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.opentype.outline.painter.base import OutlinesPainter
-from pixel_font_builder.opentype.outline.pen.base import OutlinesPen
+from pixel_font_builder.opentype.outline.painter.painter import OutlinesPainter
+from pixel_font_builder.opentype.outline.pen.pen import OutlinesPen
 
 
 class CircleDotOutlinesPainter(OutlinesPainter):

@@ -8,7 +8,7 @@ from pathlib import Path
 from fontTools.feaLib import ast
 from fontTools.feaLib.parser import Parser
 
-from pixel_font_builder.opentype.feature.source.base import FeatureSource
+from pixel_font_builder.opentype.feature.source.source import FeatureSource
 
 
 class FeatureIncludes(FeatureSource):

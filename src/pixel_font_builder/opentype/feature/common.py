@@ -2,7 +2,7 @@ from collections.abc import Iterable
 
 from fontTools.feaLib import ast
 
-from pixel_font_builder.opentype.feature.source.base import FeatureSource
+from pixel_font_builder.opentype.feature.source.source import FeatureSource
 
 
 def _claims_feature(feature_ast: ast.FeatureFile, name: str) -> bool:

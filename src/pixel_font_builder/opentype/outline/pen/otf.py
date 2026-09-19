@@ -1,7 +1,7 @@
 from fontTools.misc.psCharStrings import T2CharString as OtfGlyph
 from fontTools.pens.t2CharStringPen import T2CharStringPen as OtfGlyphPen
 
-from pixel_font_builder.opentype.outline.pen.base import OutlinesPen
+from pixel_font_builder.opentype.outline.pen.pen import OutlinesPen
 
 
 class OtfOutlinesPen(OutlinesPen):

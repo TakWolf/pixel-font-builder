@@ -2,7 +2,7 @@ from fontTools import cu2qu
 from fontTools.pens.ttGlyphPen import TTGlyphPen as TtfGlyphPen
 from fontTools.ttLib.tables._g_l_y_f import Glyph as TtfGlyph
 
-from pixel_font_builder.opentype.outline.pen.base import OutlinesPen
+from pixel_font_builder.opentype.outline.pen.pen import OutlinesPen
 
 
 class TtfOutlinesPen(OutlinesPen):
