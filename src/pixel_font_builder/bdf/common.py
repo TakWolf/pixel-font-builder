@@ -14,7 +14,7 @@ from pixel_font_builder.metric import FontMetric
 _DEFAULT_CHAR = 0xFFFE
 
 
-def _create_glyphs(glyph: Glyph, encoding: int, font_metric: FontMetric, config: Config) -> BdfGlyph:
+def _create_glyph(glyph: Glyph, encoding: int, font_metric: FontMetric, config: Config) -> BdfGlyph:
     return BdfGlyph(
         name=glyph.name,
         encoding=encoding,
@@ -41,11 +41,11 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
         bounding_box=(font_metric.font_size, font_metric.horizontal_layout.line_height, 0, font_metric.horizontal_layout.descent),
     )
 
-    font.glyphs.append(_create_glyphs(name_to_glyph['.notdef'], _DEFAULT_CHAR, font_metric, config))
+    font.glyphs.append(_create_glyph(name_to_glyph['.notdef'], _DEFAULT_CHAR, font_metric, config))
     for code_point, glyph_name in sorted(character_mapping.items()):
         if code_point > 0xFFFF and config.only_basic_plane:
             break
-        font.glyphs.append(_create_glyphs(name_to_glyph[glyph_name], code_point, font_metric, config))
+        font.glyphs.append(_create_glyph(name_to_glyph[glyph_name], code_point, font_metric, config))
 
     if meta_info.manufacturer is not None:
         font.properties.foundry = meta_info.manufacturer.replace('-', '_')
