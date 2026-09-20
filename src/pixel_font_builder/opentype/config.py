@@ -7,7 +7,7 @@ from pixel_font_builder.opentype.outline.painter.painter import OutlinesPainter
 from pixel_font_builder.opentype.outline.painter.solid import SolidOutlinesPainter
 
 
-class FieldsOverride:
+class FieldOverrides:
     head_x_min: int | None
     head_y_min: int | None
     head_x_max: int | None
@@ -28,14 +28,14 @@ class FieldsOverride:
         self.head_y_max = head_y_max
         self.os2_x_avg_char_width = os2_x_avg_char_width
 
-    def __copy__(self) -> FieldsOverride:
+    def __copy__(self) -> FieldOverrides:
         return self.copy()
 
-    def __deepcopy__(self, memo: dict[int, Any]) -> FieldsOverride:
+    def __deepcopy__(self, memo: dict[int, Any]) -> FieldOverrides:
         return self.deepcopy()
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, FieldsOverride):
+        if not isinstance(other, FieldOverrides):
             return NotImplemented
         return (self.head_x_min == other.head_x_min and
                 self.head_y_min == other.head_y_min and
@@ -43,8 +43,8 @@ class FieldsOverride:
                 self.head_y_max == other.head_y_max and
                 self.os2_x_avg_char_width == other.os2_x_avg_char_width)
 
-    def copy(self) -> FieldsOverride:
-        return FieldsOverride(
+    def copy(self) -> FieldOverrides:
+        return FieldOverrides(
             self.head_x_min,
             self.head_y_min,
             self.head_x_max,
@@ -52,7 +52,7 @@ class FieldsOverride:
             self.os2_x_avg_char_width,
         )
 
-    def deepcopy(self) -> FieldsOverride:
+    def deepcopy(self) -> FieldOverrides:
         return self.copy()
 
 
@@ -63,7 +63,7 @@ class Config:
     outlines_painter: OutlinesPainter
     has_vertical_metrics: bool
     is_fixed_pitch: bool
-    fields_override: FieldsOverride
+    field_overrides: FieldOverrides
     features: FeatureSource | None
 
     def __init__(
@@ -72,14 +72,14 @@ class Config:
             outlines_painter: OutlinesPainter | None = None,
             has_vertical_metrics: bool = True,
             is_fixed_pitch: bool = False,
-            fields_override: FieldsOverride | None = None,
+            field_overrides: FieldOverrides | None = None,
             features: FeatureSource | None = None,
     ) -> None:
         self.px_to_units = px_to_units
         self.outlines_painter = outlines_painter if outlines_painter is not None else Config.DEFAULT_OUTLINES_PAINTER
         self.has_vertical_metrics = has_vertical_metrics
         self.is_fixed_pitch = is_fixed_pitch
-        self.fields_override = fields_override if fields_override is not None else FieldsOverride()
+        self.field_overrides = field_overrides if field_overrides is not None else FieldOverrides()
         self.features = features
 
     def __copy__(self) -> Config:
@@ -95,7 +95,7 @@ class Config:
                 self.outlines_painter == other.outlines_painter and
                 self.has_vertical_metrics == other.has_vertical_metrics and
                 self.is_fixed_pitch == other.is_fixed_pitch and
-                self.fields_override == other.fields_override and
+                self.field_overrides == other.field_overrides and
                 self.features == other.features)
 
     def copy(self) -> Config:
@@ -104,7 +104,7 @@ class Config:
             self.outlines_painter,
             self.has_vertical_metrics,
             self.is_fixed_pitch,
-            self.fields_override,
+            self.field_overrides,
             self.features,
         )
 
@@ -114,6 +114,6 @@ class Config:
             self.outlines_painter.deepcopy(),
             self.has_vertical_metrics,
             self.is_fixed_pitch,
-            self.fields_override.deepcopy(),
+            self.field_overrides.deepcopy(),
             self.features.deepcopy() if self.features is not None else None,
         )

@@ -1,7 +1,7 @@
 from copy import copy, deepcopy
 from pathlib import Path
 
-from pixel_font_builder.opentype import Config, FieldsOverride, SolidOutlinesPainter, FeatureFile
+from pixel_font_builder.opentype import Config, FieldOverrides, SolidOutlinesPainter, FeatureFile
 
 
 def test_copy() -> None:
@@ -10,7 +10,7 @@ def test_copy() -> None:
         outlines_painter=SolidOutlinesPainter(),
         has_vertical_metrics=False,
         is_fixed_pitch=True,
-        fields_override=FieldsOverride(
+        field_overrides=FieldOverrides(
             head_x_min=1,
             head_y_min=2,
             head_x_max=3,
@@ -24,7 +24,7 @@ def test_copy() -> None:
     assert config_1 == config_2
     assert config_1 is not config_2
     assert config_1.outlines_painter is config_2.outlines_painter
-    assert config_1.fields_override is config_2.fields_override
+    assert config_1.field_overrides is config_2.field_overrides
     assert config_1.features is config_2.features
 
 
@@ -34,7 +34,7 @@ def test_deepcopy() -> None:
         outlines_painter=SolidOutlinesPainter(),
         has_vertical_metrics=False,
         is_fixed_pitch=True,
-        fields_override=FieldsOverride(
+        field_overrides=FieldOverrides(
             head_x_min=1,
             head_y_min=2,
             head_x_max=3,
@@ -48,7 +48,7 @@ def test_deepcopy() -> None:
     assert config_1 == config_2
     assert config_1 is not config_2
     assert config_1.outlines_painter is config_2.outlines_painter
-    assert config_1.fields_override is not config_2.fields_override
+    assert config_1.field_overrides is not config_2.field_overrides
     assert config_1.features is not config_2.features
 
 
@@ -58,7 +58,7 @@ def test_eq() -> None:
         outlines_painter=SolidOutlinesPainter(),
         has_vertical_metrics=False,
         is_fixed_pitch=True,
-        fields_override=FieldsOverride(
+        field_overrides=FieldOverrides(
             head_x_min=1,
             head_y_min=2,
             head_x_max=3,
@@ -72,7 +72,7 @@ def test_eq() -> None:
         outlines_painter=SolidOutlinesPainter(),
         has_vertical_metrics=False,
         is_fixed_pitch=True,
-        fields_override=FieldsOverride(
+        field_overrides=FieldOverrides(
             head_x_min=1,
             head_y_min=2,
             head_x_max=3,

@@ -210,19 +210,19 @@ def create_font_builder(
     if config.has_vertical_metrics:
         builder.font['vhea'].recalc(builder.font)
 
-    if config.fields_override.head_x_min is not None:
-        tb_head.xMin = config.fields_override.head_x_min * config.px_to_units
-    if config.fields_override.head_y_min is not None:
-        tb_head.yMin = config.fields_override.head_y_min * config.px_to_units
-    if config.fields_override.head_x_max is not None:
-        tb_head.xMax = config.fields_override.head_x_max * config.px_to_units
-    if config.fields_override.head_y_max is not None:
-        tb_head.yMax = config.fields_override.head_y_max * config.px_to_units
+    if config.field_overrides.head_x_min is not None:
+        tb_head.xMin = config.field_overrides.head_x_min * config.px_to_units
+    if config.field_overrides.head_y_min is not None:
+        tb_head.yMin = config.field_overrides.head_y_min * config.px_to_units
+    if config.field_overrides.head_x_max is not None:
+        tb_head.xMax = config.field_overrides.head_x_max * config.px_to_units
+    if config.field_overrides.head_y_max is not None:
+        tb_head.yMax = config.field_overrides.head_y_max * config.px_to_units
 
-    if config.fields_override.os2_x_avg_char_width is None:
+    if config.field_overrides.os2_x_avg_char_width is None:
         tb_os2.recalcAvgCharWidth(builder.font)
     else:
-        tb_os2.xAvgCharWidth = config.fields_override.os2_x_avg_char_width * config.px_to_units
+        tb_os2.xAvgCharWidth = config.field_overrides.os2_x_avg_char_width * config.px_to_units
 
     match outline_table_mode:
         case OutlineTableMode.OMIT:
