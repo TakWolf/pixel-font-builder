@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.opentype.outline.painter.painter import OutlinesPainter
+from pixel_font_builder.opentype.outline.painter.painter import OutlinePainter
 from pixel_font_builder.opentype.outline.pen.pen import OutlinePen
 
 
@@ -13,7 +13,7 @@ def _is_collinear(point_1: tuple[int, int], point_2: tuple[int, int], point_3: t
     return point_1[0] == point_2[0] == point_3[0] or point_1[1] == point_2[1] == point_3[1]
 
 
-class SolidOutlinesPainter(OutlinesPainter):
+class SolidOutlinePainter(OutlinePainter):
     @staticmethod
     def create_pixel_outlines(bitmap: list[list[int]]) -> list[list[tuple[int, int]]]:
         edges = []
@@ -79,12 +79,12 @@ class SolidOutlinesPainter(OutlinesPainter):
         return outlines
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, SolidOutlinesPainter):
+        if not isinstance(other, SolidOutlinePainter):
             return NotImplemented
         return True
 
     def draw_outlines(self, glyph: Glyph, pen: OutlinePen, px_to_units: int) -> None:
-        outlines = SolidOutlinesPainter.create_pixel_outlines(glyph.bitmap)
+        outlines = SolidOutlinePainter.create_pixel_outlines(glyph.bitmap)
         for outline in outlines:
             for index, (x, y) in enumerate(outline):
                 x = (x + glyph.horizontal_offset_x) * px_to_units
@@ -96,8 +96,8 @@ class SolidOutlinesPainter(OutlinesPainter):
                     pen.line_to((x, y))
             pen.close_path()
 
-    def copy(self) -> SolidOutlinesPainter:
+    def copy(self) -> SolidOutlinePainter:
         return self
 
-    def deepcopy(self) -> SolidOutlinesPainter:
+    def deepcopy(self) -> SolidOutlinePainter:
         return self.copy()

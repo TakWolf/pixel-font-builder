@@ -107,7 +107,7 @@ def main() -> None:
     builder.save_pcf(outputs_dir.joinpath('my-font.pcf'))
 
     builder.meta_info.family_name = 'My Font SquareDot'
-    builder.opentype_config.outlines_painter = opentype.SquareDotOutlinesPainter()
+    builder.opentype_config.outline_painter = opentype.SquareDotOutlinePainter()
     builder.save_otf(outputs_dir.joinpath('my-font-square_dot.otf'))
     builder.save_otf_woff(outputs_dir.joinpath('my-font-square_dot.otf.woff'))
     builder.save_otf_woff2(outputs_dir.joinpath('my-font-square_dot.otf.woff2'))
@@ -116,7 +116,7 @@ def main() -> None:
     builder.save_ttf_woff2(outputs_dir.joinpath('my-font-square_dot.ttf.woff2'))
 
     builder.meta_info.family_name = 'My Font CircleDot'
-    builder.opentype_config.outlines_painter = opentype.CircleDotOutlinesPainter()
+    builder.opentype_config.outline_painter = opentype.CircleDotOutlinePainter()
     builder.save_otf(outputs_dir.joinpath('my-font-circle_dot.otf'))
     builder.save_otf_woff(outputs_dir.joinpath('my-font-circle_dot.otf.woff'))
     builder.save_otf_woff2(outputs_dir.joinpath('my-font-circle_dot.otf.woff2'))

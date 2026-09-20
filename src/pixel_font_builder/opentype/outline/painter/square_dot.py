@@ -1,18 +1,18 @@
 from __future__ import annotations
 
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.opentype.outline.painter.painter import OutlinesPainter
+from pixel_font_builder.opentype.outline.painter.painter import OutlinePainter
 from pixel_font_builder.opentype.outline.pen.pen import OutlinePen
 
 
-class SquareDotOutlinesPainter(OutlinesPainter):
+class SquareDotOutlinePainter(OutlinePainter):
     size: float
 
     def __init__(self, size: float = 0.8) -> None:
         self.size = size
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, SquareDotOutlinesPainter):
+        if not isinstance(other, SquareDotOutlinePainter):
             return NotImplemented
         return self.size == other.size
 
@@ -30,8 +30,8 @@ class SquareDotOutlinesPainter(OutlinesPainter):
                     pen.line_to((x, y - size))
                     pen.close_path()
 
-    def copy(self) -> SquareDotOutlinesPainter:
-        return SquareDotOutlinesPainter(self.size)
+    def copy(self) -> SquareDotOutlinePainter:
+        return SquareDotOutlinePainter(self.size)
 
-    def deepcopy(self) -> SquareDotOutlinesPainter:
+    def deepcopy(self) -> SquareDotOutlinePainter:
         return self.copy()

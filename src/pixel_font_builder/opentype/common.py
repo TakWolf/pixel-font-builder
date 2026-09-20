@@ -90,7 +90,7 @@ def create_font_builder(
         for glyph_name, glyph in name_to_glyph.items():
             pen = TtfOutlinePen()
             if outline_table_mode == OutlineTableMode.NORMAL:
-                config.outlines_painter.draw_outlines(glyph, pen, config.px_to_units)
+                config.outline_painter.draw_outlines(glyph, pen, config.px_to_units)
             ttf_glyphs[glyph_name] = pen.to_glyph()
         builder.setupGlyf(ttf_glyphs)
 
@@ -115,7 +115,7 @@ def create_font_builder(
         for glyph_name, glyph in name_to_glyph.items():
             pen = OtfOutlinePen(glyph.advance_width * config.px_to_units)
             if outline_table_mode == OutlineTableMode.NORMAL:
-                config.outlines_painter.draw_outlines(glyph, pen, config.px_to_units)
+                config.outline_painter.draw_outlines(glyph, pen, config.px_to_units)
             otf_glyphs[glyph_name] = pen.to_glyph()
         builder.setupCFF('', {
             'isFixedPitch': config.is_fixed_pitch,

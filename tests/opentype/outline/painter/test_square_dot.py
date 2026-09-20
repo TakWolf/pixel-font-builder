@@ -1,10 +1,10 @@
 from copy import copy, deepcopy
 
-from pixel_font_builder.opentype import SquareDotOutlinesPainter
+from pixel_font_builder.opentype import SquareDotOutlinePainter
 
 
 def test_copy() -> None:
-    painter_1 = SquareDotOutlinesPainter(size=1)
+    painter_1 = SquareDotOutlinePainter(size=1)
     painter_2 = copy(painter_1)
     painter_3 = deepcopy(painter_1)
 
@@ -15,6 +15,6 @@ def test_copy() -> None:
 
 
 def test_eq() -> None:
-    painter_1 = SquareDotOutlinesPainter(size=1)
-    painter_2 = SquareDotOutlinesPainter(size=1)
+    painter_1 = SquareDotOutlinePainter(size=1)
+    painter_2 = SquareDotOutlinePainter(size=1)
     assert painter_1 == painter_2

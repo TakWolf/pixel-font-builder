@@ -8,11 +8,11 @@ from pixel_font_builder.opentype.outline.pen.pen import OutlinePen
 
 
 @runtime_checkable
-class OutlinesPainter(Protocol):
-    def __copy__(self) -> OutlinesPainter:
+class OutlinePainter(Protocol):
+    def __copy__(self) -> OutlinePainter:
         return self.copy()
 
-    def __deepcopy__(self, memo: dict[int, Any]) -> OutlinesPainter:
+    def __deepcopy__(self, memo: dict[int, Any]) -> OutlinePainter:
         return self.deepcopy()
 
     @abstractmethod
@@ -24,9 +24,9 @@ class OutlinesPainter(Protocol):
         raise NotImplementedError()
 
     @abstractmethod
-    def copy(self) -> OutlinesPainter:
+    def copy(self) -> OutlinePainter:
         raise NotImplementedError()
 
     @abstractmethod
-    def deepcopy(self) -> OutlinesPainter:
+    def deepcopy(self) -> OutlinePainter:
         raise NotImplementedError()

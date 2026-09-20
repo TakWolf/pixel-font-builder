@@ -6,8 +6,8 @@ from pixel_font_builder.opentype.feature.source.input import FeatureInput, Featu
 from pixel_font_builder.opentype.feature.source.program import FeatureProgram
 from pixel_font_builder.opentype.feature.source.source import FeatureSource
 from pixel_font_builder.opentype.feature.source.text import FeatureText
-from pixel_font_builder.opentype.outline.painter.circle_dot import CircleDotOutlinesPainter
-from pixel_font_builder.opentype.outline.painter.painter import OutlinesPainter
-from pixel_font_builder.opentype.outline.painter.solid import SolidOutlinesPainter
-from pixel_font_builder.opentype.outline.painter.square_dot import SquareDotOutlinesPainter
+from pixel_font_builder.opentype.outline.painter.circle_dot import CircleDotOutlinePainter
+from pixel_font_builder.opentype.outline.painter.painter import OutlinePainter
+from pixel_font_builder.opentype.outline.painter.solid import SolidOutlinePainter
+from pixel_font_builder.opentype.outline.painter.square_dot import SquareDotOutlinePainter
 from pixel_font_builder.opentype.outline.pen.pen import OutlinePen

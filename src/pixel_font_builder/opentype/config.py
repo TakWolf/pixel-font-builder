@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Any, Final
 
 from pixel_font_builder.opentype.feature.source.source import FeatureSource
-from pixel_font_builder.opentype.outline.painter.painter import OutlinesPainter
-from pixel_font_builder.opentype.outline.painter.solid import SolidOutlinesPainter
+from pixel_font_builder.opentype.outline.painter.painter import OutlinePainter
+from pixel_font_builder.opentype.outline.painter.solid import SolidOutlinePainter
 
 
 class FieldOverrides:
@@ -57,10 +57,10 @@ class FieldOverrides:
 
 
 class Config:
-    DEFAULT_OUTLINES_PAINTER: Final = SolidOutlinesPainter()
+    DEFAULT_OUTLINE_PAINTER: Final = SolidOutlinePainter()
 
     px_to_units: int
-    outlines_painter: OutlinesPainter
+    outline_painter: OutlinePainter
     has_vertical_metrics: bool
     is_fixed_pitch: bool
     field_overrides: FieldOverrides
@@ -69,14 +69,14 @@ class Config:
     def __init__(
             self,
             px_to_units: int = 100,
-            outlines_painter: OutlinesPainter | None = None,
+            outline_painter: OutlinePainter | None = None,
             has_vertical_metrics: bool = True,
             is_fixed_pitch: bool = False,
             field_overrides: FieldOverrides | None = None,
             features: FeatureSource | None = None,
     ) -> None:
         self.px_to_units = px_to_units
-        self.outlines_painter = outlines_painter if outlines_painter is not None else Config.DEFAULT_OUTLINES_PAINTER
+        self.outline_painter = outline_painter if outline_painter is not None else Config.DEFAULT_OUTLINE_PAINTER
         self.has_vertical_metrics = has_vertical_metrics
         self.is_fixed_pitch = is_fixed_pitch
         self.field_overrides = field_overrides if field_overrides is not None else FieldOverrides()
@@ -92,7 +92,7 @@ class Config:
         if not isinstance(other, Config):
             return NotImplemented
         return (self.px_to_units == other.px_to_units and
-                self.outlines_painter == other.outlines_painter and
+                self.outline_painter == other.outline_painter and
                 self.has_vertical_metrics == other.has_vertical_metrics and
                 self.is_fixed_pitch == other.is_fixed_pitch and
                 self.field_overrides == other.field_overrides and
@@ -101,7 +101,7 @@ class Config:
     def copy(self) -> Config:
         return Config(
             self.px_to_units,
-            self.outlines_painter,
+            self.outline_painter,
             self.has_vertical_metrics,
             self.is_fixed_pitch,
             self.field_overrides,
@@ -111,7 +111,7 @@ class Config:
     def deepcopy(self) -> Config:
         return Config(
             self.px_to_units,
-            self.outlines_painter.deepcopy(),
+            self.outline_painter.deepcopy(),
             self.has_vertical_metrics,
             self.is_fixed_pitch,
             self.field_overrides.deepcopy(),

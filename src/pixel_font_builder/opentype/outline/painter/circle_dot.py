@@ -3,18 +3,18 @@ from __future__ import annotations
 import math
 
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.opentype.outline.painter.painter import OutlinesPainter
+from pixel_font_builder.opentype.outline.painter.painter import OutlinePainter
 from pixel_font_builder.opentype.outline.pen.pen import OutlinePen
 
 
-class CircleDotOutlinesPainter(OutlinesPainter):
+class CircleDotOutlinePainter(OutlinePainter):
     radius: float
 
     def __init__(self, radius: float = 0.4) -> None:
         self.radius = radius
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, CircleDotOutlinesPainter):
+        if not isinstance(other, CircleDotOutlinePainter):
             return NotImplemented
         return self.radius == other.radius
 
@@ -33,8 +33,8 @@ class CircleDotOutlinesPainter(OutlinesPainter):
                     pen.cubic_curve_to((x - radius, y + c), (x - c, y + radius), (x, y + radius))
                     pen.close_path()
 
-    def copy(self) -> CircleDotOutlinesPainter:
-        return CircleDotOutlinesPainter(self.radius)
+    def copy(self) -> CircleDotOutlinePainter:
+        return CircleDotOutlinePainter(self.radius)
 
-    def deepcopy(self) -> CircleDotOutlinesPainter:
+    def deepcopy(self) -> CircleDotOutlinePainter:
         return self.copy()
