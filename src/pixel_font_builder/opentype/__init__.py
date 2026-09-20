@@ -10,4 +10,4 @@ from pixel_font_builder.opentype.outline.painter.circle_dot import CircleDotOutl
 from pixel_font_builder.opentype.outline.painter.painter import OutlinesPainter
 from pixel_font_builder.opentype.outline.painter.solid import SolidOutlinesPainter
 from pixel_font_builder.opentype.outline.painter.square_dot import SquareDotOutlinesPainter
-from pixel_font_builder.opentype.outline.pen.pen import OutlinesPen
+from pixel_font_builder.opentype.outline.pen.pen import OutlinePen

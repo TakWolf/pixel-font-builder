@@ -20,8 +20,8 @@ from pixel_font_builder.opentype.bitmap import create_bitmap_strike_data
 from pixel_font_builder.opentype.feature.common import build_feature_ast
 from pixel_font_builder.opentype.kerning import create_kern_feature
 from pixel_font_builder.opentype.name import create_name_strings
-from pixel_font_builder.opentype.outline.pen.otf import OtfOutlinesPen
-from pixel_font_builder.opentype.outline.pen.ttf import TtfOutlinesPen
+from pixel_font_builder.opentype.outline.pen.otf import OtfOutlinePen
+from pixel_font_builder.opentype.outline.pen.ttf import TtfOutlinePen
 
 
 @unique
@@ -88,7 +88,7 @@ def create_font_builder(
     if is_ttf:
         ttf_glyphs = {}
         for glyph_name, glyph in name_to_glyph.items():
-            pen = TtfOutlinesPen()
+            pen = TtfOutlinePen()
             if outline_table_mode == OutlineTableMode.NORMAL:
                 config.outlines_painter.draw_outlines(glyph, pen, config.px_to_units)
             ttf_glyphs[glyph_name] = pen.to_glyph()
@@ -113,7 +113,7 @@ def create_font_builder(
     else:
         otf_glyphs = {}
         for glyph_name, glyph in name_to_glyph.items():
-            pen = OtfOutlinesPen(glyph.advance_width * config.px_to_units)
+            pen = OtfOutlinePen(glyph.advance_width * config.px_to_units)
             if outline_table_mode == OutlineTableMode.NORMAL:
                 config.outlines_painter.draw_outlines(glyph, pen, config.px_to_units)
             otf_glyphs[glyph_name] = pen.to_glyph()

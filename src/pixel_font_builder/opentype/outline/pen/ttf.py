@@ -2,10 +2,10 @@ from fontTools import cu2qu
 from fontTools.pens.ttGlyphPen import TTGlyphPen as TtfGlyphPen
 from fontTools.ttLib.tables._g_l_y_f import Glyph as TtfGlyph
 
-from pixel_font_builder.opentype.outline.pen.pen import OutlinesPen
+from pixel_font_builder.opentype.outline.pen.pen import OutlinePen
 
 
-class TtfOutlinesPen(OutlinesPen):
+class TtfOutlinePen(OutlinePen):
     pen: TtfGlyphPen
     cubic_curve_double_max_err: float
     current_point: tuple[float, float] | None

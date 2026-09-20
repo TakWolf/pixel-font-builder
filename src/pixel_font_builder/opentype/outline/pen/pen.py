@@ -3,7 +3,7 @@ from typing import Any, Protocol, runtime_checkable
 
 
 @runtime_checkable
-class OutlinesPen(Protocol):
+class OutlinePen(Protocol):
     @abstractmethod
     def move_to(self, point: tuple[float, float]) -> None:
         raise NotImplementedError()

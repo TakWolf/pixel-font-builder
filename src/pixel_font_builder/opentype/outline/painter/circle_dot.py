@@ -4,7 +4,7 @@ import math
 
 from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.opentype.outline.painter.painter import OutlinesPainter
-from pixel_font_builder.opentype.outline.pen.pen import OutlinesPen
+from pixel_font_builder.opentype.outline.pen.pen import OutlinePen
 
 
 class CircleDotOutlinesPainter(OutlinesPainter):
@@ -18,7 +18,7 @@ class CircleDotOutlinesPainter(OutlinesPainter):
             return NotImplemented
         return self.radius == other.radius
 
-    def draw_outlines(self, glyph: Glyph, pen: OutlinesPen, px_to_units: int) -> None:
+    def draw_outlines(self, glyph: Glyph, pen: OutlinePen, px_to_units: int) -> None:
         radius = self.radius * px_to_units
         c = radius * 4 / 3 * (math.sqrt(2) - 1)
         for y, bitmap_row in enumerate(glyph.bitmap):

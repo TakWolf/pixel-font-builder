@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.opentype.outline.painter.painter import OutlinesPainter
-from pixel_font_builder.opentype.outline.pen.pen import OutlinesPen
+from pixel_font_builder.opentype.outline.pen.pen import OutlinePen
 
 
 def _is_solid(bitmap: list[list[int]], x: int, y: int) -> bool:
@@ -83,7 +83,7 @@ class SolidOutlinesPainter(OutlinesPainter):
             return NotImplemented
         return True
 
-    def draw_outlines(self, glyph: Glyph, pen: OutlinesPen, px_to_units: int) -> None:
+    def draw_outlines(self, glyph: Glyph, pen: OutlinePen, px_to_units: int) -> None:
         outlines = SolidOutlinesPainter.create_pixel_outlines(glyph.bitmap)
         for outline in outlines:
             for index, (x, y) in enumerate(outline):

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.opentype.outline.painter.painter import OutlinesPainter
-from pixel_font_builder.opentype.outline.pen.pen import OutlinesPen
+from pixel_font_builder.opentype.outline.pen.pen import OutlinePen
 
 
 class SquareDotOutlinesPainter(OutlinesPainter):
@@ -16,7 +16,7 @@ class SquareDotOutlinesPainter(OutlinesPainter):
             return NotImplemented
         return self.size == other.size
 
-    def draw_outlines(self, glyph: Glyph, pen: OutlinesPen, px_to_units: int) -> None:
+    def draw_outlines(self, glyph: Glyph, pen: OutlinePen, px_to_units: int) -> None:
         size = self.size * px_to_units
         offset = (1 - self.size) / 2 * px_to_units
         for y, bitmap_row in enumerate(glyph.bitmap):
