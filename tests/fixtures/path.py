@@ -5,7 +5,7 @@ import pytest
 
 @pytest.fixture(scope='session')
 def project_root_dir() -> Path:
-    return Path(__file__).parent.joinpath('..', '..').resolve()
+    return Path(__file__).parents[2]
 
 
 @pytest.fixture(scope='session')
