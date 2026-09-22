@@ -60,8 +60,8 @@ def _collect_glyph_infos(glyphs_dir: Path) -> tuple[list[GlyphInfo], dict[int, s
     glyph_infos = []
     character_mapping = {}
 
-    for file_path in glyphs_dir.iterdir():
-        if file_path.suffix != '.txt':
+    for file_path in glyphs_dir.glob('*.txt'):
+        if not file_path.is_file():
             continue
 
         glyph_info = GlyphInfo.load(file_path)
