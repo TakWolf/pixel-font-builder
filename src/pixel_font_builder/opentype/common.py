@@ -140,6 +140,13 @@ def create_font_builder(
                 vertical_metrics[glyph_name] = advance_height, top_side_bearing
             builder.setupVerticalMetrics(vertical_metrics)
 
+            if outline_table_mode == OutlineTableMode.NORMAL:
+                vertical_origins = {
+                    glyph_name: (glyph.height + glyph.horizontal_offset_y + glyph.vertical_offset_y) * config.px_to_units
+                    for glyph_name, glyph in name_to_glyph.items()
+                }
+                builder.setupVerticalOrigins(vertical_origins)
+
     if bitmap_table_mode in (BitmapTableMode.STANDARD, BitmapTableMode.APPLE):
         strike, strike_data = create_bitmap_strike_data(context.font_metric, config.has_vertical_metrics, glyph_order, name_to_glyph)
 
