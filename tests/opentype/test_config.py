@@ -1,7 +1,7 @@
 from copy import copy, deepcopy
 from pathlib import Path
 
-from pixel_font_builder.opentype import Config, FieldOverrides, SolidOutlinePainter, FeatureFile
+from pixel_font_builder.opentype import Config, SolidOutlinePainter, FieldOverrides, KerningMode, FeatureFile
 
 
 def test_copy() -> None:
@@ -17,6 +17,7 @@ def test_copy() -> None:
             head_y_max=4,
             os2_x_avg_char_width=5,
         ),
+        kerning_mode=KerningMode.ADDITIVE,
         features=FeatureFile(Path('main.fea')),
     )
     config_2 = copy(config_1)
@@ -41,6 +42,7 @@ def test_deepcopy() -> None:
             head_y_max=4,
             os2_x_avg_char_width=5,
         ),
+        kerning_mode=KerningMode.ADDITIVE,
         features=FeatureFile(Path('main.fea')),
     )
     config_2 = deepcopy(config_1)
@@ -65,6 +67,7 @@ def test_eq() -> None:
             head_y_max=4,
             os2_x_avg_char_width=5,
         ),
+        kerning_mode=KerningMode.ADDITIVE,
         features=FeatureFile(Path('main.fea')),
     )
     config_2 = Config(
@@ -79,6 +82,7 @@ def test_eq() -> None:
             head_y_max=4,
             os2_x_avg_char_width=5,
         ),
+        kerning_mode=KerningMode.ADDITIVE,
         features=FeatureFile(Path('main.fea')),
     )
     assert config_1 == config_2
