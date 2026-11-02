@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from enum import StrEnum, unique
 from typing import Any, Final
 
 from pixel_font_builder.opentype.feature.source.source import FeatureSource
@@ -56,6 +57,22 @@ class FieldOverrides:
         return self.copy()
 
 
+@unique
+class UserKerningMode(StrEnum):
+    # Let any user kern feature or variation block take over all kerning.
+    # Skip all generated kerning when such a block exists, even if it is empty
+    # or limited to particular glyph pairs, scripts, languages, or conditions.
+    # Generate kerning normally when no user kern block exists.
+    TAKEOVER = 'Takeover'
+
+    # Prepend generated kerning while preserving all user feature statements.
+    # Rules are not deduplicated or merged by glyph pair. When both sets of rules
+    # apply to the same pair, their positioning adjustments can accumulate.
+    # Generated kerning uses DFLT/dflt; user script and language declarations
+    # still determine where user rules apply.
+    COEXIST = 'Coexist'
+
+
 class Config:
     DEFAULT_OUTLINE_PAINTER: Final = SolidOutlinePainter()
 
@@ -64,6 +81,7 @@ class Config:
     has_vertical_metrics: bool
     is_fixed_pitch: bool
     field_overrides: FieldOverrides
+    user_kerning_mode: UserKerningMode
     features: FeatureSource | None
 
     def __init__(
@@ -73,6 +91,7 @@ class Config:
             has_vertical_metrics: bool = True,
             is_fixed_pitch: bool = False,
             field_overrides: FieldOverrides | None = None,
+            user_kerning_mode: UserKerningMode = UserKerningMode.TAKEOVER,
             features: FeatureSource | None = None,
     ) -> None:
         self.px_to_units = px_to_units
@@ -80,6 +99,7 @@ class Config:
         self.has_vertical_metrics = has_vertical_metrics
         self.is_fixed_pitch = is_fixed_pitch
         self.field_overrides = field_overrides if field_overrides is not None else FieldOverrides()
+        self.user_kerning_mode = user_kerning_mode
         self.features = features
 
     def __copy__(self) -> Config:
@@ -96,6 +116,7 @@ class Config:
                 self.has_vertical_metrics == other.has_vertical_metrics and
                 self.is_fixed_pitch == other.is_fixed_pitch and
                 self.field_overrides == other.field_overrides and
+                self.user_kerning_mode == other.user_kerning_mode and
                 self.features == other.features)
 
     def copy(self) -> Config:
@@ -105,6 +126,7 @@ class Config:
             self.has_vertical_metrics,
             self.is_fixed_pitch,
             self.field_overrides,
+            self.user_kerning_mode,
             self.features,
         )
 
@@ -115,5 +137,6 @@ class Config:
             self.has_vertical_metrics,
             self.is_fixed_pitch,
             self.field_overrides.deepcopy(),
+            self.user_kerning_mode,
             self.features.deepcopy() if self.features is not None else None,
         )

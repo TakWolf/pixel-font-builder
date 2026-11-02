@@ -4,7 +4,7 @@ import pytest
 from fontTools.feaLib import ast
 
 from pixel_font_builder import FontBuilder, Glyph
-from pixel_font_builder.opentype import OutlineTableMode, FeatureText, FeatureFile, FeatureIncludes
+from pixel_font_builder.opentype import OutlineTableMode, UserKerningMode, FeatureText, FeatureFile, FeatureIncludes
 from pixel_font_builder.opentype.feature.kerning import add_generated_kern_feature
 from pixel_font_builder.opentype.feature.source.parser import parse_feature_inputs
 
@@ -34,12 +34,13 @@ def builder() -> FontBuilder:
     return builder
 
 
-def test_add_generated_kern_feature() -> None:
+@pytest.mark.parametrize('user_kerning_mode', list(UserKerningMode))
+def test_add_generated_kern_feature(user_kerning_mode: UserKerningMode) -> None:
     feature_ast = ast.FeatureFile()
     add_generated_kern_feature(feature_ast, {
         ('b', 'a'): -1,
         ('a', 'b'): -2,
-    }, 100)
+    }, 100, user_kerning_mode)
     feature = feature_ast.statements[0]
 
     assert feature.name == 'kern'
@@ -64,17 +65,19 @@ def test_add_generated_kern_feature() -> None:
         '# User features\nfeature salt { sub a by b; } salt;',
     ],
 )
-def test_generated_kerning_is_added_without_user_kern(source: str) -> None:
+@pytest.mark.parametrize('user_kerning_mode', list(UserKerningMode))
+def test_generated_kerning_is_added_without_user_kern(source: str, user_kerning_mode: UserKerningMode) -> None:
     feature_ast = parse_feature_inputs(FeatureText(source).create_inputs(), ['a', 'b'])
     user_statements = list(feature_ast.statements)
-    add_generated_kern_feature(feature_ast, {('a', 'b'): -1}, 100)
+    add_generated_kern_feature(feature_ast, {('a', 'b'): -1}, 100, user_kerning_mode)
 
     assert isinstance(feature_ast.statements[0], ast.FeatureBlock)
     assert feature_ast.statements[0].name == 'kern'
     assert feature_ast.statements[1:] == user_statements
 
 
-def test_non_kern_variation_block_does_not_claim_kerning() -> None:
+@pytest.mark.parametrize('user_kerning_mode', list(UserKerningMode))
+def test_non_kern_variation_block_does_not_claim_kerning(user_kerning_mode: UserKerningMode) -> None:
     feature_ast = parse_feature_inputs(
         FeatureText(
             'conditionset Heavy { wght 700 900; } Heavy; variation dist Heavy { pos b a -300; } dist;',
@@ -82,7 +85,7 @@ def test_non_kern_variation_block_does_not_claim_kerning() -> None:
         ['a', 'b'],
     )
     user_statements = list(feature_ast.statements)
-    add_generated_kern_feature(feature_ast, {('a', 'b'): -1}, 100)
+    add_generated_kern_feature(feature_ast, {('a', 'b'): -1}, 100, user_kerning_mode)
 
     assert isinstance(feature_ast.statements[0], ast.FeatureBlock)
     assert feature_ast.statements[0].name == 'kern'
@@ -92,16 +95,18 @@ def test_non_kern_variation_block_does_not_claim_kerning() -> None:
 @pytest.mark.parametrize(
     'source',
     [
+        'feature kern {} kern;',
+        'feature kern { script latn; language dflt; pos b a -300; } kern;',
         'feature kern { pos b a -300; } kern;',
         'conditionset Heavy { wght 700 900; } Heavy; variation kern Heavy { pos b a -300; } kern;',
         'conditionset Heavy { wght 700 900; } Heavy; feature kern { pos a b -100; } kern; variation kern Heavy { pos b a -300; } kern;',
     ],
 )
-def test_user_kerning_prevents_generated_feature(source: str) -> None:
+def test_takeover_user_kerning_prevents_generated_feature(source: str) -> None:
     feature_ast = parse_feature_inputs(FeatureText(source).create_inputs(), ['a', 'b'])
     user_statements = list(feature_ast.statements)
     user_features = feature_ast.asFea()
-    add_generated_kern_feature(feature_ast, {('a', 'b'): -1}, 100)
+    add_generated_kern_feature(feature_ast, {('a', 'b'): -1}, 100, UserKerningMode.TAKEOVER)
 
     assert feature_ast.statements == user_statements
     assert feature_ast.asFea() == user_features
@@ -136,7 +141,7 @@ def test_kerning_pair_positioning_is_sorted_by_glyph_order(builder: FontBuilder)
     assert pair_pos.PairSet[1].PairValueRecord[0].SecondGlyph == 'a'
 
 
-def test_generated_kerning_coexists_with_user_features(builder: FontBuilder) -> None:
+def test_takeover_preserves_other_user_features(builder: FontBuilder) -> None:
     builder.kerning_values[('a', 'b')] = -1
     builder.opentype_config.features = FeatureText(
         'feature salt { sub a by b; } salt; feature kern { pos b a -300; } kern;',
@@ -151,6 +156,57 @@ def test_generated_kerning_coexists_with_user_features(builder: FontBuilder) -> 
     assert [record.FeatureTag for record in tb_gpos.FeatureList.FeatureRecord] == ['kern']
     assert pair_pos.Coverage.glyphs == ['b']
     assert pair_pos.PairSet[0].PairValueRecord[0].Value1.XAdvance == -300
+
+
+@pytest.mark.parametrize(
+    'user_pair',
+    [
+        ('a', 'b'),
+        ('b', 'a'),
+    ],
+)
+def test_coexist_preserves_both_kerning_lookups(builder: FontBuilder, user_pair: tuple[str, str]) -> None:
+    builder.kerning_values[('a', 'b')] = -1
+    builder.opentype_config.user_kerning_mode = UserKerningMode.COEXIST
+    builder.opentype_config.features = FeatureText(
+        f'feature kern {{ pos {user_pair[0]} {user_pair[1]} -300; }} kern;',
+    )
+
+    font = builder.to_ttf_builder().font
+    tb_gpos = font['GPOS'].table
+    feature_records = tb_gpos.FeatureList.FeatureRecord
+
+    assert [record.FeatureTag for record in feature_records] == ['kern']
+    assert feature_records[0].Feature.LookupListIndex == [0, 1]
+    assert tb_gpos.ScriptList.ScriptRecord[0].Script.DefaultLangSys.FeatureIndex == [0]
+
+    pair_values = []
+    for lookup in tb_gpos.LookupList.Lookup:
+        for subtable in lookup.SubTable:
+            for left, pair_set in zip(subtable.Coverage.glyphs, subtable.PairSet):
+                for pair in pair_set.PairValueRecord:
+                    pair_values.append((left, pair.SecondGlyph, pair.Value1.XAdvance))
+    assert pair_values == [('a', 'b', -100), (*user_pair, -300)]
+
+
+def test_coexist_keeps_script_specific_kerning_separate(builder: FontBuilder) -> None:
+    builder.kerning_values[('a', 'b')] = -1
+    builder.opentype_config.user_kerning_mode = UserKerningMode.COEXIST
+    builder.opentype_config.features = FeatureText(
+        'feature kern { script latn; language dflt; pos a b -300; } kern;',
+    )
+
+    font = builder.to_ttf_builder().font
+    tb_gpos = font['GPOS'].table
+    script_lookups = {}
+    for record in tb_gpos.ScriptList.ScriptRecord:
+        script_lookups[record.ScriptTag] = [
+            lookup_index
+            for feature_index in record.Script.DefaultLangSys.FeatureIndex
+            for lookup_index in tb_gpos.FeatureList.FeatureRecord[feature_index].Feature.LookupListIndex
+        ]
+
+    assert script_lookups == {'DFLT': [0], 'latn': [1]}
 
 
 def test_generated_kerning_coexists_with_feature_file(builder: FontBuilder, tmp_path: Path) -> None:
