@@ -16,9 +16,9 @@ def _claims_feature(feature_ast: ast.FeatureFile, name: str) -> bool:
 def build_feature_ast(
         features: FeatureSource | None,
         glyph_names: Iterable[str],
-        generated_kern_feature: ast.FeatureBlock | None = None,
+        kern_feature: ast.FeatureBlock | None = None,
 ) -> ast.FeatureFile:
     feature_ast = parse_feature_inputs(features.create_inputs(), glyph_names) if features is not None else ast.FeatureFile()
-    if generated_kern_feature is not None and not _claims_feature(feature_ast, 'kern'):
-        feature_ast.statements.append(generated_kern_feature)
+    if kern_feature is not None and not _claims_feature(feature_ast, 'kern'):
+        feature_ast.statements.append(kern_feature)
     return feature_ast

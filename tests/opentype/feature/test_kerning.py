@@ -54,21 +54,21 @@ def test_create_kern_feature() -> None:
 
 
 def test_generated_kerning_is_added_without_user_kern() -> None:
-    generated_kern_feature = create_kern_feature({
+    kern_feature = create_kern_feature({
         ('a', 'b'): -1,
     }, 100)
 
     feature_ast = build_feature_ast(
         FeatureText('feature salt { sub a by b; } salt;'),
         ['a', 'b'],
-        generated_kern_feature,
+        kern_feature,
     )
 
-    assert feature_ast.statements[-1] is generated_kern_feature
+    assert feature_ast.statements[-1] is kern_feature
 
 
 def test_non_kern_variation_block_does_not_claim_kerning() -> None:
-    generated_kern_feature = create_kern_feature({
+    kern_feature = create_kern_feature({
         ('a', 'b'): -1,
     }, 100)
 
@@ -77,10 +77,10 @@ def test_non_kern_variation_block_does_not_claim_kerning() -> None:
             'conditionset Heavy { wght 700 900; } Heavy; variation dist Heavy { pos b a -300; } dist;',
         ),
         ['a', 'b'],
-        generated_kern_feature,
+        kern_feature,
     )
 
-    assert feature_ast.statements[-1] is generated_kern_feature
+    assert feature_ast.statements[-1] is kern_feature
     assert any(
         isinstance(statement, ast.VariationBlock) and statement.name == 'dist'
         for statement in feature_ast.statements
@@ -88,22 +88,22 @@ def test_non_kern_variation_block_does_not_claim_kerning() -> None:
 
 
 def test_user_feature_block_claims_kerning() -> None:
-    generated_kern_feature = create_kern_feature({
+    kern_feature = create_kern_feature({
         ('a', 'b'): -1,
     }, 100)
 
     feature_ast = build_feature_ast(
         FeatureText('feature kern { pos b a -300; } kern;'),
         ['a', 'b'],
-        generated_kern_feature,
+        kern_feature,
     )
 
-    assert generated_kern_feature not in feature_ast.statements
+    assert kern_feature not in feature_ast.statements
     assert [type(statement) for statement in feature_ast.statements] == [ast.FeatureBlock]
 
 
 def test_user_variation_block_claims_kerning() -> None:
-    generated_kern_feature = create_kern_feature({
+    kern_feature = create_kern_feature({
         ('a', 'b'): -1,
     }, 100)
 
@@ -112,15 +112,15 @@ def test_user_variation_block_claims_kerning() -> None:
             'conditionset Heavy { wght 700 900; } Heavy; variation kern Heavy { pos b a -300; } kern;',
         ),
         ['a', 'b'],
-        generated_kern_feature,
+        kern_feature,
     )
 
-    assert generated_kern_feature not in feature_ast.statements
+    assert kern_feature not in feature_ast.statements
     assert any(isinstance(statement, ast.VariationBlock) and statement.name == 'kern' for statement in feature_ast.statements)
 
 
 def test_user_feature_and_variation_blocks_claim_kerning() -> None:
-    generated_kern_feature = create_kern_feature({
+    kern_feature = create_kern_feature({
         ('a', 'b'): -1,
     }, 100)
 
@@ -129,10 +129,10 @@ def test_user_feature_and_variation_blocks_claim_kerning() -> None:
             'conditionset Heavy { wght 700 900; } Heavy; feature kern { pos a b -100; } kern; variation kern Heavy { pos b a -300; } kern;',
         ),
         ['a', 'b'],
-        generated_kern_feature,
+        kern_feature,
     )
 
-    assert generated_kern_feature not in feature_ast.statements
+    assert kern_feature not in feature_ast.statements
     assert any(isinstance(statement, ast.FeatureBlock) and statement.name == 'kern' for statement in feature_ast.statements)
     assert any(isinstance(statement, ast.VariationBlock) and statement.name == 'kern' for statement in feature_ast.statements)
 
