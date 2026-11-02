@@ -18,7 +18,7 @@ from fontTools.ttLib.tables._b_l_o_c import table__b_l_o_c
 import pixel_font_builder
 from pixel_font_builder.opentype.bitmap import create_bitmap_strike_data
 from pixel_font_builder.opentype.feature.common import build_feature_ast
-from pixel_font_builder.opentype.kerning import create_kern_feature
+from pixel_font_builder.opentype.feature.kerning import create_kern_feature
 from pixel_font_builder.opentype.name import create_name_strings
 from pixel_font_builder.opentype.outline.pen.otf import OtfOutlinePen
 from pixel_font_builder.opentype.outline.pen.ttf import TtfOutlinePen
