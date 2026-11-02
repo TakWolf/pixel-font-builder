@@ -24,7 +24,7 @@ def _pack_uint24(value: int) -> bytes:
 
 def _encode_pascal_string(value: str | None) -> bytes:
     encoded = (value or '').encode('mac_roman', errors='replace')[:255]
-    if len(encoded) > 0 and 0x61 <= encoded[0] <= 0x7A:
+    if encoded and 0x61 <= encoded[0] <= 0x7A:
         encoded = bytes([encoded[0] - 0x20]) + encoded[1:]
     return bytes([len(encoded)]) + encoded
 

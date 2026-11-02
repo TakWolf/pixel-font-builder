@@ -268,11 +268,11 @@ def create_font_builder(
             del builder.font[tb_head.tableTag]
 
     kern_feature = None
-    if outline_table_mode == OutlineTableMode.NORMAL and len(kerning_values) > 0:
+    if outline_table_mode == OutlineTableMode.NORMAL and kerning_values:
         kern_feature = create_kern_feature(kerning_values, config.px_to_units)
 
     feature_ast = build_feature_ast(config.features, glyph_order, kern_feature)
-    if len(feature_ast.statements) > 0:
+    if feature_ast.statements:
         addOpenTypeFeatures(builder.font, feature_ast)
 
     if flavor is not None:
