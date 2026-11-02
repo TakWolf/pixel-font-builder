@@ -123,7 +123,7 @@ def test_parse_error_uses_included_file_path(tmp_path: Path) -> None:
 def test_copy() -> None:
     feature_includes_1 = FeatureIncludes([
         Path('test-1.fea'),
-        Path('test-2.fea')
+        Path('test-2.fea'),
     ], include_dir=Path('fea'))
     feature_includes_2 = copy(feature_includes_1)
 
@@ -135,7 +135,7 @@ def test_copy() -> None:
 def test_deepcopy() -> None:
     feature_includes_1 = FeatureIncludes([
         Path('test-1.fea'),
-        Path('test-2.fea')
+        Path('test-2.fea'),
     ], include_dir=Path('fea'))
     feature_includes_2 = deepcopy(feature_includes_1)
 
@@ -147,10 +147,10 @@ def test_deepcopy() -> None:
 def test_eq() -> None:
     feature_includes_1 = FeatureIncludes([
         Path('test-1.fea'),
-        Path('test-2.fea')
+        Path('test-2.fea'),
     ], include_dir=Path('fea'))
     feature_includes_2 = FeatureIncludes([
         Path('test-1.fea'),
-        Path('test-2.fea')
+        Path('test-2.fea'),
     ], include_dir=Path('fea'))
     assert feature_includes_1 == feature_includes_2

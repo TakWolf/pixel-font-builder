@@ -74,7 +74,7 @@ def test_non_kern_variation_block_does_not_claim_kerning() -> None:
 
     feature_ast = build_feature_ast(
         FeatureText(
-            'conditionset Heavy { wght 700 900; } Heavy; variation dist Heavy { pos b a -300; } dist;'
+            'conditionset Heavy { wght 700 900; } Heavy; variation dist Heavy { pos b a -300; } dist;',
         ),
         ['a', 'b'],
         generated_kern_feature,
@@ -109,7 +109,7 @@ def test_user_variation_block_claims_kerning() -> None:
 
     feature_ast = build_feature_ast(
         FeatureText(
-            'conditionset Heavy { wght 700 900; } Heavy; variation kern Heavy { pos b a -300; } kern;'
+            'conditionset Heavy { wght 700 900; } Heavy; variation kern Heavy { pos b a -300; } kern;',
         ),
         ['a', 'b'],
         generated_kern_feature,
@@ -126,7 +126,7 @@ def test_user_feature_and_variation_blocks_claim_kerning() -> None:
 
     feature_ast = build_feature_ast(
         FeatureText(
-            'conditionset Heavy { wght 700 900; } Heavy; feature kern { pos a b -100; } kern; variation kern Heavy { pos b a -300; } kern;'
+            'conditionset Heavy { wght 700 900; } Heavy; feature kern { pos a b -100; } kern; variation kern Heavy { pos b a -300; } kern;',
         ),
         ['a', 'b'],
         generated_kern_feature,
@@ -169,7 +169,7 @@ def test_kerning_pair_positioning_is_sorted_by_glyph_order(builder: FontBuilder)
 def test_generated_kerning_coexists_with_user_features(builder: FontBuilder) -> None:
     builder.kerning_values[('a', 'b')] = -1
     builder.opentype_config.features = FeatureText(
-        'feature salt { sub a by b; } salt; feature kern { pos b a -300; } kern;'
+        'feature salt { sub a by b; } salt; feature kern { pos b a -300; } kern;',
     )
 
     font = builder.to_ttf_builder().font
