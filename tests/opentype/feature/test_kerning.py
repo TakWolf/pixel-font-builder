@@ -64,7 +64,7 @@ def test_generated_kerning_is_added_without_user_kern() -> None:
         kern_feature,
     )
 
-    assert feature_ast.statements[-1] is kern_feature
+    assert feature_ast.statements[0] is kern_feature
 
 
 def test_non_kern_variation_block_does_not_claim_kerning() -> None:
@@ -80,7 +80,7 @@ def test_non_kern_variation_block_does_not_claim_kerning() -> None:
         kern_feature,
     )
 
-    assert feature_ast.statements[-1] is kern_feature
+    assert feature_ast.statements[0] is kern_feature
     assert any(
         isinstance(statement, ast.VariationBlock) and statement.name == 'dist'
         for statement in feature_ast.statements

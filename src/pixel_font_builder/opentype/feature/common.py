@@ -20,5 +20,5 @@ def build_feature_ast(
 ) -> ast.FeatureFile:
     feature_ast = parse_feature_inputs(features.create_inputs(), glyph_names) if features is not None else ast.FeatureFile()
     if kern_feature is not None and not _claims_feature(feature_ast, 'kern'):
-        feature_ast.statements.append(kern_feature)
+        feature_ast.statements.insert(0, kern_feature)
     return feature_ast
