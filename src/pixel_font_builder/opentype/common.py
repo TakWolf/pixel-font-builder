@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from enum import StrEnum, unique
 
+from fontTools.feaLib import ast
 from fontTools.feaLib.builder import addOpenTypeFeatures
 from fontTools.fontBuilder import FontBuilder
 from fontTools.misc import timeTools
@@ -17,8 +18,8 @@ from fontTools.ttLib.tables._b_l_o_c import table__b_l_o_c
 
 import pixel_font_builder
 from pixel_font_builder.opentype.bitmap import create_bitmap_strike_data
-from pixel_font_builder.opentype.feature.common import build_feature_ast
-from pixel_font_builder.opentype.feature.kerning import create_kern_feature
+from pixel_font_builder.opentype.feature.kerning import add_generated_kern_feature
+from pixel_font_builder.opentype.feature.source.parser import parse_feature_inputs
 from pixel_font_builder.opentype.name import create_name_strings
 from pixel_font_builder.opentype.outline.pen.otf import OtfOutlinePen
 from pixel_font_builder.opentype.outline.pen.ttf import TtfOutlinePen
@@ -267,11 +268,11 @@ def create_font_builder(
         if outline_table_mode == OutlineTableMode.OMIT:
             del builder.font[tb_head.tableTag]
 
-    kern_feature = None
-    if outline_table_mode == OutlineTableMode.NORMAL and kerning_values:
-        kern_feature = create_kern_feature(kerning_values, config.px_to_units)
+    feature_ast = parse_feature_inputs(config.features.create_inputs(), glyph_order) if config.features is not None else ast.FeatureFile()
 
-    feature_ast = build_feature_ast(config.features, glyph_order, kern_feature)
+    if outline_table_mode == OutlineTableMode.NORMAL and kerning_values:
+        add_generated_kern_feature(feature_ast, kerning_values, config.px_to_units)
+
     if feature_ast.statements:
         addOpenTypeFeatures(builder.font, feature_ast)
 
