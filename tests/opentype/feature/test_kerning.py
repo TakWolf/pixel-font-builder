@@ -6,7 +6,7 @@ from fontTools.feaLib import ast
 from pixel_font_builder import FontBuilder, Glyph
 from pixel_font_builder.opentype import OutlineTableMode, FeatureText, FeatureFile, FeatureIncludes
 from pixel_font_builder.opentype.feature.common import build_feature_ast
-from pixel_font_builder.opentype.kerning import create_kern_feature
+from pixel_font_builder.opentype.feature.kerning import create_kern_feature
 
 
 @pytest.fixture
