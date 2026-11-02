@@ -271,7 +271,7 @@ def create_font_builder(
     feature_ast = parse_feature_inputs(config.features.create_inputs(), glyph_order) if config.features is not None else ast.FeatureFile()
 
     if outline_table_mode == OutlineTableMode.NORMAL and kerning_values:
-        add_generated_kern_feature(feature_ast, kerning_values, config.px_to_units)
+        add_generated_kern_feature(feature_ast, kerning_values, config.px_to_units, config.user_kerning_mode)
 
     if feature_ast.statements:
         addOpenTypeFeatures(builder.font, feature_ast)
