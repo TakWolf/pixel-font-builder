@@ -5,8 +5,8 @@ from fontTools.feaLib import ast
 
 from pixel_font_builder import FontBuilder, Glyph
 from pixel_font_builder.opentype import OutlineTableMode, FeatureText, FeatureFile, FeatureIncludes
-from pixel_font_builder.opentype.feature.common import build_feature_ast
-from pixel_font_builder.opentype.feature.kerning import create_kern_feature
+from pixel_font_builder.opentype.feature.kerning import add_generated_kern_feature
+from pixel_font_builder.opentype.feature.source.parser import parse_feature_inputs
 
 
 @pytest.fixture
@@ -34,11 +34,13 @@ def builder() -> FontBuilder:
     return builder
 
 
-def test_create_kern_feature() -> None:
-    feature = create_kern_feature({
+def test_add_generated_kern_feature() -> None:
+    feature_ast = ast.FeatureFile()
+    add_generated_kern_feature(feature_ast, {
         ('b', 'a'): -1,
         ('a', 'b'): -2,
     }, 100)
+    feature = feature_ast.statements[0]
 
     assert feature.name == 'kern'
     assert isinstance(feature.statements[0], ast.ScriptStatement)
@@ -53,88 +55,56 @@ def test_create_kern_feature() -> None:
     ]
 
 
-def test_generated_kerning_is_added_without_user_kern() -> None:
-    kern_feature = create_kern_feature({
-        ('a', 'b'): -1,
-    }, 100)
+@pytest.mark.parametrize(
+    'source',
+    [
+        '',
+        'feature salt { sub a by b; } salt;',
+        'languagesystem latn dflt; feature salt { sub a by b; } salt;',
+        '# User features\nfeature salt { sub a by b; } salt;',
+    ],
+)
+def test_generated_kerning_is_added_without_user_kern(source: str) -> None:
+    feature_ast = parse_feature_inputs(FeatureText(source).create_inputs(), ['a', 'b'])
+    user_statements = list(feature_ast.statements)
+    add_generated_kern_feature(feature_ast, {('a', 'b'): -1}, 100)
 
-    feature_ast = build_feature_ast(
-        FeatureText('feature salt { sub a by b; } salt;'),
-        ['a', 'b'],
-        kern_feature,
-    )
-
-    assert feature_ast.statements[0] is kern_feature
+    assert isinstance(feature_ast.statements[0], ast.FeatureBlock)
+    assert feature_ast.statements[0].name == 'kern'
+    assert feature_ast.statements[1:] == user_statements
 
 
 def test_non_kern_variation_block_does_not_claim_kerning() -> None:
-    kern_feature = create_kern_feature({
-        ('a', 'b'): -1,
-    }, 100)
-
-    feature_ast = build_feature_ast(
+    feature_ast = parse_feature_inputs(
         FeatureText(
             'conditionset Heavy { wght 700 900; } Heavy; variation dist Heavy { pos b a -300; } dist;',
-        ),
+        ).create_inputs(),
         ['a', 'b'],
-        kern_feature,
     )
+    user_statements = list(feature_ast.statements)
+    add_generated_kern_feature(feature_ast, {('a', 'b'): -1}, 100)
 
-    assert feature_ast.statements[0] is kern_feature
-    assert any(
-        isinstance(statement, ast.VariationBlock) and statement.name == 'dist'
-        for statement in feature_ast.statements
-    )
-
-
-def test_user_feature_block_claims_kerning() -> None:
-    kern_feature = create_kern_feature({
-        ('a', 'b'): -1,
-    }, 100)
-
-    feature_ast = build_feature_ast(
-        FeatureText('feature kern { pos b a -300; } kern;'),
-        ['a', 'b'],
-        kern_feature,
-    )
-
-    assert kern_feature not in feature_ast.statements
-    assert [type(statement) for statement in feature_ast.statements] == [ast.FeatureBlock]
+    assert isinstance(feature_ast.statements[0], ast.FeatureBlock)
+    assert feature_ast.statements[0].name == 'kern'
+    assert feature_ast.statements[1:] == user_statements
 
 
-def test_user_variation_block_claims_kerning() -> None:
-    kern_feature = create_kern_feature({
-        ('a', 'b'): -1,
-    }, 100)
+@pytest.mark.parametrize(
+    'source',
+    [
+        'feature kern { pos b a -300; } kern;',
+        'conditionset Heavy { wght 700 900; } Heavy; variation kern Heavy { pos b a -300; } kern;',
+        'conditionset Heavy { wght 700 900; } Heavy; feature kern { pos a b -100; } kern; variation kern Heavy { pos b a -300; } kern;',
+    ],
+)
+def test_user_kerning_prevents_generated_feature(source: str) -> None:
+    feature_ast = parse_feature_inputs(FeatureText(source).create_inputs(), ['a', 'b'])
+    user_statements = list(feature_ast.statements)
+    user_features = feature_ast.asFea()
+    add_generated_kern_feature(feature_ast, {('a', 'b'): -1}, 100)
 
-    feature_ast = build_feature_ast(
-        FeatureText(
-            'conditionset Heavy { wght 700 900; } Heavy; variation kern Heavy { pos b a -300; } kern;',
-        ),
-        ['a', 'b'],
-        kern_feature,
-    )
-
-    assert kern_feature not in feature_ast.statements
-    assert any(isinstance(statement, ast.VariationBlock) and statement.name == 'kern' for statement in feature_ast.statements)
-
-
-def test_user_feature_and_variation_blocks_claim_kerning() -> None:
-    kern_feature = create_kern_feature({
-        ('a', 'b'): -1,
-    }, 100)
-
-    feature_ast = build_feature_ast(
-        FeatureText(
-            'conditionset Heavy { wght 700 900; } Heavy; feature kern { pos a b -100; } kern; variation kern Heavy { pos b a -300; } kern;',
-        ),
-        ['a', 'b'],
-        kern_feature,
-    )
-
-    assert kern_feature not in feature_ast.statements
-    assert any(isinstance(statement, ast.FeatureBlock) and statement.name == 'kern' for statement in feature_ast.statements)
-    assert any(isinstance(statement, ast.VariationBlock) and statement.name == 'kern' for statement in feature_ast.statements)
+    assert feature_ast.statements == user_statements
+    assert feature_ast.asFea() == user_features
 
 
 def test_kerning_uses_scaled_pair_positioning(builder: FontBuilder) -> None:
