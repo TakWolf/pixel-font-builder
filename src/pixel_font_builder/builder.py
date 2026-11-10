@@ -192,7 +192,7 @@ class FontBuilder:
 
     def to_dfont_builder(self) -> dfont.DFontBuilder:
         return dfont.create_font_builder(self)
-    
+
     def save_dfont(self, file_path: str | PathLike[str]) -> None:
         self.to_dfont_builder().save(file_path)
 
