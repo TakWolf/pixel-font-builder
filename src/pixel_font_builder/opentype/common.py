@@ -48,11 +48,11 @@ class BitmapTableMode(StrEnum):
     NONE = 'None'
 
     # Generate standard OpenType embedded bitmap tables.
-    # Typically, EBLC + EBDT.
+    # Typically, EBDT + EBLC.
     STANDARD = 'Standard'
 
     # Generate Apple-style embedded bitmap tables.
-    # Uses the same binary structure as EBLC/EBDT, but writes bloc/bdat tags instead.
+    # Uses the same binary structure as EBDT/EBLC, but writes bdat/bloc tags instead.
     # Also generates a bhed table copied from head.
     APPLE = 'Apple'
 
