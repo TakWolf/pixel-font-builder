@@ -38,6 +38,14 @@ def create_font_builder(
     character_mapping = context.character_mapping
     kerning_values = context.kerning_values
 
+    if config.has_vertical_metrics:
+        vertical_origins = {}
+        for glyph_name, glyph in name_to_glyph.items():
+            vertical_origin = (glyph.height + glyph.horizontal_offset_y + glyph.vertical_offset_y) * config.px_to_units
+            vertical_origins[glyph_name] = vertical_origin
+    else:
+        vertical_origins = None
+
     builder = FontBuilder(font_metric.font_size, isTTF=is_ttf)
 
     name_strings = create_name_strings(meta_info)
@@ -68,7 +76,8 @@ def create_font_builder(
             for glyph_name, glyph in name_to_glyph.items():
                 ttf_glyph = ttf_glyphs[glyph_name]
                 advance_height = glyph.advance_height * config.px_to_units
-                top_side_bearing = (glyph.height + glyph.horizontal_offset_y + glyph.vertical_offset_y) * config.px_to_units - ttf_glyph.yMax if ttf_glyph.numberOfContours > 0 else 0
+                vertical_origin = vertical_origins[glyph_name]
+                top_side_bearing = vertical_origin - ttf_glyph.yMax if ttf_glyph.numberOfContours > 0 else vertical_origin
                 vertical_metrics[glyph_name] = advance_height, top_side_bearing
             builder.setupVerticalMetrics(vertical_metrics)
     else:
@@ -97,15 +106,12 @@ def create_font_builder(
             for glyph_name, glyph in name_to_glyph.items():
                 otf_bounds = name_to_otf_bounds[glyph_name]
                 advance_height = glyph.advance_height * config.px_to_units
-                top_side_bearing = otRound((glyph.height + glyph.horizontal_offset_y + glyph.vertical_offset_y) * config.px_to_units - otf_bounds[3]) if otf_bounds is not None else 0
+                vertical_origin = vertical_origins[glyph_name]
+                top_side_bearing = otRound(vertical_origin - otf_bounds[3]) if otf_bounds is not None else vertical_origin
                 vertical_metrics[glyph_name] = advance_height, top_side_bearing
             builder.setupVerticalMetrics(vertical_metrics)
 
             if outline_table_mode == OutlineTableMode.NORMAL:
-                vertical_origins = {
-                    glyph_name: (glyph.height + glyph.horizontal_offset_y + glyph.vertical_offset_y) * config.px_to_units
-                    for glyph_name, glyph in name_to_glyph.items()
-                }
                 builder.setupVerticalOrigins(vertical_origins)
 
     if bitmap_table_mode in (BitmapTableMode.STANDARD, BitmapTableMode.APPLE):
