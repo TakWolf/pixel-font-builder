@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Any, Protocol, runtime_checkable
 
-from pixel_font_builder.glyph import Glyph
+from pixel_font_builder.glyph import MonoRaster
 from pixel_font_builder.opentype.outline.pen.pen import OutlinePen
 
 
@@ -20,7 +20,7 @@ class OutlinePainter(Protocol):
         raise NotImplementedError()
 
     @abstractmethod
-    def draw_outlines(self, glyph: Glyph, pen: OutlinePen, px_to_units: int) -> None:
+    def draw_outlines(self, raster: MonoRaster, pen: OutlinePen, px_to_units: int) -> None:
         raise NotImplementedError()
 
     @abstractmethod

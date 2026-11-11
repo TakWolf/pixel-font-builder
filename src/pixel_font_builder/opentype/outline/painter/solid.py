@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pixel_font_builder.glyph import Glyph
+from pixel_font_builder.glyph import MonoRaster
 from pixel_font_builder.opentype.outline.painter.painter import OutlinePainter
 from pixel_font_builder.opentype.outline.pen.pen import OutlinePen
 
@@ -83,12 +83,12 @@ class SolidOutlinePainter(OutlinePainter):
             return NotImplemented
         return True
 
-    def draw_outlines(self, glyph: Glyph, pen: OutlinePen, px_to_units: int) -> None:
-        outlines = SolidOutlinePainter.create_pixel_outlines(glyph.bitmap)
+    def draw_outlines(self, raster: MonoRaster, pen: OutlinePen, px_to_units: int) -> None:
+        outlines = SolidOutlinePainter.create_pixel_outlines(raster.bitmap)
         for outline in outlines:
             for index, (x, y) in enumerate(outline):
-                x = (x + glyph.horizontal_offset_x) * px_to_units
-                y = (glyph.height + glyph.horizontal_offset_y - y) * px_to_units
+                x = (x + raster.horizontal_offset_x) * px_to_units
+                y = (raster.height + raster.horizontal_offset_y - y) * px_to_units
 
                 if index == 0:
                     pen.move_to((x, y))
