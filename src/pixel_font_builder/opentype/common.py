@@ -56,8 +56,8 @@ def create_font_builder(
         builder.setupGlyf(ttf_glyphs)
 
         horizontal_metrics = {}
-        for glyph_name, ttf_glyph in ttf_glyphs.items():
-            glyph = name_to_glyph[glyph_name]
+        for glyph_name, glyph in name_to_glyph.items():
+            ttf_glyph = ttf_glyphs[glyph_name]
             advance_width = glyph.advance_width * config.px_to_units
             left_side_bearing = ttf_glyph.xMin if ttf_glyph.numberOfContours > 0 else 0
             horizontal_metrics[glyph_name] = advance_width, left_side_bearing
@@ -65,8 +65,8 @@ def create_font_builder(
 
         if config.has_vertical_metrics:
             vertical_metrics = {}
-            for glyph_name, ttf_glyph in ttf_glyphs.items():
-                glyph = name_to_glyph[glyph_name]
+            for glyph_name, glyph in name_to_glyph.items():
+                ttf_glyph = ttf_glyphs[glyph_name]
                 advance_height = glyph.advance_height * config.px_to_units
                 top_side_bearing = (glyph.height + glyph.horizontal_offset_y + glyph.vertical_offset_y) * config.px_to_units - ttf_glyph.yMax if ttf_glyph.numberOfContours > 0 else 0
                 vertical_metrics[glyph_name] = advance_height, top_side_bearing
@@ -85,8 +85,8 @@ def create_font_builder(
         name_to_otf_bounds = {glyph_name: otf_glyph.calcBounds(None) for glyph_name, otf_glyph in otf_glyphs.items()}
 
         horizontal_metrics = {}
-        for glyph_name, otf_bounds in name_to_otf_bounds.items():
-            glyph = name_to_glyph[glyph_name]
+        for glyph_name, glyph in name_to_glyph.items():
+            otf_bounds = name_to_otf_bounds[glyph_name]
             advance_width = glyph.advance_width * config.px_to_units
             left_side_bearing = otRound(otf_bounds[0]) if otf_bounds is not None else 0
             horizontal_metrics[glyph_name] = advance_width, left_side_bearing
@@ -94,8 +94,8 @@ def create_font_builder(
 
         if config.has_vertical_metrics:
             vertical_metrics = {}
-            for glyph_name, otf_bounds in name_to_otf_bounds.items():
-                glyph = name_to_glyph[glyph_name]
+            for glyph_name, glyph in name_to_glyph.items():
+                otf_bounds = name_to_otf_bounds[glyph_name]
                 advance_height = glyph.advance_height * config.px_to_units
                 top_side_bearing = otRound((glyph.height + glyph.horizontal_offset_y + glyph.vertical_offset_y) * config.px_to_units - otf_bounds[3]) if otf_bounds is not None else 0
                 vertical_metrics[glyph_name] = advance_height, top_side_bearing
