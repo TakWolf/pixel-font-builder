@@ -111,7 +111,7 @@ def create_font_builder(
                 vertical_metrics[glyph_name] = advance_height, top_side_bearing
             builder.setupVerticalMetrics(vertical_metrics)
 
-            if outline_table_mode == OutlineTableMode.NORMAL:
+            if outline_table_mode in (OutlineTableMode.NORMAL, OutlineTableMode.BLANK_GLYPHS):
                 builder.setupVerticalOrigins(vertical_origins)
 
     if bitmap_table_mode in (BitmapTableMode.STANDARD, BitmapTableMode.APPLE):
