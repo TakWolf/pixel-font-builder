@@ -1,101 +1,169 @@
 from __future__ import annotations
 
 import math
+import struct
+import zlib
 from datetime import datetime
 from pathlib import Path
 
 import pytest
 
-from pixel_font_builder import FontBuilder, FontCollectionBuilder, WeightName, SerifStyle, SlantStyle, WidthStyle, Glyph
+from pixel_font_builder import FontBuilder, FontCollectionBuilder, WeightName, SerifStyle, SlantStyle, WidthStyle, Glyph, MonoRaster, ColorRaster, ColorRgba
 
 
-def _load_bitmap(file_path: Path) -> tuple[int, int, list[list[int]]]:
-    width = 0
-    height = 0
+def _load_color_bitmap(file_path: Path) -> tuple[int, int, list[list[ColorRgba]]]:
+    data = file_path.read_bytes()
+    if data[:8] != b'\x89PNG\r\n\x1a\n':
+        raise ValueError(f'invalid PNG signature: {file_path}')
+
+    header = None
+    compressed = bytearray()
+    offset = 8
+    while offset < len(data):
+        if offset + 12 > len(data):
+            raise ValueError(f'truncated PNG chunk: {file_path}')
+        length, tag = struct.unpack_from('>I4s', data, offset)
+        end = offset + 12 + length
+        if end > len(data):
+            raise ValueError(f'truncated PNG chunk: {file_path}')
+        payload = data[offset + 8:end - 4]
+        checksum = struct.unpack_from('>I', data, end - 4)[0]
+        if checksum != zlib.crc32(tag + payload):
+            raise ValueError(f'invalid PNG chunk checksum: {file_path}')
+        if tag == b'IHDR':
+            if header is not None or offset != 8 or length != 13:
+                raise ValueError(f'invalid PNG header: {file_path}')
+            header = struct.unpack('>IIBBBBB', payload)
+        elif tag == b'IDAT':
+            compressed.extend(payload)
+        elif tag == b'IEND':
+            break
+        offset = end
+    else:
+        raise ValueError(f'missing PNG end chunk: {file_path}')
+
+    if header is None:
+        raise ValueError(f'missing PNG header: {file_path}')
+    width, height, bitdepth, color_type, compression, filtering, interlace = header
+    if width == 0 or height == 0 or (bitdepth, color_type, compression, filtering, interlace) != (8, 6, 0, 0, 0):
+        raise ValueError(f'expected a non-interlaced 8-bit RGBA PNG: {file_path}')
+    raw = zlib.decompress(compressed)
+    stride = width * 4
+    if len(raw) != height * (stride + 1):
+        raise ValueError(f'invalid PNG pixel data length: {file_path}')
+
     bitmap = []
-    with file_path.open('r', encoding='utf-8') as file:
-        for i, line in enumerate(file):
-            line = line.strip().replace('##', '#').replace('..', '.')
-            bitmap.append([1 if c == '#' else 0 for c in line])
-
-            if i == 0:
-                width = len(line)
+    previous = bytearray(stride)
+    for y in range(height):
+        start = y * (stride + 1)
+        row_filter = raw[start]
+        row = bytearray(raw[start + 1:start + 1 + stride])
+        if row_filter not in (0, 1, 2, 3, 4):
+            raise ValueError(f'unsupported PNG row filter {row_filter}: {file_path}')
+        for x in range(stride):
+            left = row[x - 4] if x >= 4 else 0
+            above = previous[x]
+            upper_left = previous[x - 4] if x >= 4 else 0
+            if row_filter == 0:
+                predictor = 0
+            elif row_filter == 1:
+                predictor = left
+            elif row_filter == 2:
+                predictor = above
+            elif row_filter == 3:
+                predictor = (left + above) // 2
             else:
-                assert width == len(line)
-            height += 1
+                prediction = left + above - upper_left
+                left_distance = abs(prediction - left)
+                above_distance = abs(prediction - above)
+                upper_left_distance = abs(prediction - upper_left)
+                if left_distance <= above_distance and left_distance <= upper_left_distance:
+                    predictor = left
+                elif above_distance <= upper_left_distance:
+                    predictor = above
+                else:
+                    predictor = upper_left
+            row[x] = (row[x] + predictor) & 255
+        bitmap.append([tuple(row[x:x + 4]) for x in range(0, stride, 4)])
+        previous = row
     return width, height, bitmap
 
 
-class GlyphInfo:
-    @staticmethod
-    def load(file_path: Path) -> GlyphInfo:
-        hex_name = file_path.stem.strip()
-        code_point = -1 if hex_name == 'notdef' else int(hex_name, 16)
-        width, height, bitmap = _load_bitmap(file_path)
-        return GlyphInfo(code_point, width, height, bitmap)
-
-    code_point: int
-    width: int
-    height: int
-    bitmap: list[list[int]]
-
-    def __init__(
-            self,
-            code_point: int,
-            width: int,
-            height: int,
-            bitmap: list[list[int]],
-    ) -> None:
-        self.code_point = code_point
-        self.width = width
-        self.height = height
-        self.bitmap = bitmap
+def _load_mono_bitmap(file_path: Path) -> tuple[int, int, list[list[int]]]:
+    width, height, color_bitmap = _load_color_bitmap(file_path)
+    return width, height, [[int(pixel[3] >= 128) for pixel in row] for row in color_bitmap]
 
 
-def _get_glyph_name(code_point: int) -> str:
-    return '.notdef' if code_point == -1 else f'u{code_point:04X}'
-
-
-def _collect_glyph_infos(glyphs_dir: Path) -> tuple[list[GlyphInfo], dict[int, str]]:
-    glyph_infos = []
-    character_mapping = {}
-
-    for file_path in glyphs_dir.glob('*.txt'):
+def _collect_glyphs(
+        glyphs_dir: Path,
+        font_size: int,
+        horizontal_ascent: int,
+        horizontal_descent: int,
+) -> tuple[list[Glyph], dict[int, str]]:
+    code_points = set[int]()
+    for file_path in glyphs_dir.glob('*.png'):
         if not file_path.is_file():
             continue
 
-        glyph_info = GlyphInfo.load(file_path)
-        glyph_infos.append(glyph_info)
+        hex_name = file_path.stem.removesuffix('.color')
+        code_point = -1 if hex_name == 'notdef' else int(hex_name, 16)
+        code_points.add(code_point)
 
-        if glyph_info.code_point != -1:
-            character_mapping[glyph_info.code_point] = _get_glyph_name(glyph_info.code_point)
+    glyphs = []
+    character_mapping = {}
+    for code_point in sorted(code_points):
+        hex_name = 'notdef' if code_point == -1 else f'{code_point:04X}'
+        glyph_name = '.notdef' if code_point == -1 else f'u{hex_name}'
+        glyph = Glyph(
+            name=glyph_name,
+            advance_height=font_size,
+        )
 
-    glyph_infos.sort(key=lambda x: x.code_point)
-    return glyph_infos, character_mapping
+        mono_file_path = glyphs_dir.joinpath(f'{hex_name}.png')
+        if mono_file_path.is_file():
+            width, height, bitmap = _load_mono_bitmap(mono_file_path)
 
+            horizontal_offset_x = 0
+            horizontal_offset_y = (horizontal_ascent + horizontal_descent - height) // 2
+            vertical_offset_x = -math.ceil(width / 2)
+            vertical_offset_y = (font_size - height) // 2
 
-def _build_kerning_values() -> dict[tuple[str, str], int]:
-    kerning_values = {}
+            glyph.advance_width = width
+            glyph.mono_raster = MonoRaster(
+                horizontal_offset=(horizontal_offset_x, horizontal_offset_y),
+                vertical_offset=(vertical_offset_x, vertical_offset_y),
+                bitmap=bitmap,
+            )
 
-    for left_letter in 'FTVY':
-        for right_letter in 'acdefgjmnopqrstuvwxyz':
-            kerning_values[(_get_glyph_name(ord(left_letter)), _get_glyph_name(ord(right_letter)))] = -1
+        color_file_path = glyphs_dir.joinpath(f'{hex_name}.color.png')
+        if color_file_path.is_file():
+            width, height, bitmap = _load_color_bitmap(color_file_path)
 
-    for left_letter in 'W':
-        for right_letter in 'acdegoqs':
-            kerning_values[(_get_glyph_name(ord(left_letter)), _get_glyph_name(ord(right_letter)))] = -1
+            horizontal_offset_x = 0
+            horizontal_offset_y = (horizontal_ascent + horizontal_descent - height) // 2
+            vertical_offset_x = -math.ceil(width / 2)
+            vertical_offset_y = (font_size - height) // 2
 
-    for left_letter, right_letter in (('A', 'T'), ('A', 'V'), ('A', 'W'), ('A', 'Y'), ('T', 'A'), ('V', 'A'), ('W', 'A'), ('Y', 'A')):
-        kerning_values[(_get_glyph_name(ord(left_letter)), _get_glyph_name(ord(right_letter)))] = -1
+            glyph.color_raster = ColorRaster(
+                horizontal_offset=(horizontal_offset_x, horizontal_offset_y),
+                vertical_offset=(vertical_offset_x, vertical_offset_y),
+                bitmap=bitmap,
+            )
 
-    return kerning_values
+            if glyph.mono_raster is None:
+                glyph.advance_width = width
+            else:
+                assert width == glyph.mono_raster.width
+                assert height == glyph.mono_raster.height
+
+        glyphs.append(glyph)
+        if code_point != -1:
+            character_mapping[code_point] = glyph_name
+    return glyphs, character_mapping
 
 
 @pytest.fixture(scope='session')
 def demo_builder(assets_dir: Path) -> FontBuilder:
-    glyph_infos, character_mapping = _collect_glyph_infos(assets_dir.joinpath('glyphs'))
-    kerning_values = _build_kerning_values()
-
     builder = FontBuilder()
     builder.font_metric.font_size = 12
     builder.font_metric.horizontal_layout.ascent = 13
@@ -126,22 +194,167 @@ def demo_builder(assets_dir: Path) -> FontBuilder:
     builder.meta_info.designer_url = 'https://takwolf.com'
     builder.meta_info.license_url = 'https://openfontlicense.org'
 
-    for glyph_info in glyph_infos:
-        horizontal_offset_x = 0
-        horizontal_offset_y = (builder.font_metric.horizontal_layout.ascent + builder.font_metric.horizontal_layout.descent - glyph_info.height) // 2
-        vertical_offset_x = -math.ceil(glyph_info.width / 2)
-        vertical_offset_y = (builder.font_metric.font_size - glyph_info.height) // 2
-        builder.glyphs.append(Glyph(
-            name=_get_glyph_name(glyph_info.code_point),
-            horizontal_offset=(horizontal_offset_x, horizontal_offset_y),
-            advance_width=glyph_info.width,
-            vertical_offset=(vertical_offset_x, vertical_offset_y),
-            advance_height=builder.font_metric.font_size,
-            bitmap=glyph_info.bitmap,
-        ))
-
+    glyphs, character_mapping = _collect_glyphs(
+        assets_dir.joinpath('glyphs'),
+        builder.font_metric.font_size,
+        builder.font_metric.horizontal_layout.ascent,
+        builder.font_metric.horizontal_layout.descent,
+    )
+    builder.glyphs = glyphs
     builder.character_mapping = character_mapping
-    builder.kerning_values = kerning_values
+
+    builder.kerning_values = {
+        ('u002F', 'u002F'): -1,
+        ('u0041', 'u0054'): -1,
+        ('u0041', 'u0056'): -1,
+        ('u0041', 'u0057'): -1,
+        ('u0041', 'u0059'): -1,
+        ('u0041', 'u0066'): -1,
+        ('u0041', 'u006A'): -1,
+        ('u0041', 'u006C'): -1,
+        ('u0041', 'u0074'): -1,
+        ('u0041', 'u0076'): -1,
+        ('u0046', 'u002C'): -1,
+        ('u0046', 'u002E'): -1,
+        ('u0046', 'u0041'): -1,
+        ('u0046', 'u0061'): -1,
+        ('u0046', 'u0063'): -1,
+        ('u0046', 'u0064'): -1,
+        ('u0046', 'u0065'): -1,
+        ('u0046', 'u0066'): -1,
+        ('u0046', 'u0067'): -1,
+        ('u0046', 'u0069'): -1,
+        ('u0046', 'u006A'): -1,
+        ('u0046', 'u006D'): -1,
+        ('u0046', 'u006E'): -1,
+        ('u0046', 'u006F'): -1,
+        ('u0046', 'u0070'): -1,
+        ('u0046', 'u0071'): -1,
+        ('u0046', 'u0072'): -1,
+        ('u0046', 'u0073'): -1,
+        ('u0046', 'u0074'): -1,
+        ('u0046', 'u0075'): -1,
+        ('u0046', 'u0076'): -1,
+        ('u0046', 'u0077'): -1,
+        ('u0046', 'u0078'): -1,
+        ('u0046', 'u0079'): -1,
+        ('u0046', 'u007A'): -1,
+        ('u004C', 'u0054'): -1,
+        ('u004C', 'u0056'): -1,
+        ('u004C', 'u0057'): -1,
+        ('u004C', 'u0059'): -1,
+        ('u004C', 'u0066'): -1,
+        ('u004C', 'u006A'): -1,
+        ('u004C', 'u006C'): -1,
+        ('u004C', 'u0074'): -1,
+        ('u004C', 'u0076'): -1,
+        ('u004C', 'u0077'): -1,
+        ('u004C', 'u0079'): -1,
+        ('u0050', 'u002C'): -1,
+        ('u0050', 'u002E'): -1,
+        ('u0050', 'u0041'): -1,
+        ('u0050', 'u0061'): -1,
+        ('u0054', 'u002C'): -1,
+        ('u0054', 'u002E'): -1,
+        ('u0054', 'u0041'): -1,
+        ('u0054', 'u0061'): -1,
+        ('u0054', 'u0063'): -1,
+        ('u0054', 'u0064'): -1,
+        ('u0054', 'u0065'): -1,
+        ('u0054', 'u0066'): -1,
+        ('u0054', 'u0069'): -1,
+        ('u0054', 'u006A'): -1,
+        ('u0054', 'u006D'): -1,
+        ('u0054', 'u006E'): -1,
+        ('u0054', 'u006F'): -1,
+        ('u0054', 'u0070'): -1,
+        ('u0054', 'u0071'): -1,
+        ('u0054', 'u0072'): -1,
+        ('u0054', 'u0073'): -1,
+        ('u0054', 'u0074'): -1,
+        ('u0054', 'u0075'): -1,
+        ('u0054', 'u0076'): -1,
+        ('u0054', 'u0077'): -1,
+        ('u0054', 'u0078'): -1,
+        ('u0054', 'u0079'): -1,
+        ('u0054', 'u007A'): -1,
+        ('u0056', 'u002C'): -1,
+        ('u0056', 'u002E'): -1,
+        ('u0056', 'u0041'): -1,
+        ('u0056', 'u0061'): -1,
+        ('u0056', 'u0063'): -1,
+        ('u0056', 'u0064'): -1,
+        ('u0056', 'u0065'): -1,
+        ('u0056', 'u0066'): -1,
+        ('u0056', 'u0067'): -1,
+        ('u0056', 'u0069'): -1,
+        ('u0056', 'u006A'): -1,
+        ('u0056', 'u006D'): -1,
+        ('u0056', 'u006E'): -1,
+        ('u0056', 'u006F'): -1,
+        ('u0056', 'u0070'): -1,
+        ('u0056', 'u0071'): -1,
+        ('u0056', 'u0072'): -1,
+        ('u0056', 'u0073'): -1,
+        ('u0056', 'u0074'): -1,
+        ('u0056', 'u0075'): -1,
+        ('u0056', 'u0076'): -1,
+        ('u0056', 'u0077'): -1,
+        ('u0056', 'u0078'): -1,
+        ('u0056', 'u0079'): -1,
+        ('u0056', 'u007A'): -1,
+        ('u0057', 'u002C'): -1,
+        ('u0057', 'u002E'): -1,
+        ('u0057', 'u0041'): -1,
+        ('u0057', 'u0061'): -1,
+        ('u0057', 'u0063'): -1,
+        ('u0057', 'u0064'): -1,
+        ('u0057', 'u0065'): -1,
+        ('u0057', 'u0067'): -1,
+        ('u0057', 'u006F'): -1,
+        ('u0057', 'u0071'): -1,
+        ('u0057', 'u0073'): -1,
+        ('u0059', 'u002C'): -1,
+        ('u0059', 'u002E'): -1,
+        ('u0059', 'u0041'): -1,
+        ('u0059', 'u0061'): -1,
+        ('u0059', 'u0063'): -1,
+        ('u0059', 'u0064'): -1,
+        ('u0059', 'u0065'): -1,
+        ('u0059', 'u0066'): -1,
+        ('u0059', 'u0067'): -1,
+        ('u0059', 'u0069'): -1,
+        ('u0059', 'u006A'): -1,
+        ('u0059', 'u006D'): -1,
+        ('u0059', 'u006E'): -1,
+        ('u0059', 'u006F'): -1,
+        ('u0059', 'u0070'): -1,
+        ('u0059', 'u0071'): -1,
+        ('u0059', 'u0072'): -1,
+        ('u0059', 'u0073'): -1,
+        ('u0059', 'u0074'): -1,
+        ('u0059', 'u0075'): -1,
+        ('u0059', 'u0076'): -1,
+        ('u0059', 'u0077'): -1,
+        ('u0059', 'u0078'): -1,
+        ('u0059', 'u0079'): -1,
+        ('u0059', 'u007A'): -1,
+        ('u005C', 'u005C'): -1,
+        ('u0066', 'u002C'): -1,
+        ('u0066', 'u002E'): -1,
+        ('u0066', 'u0061'): -1,
+        ('u0069', 'u006A'): -1,
+        ('u006C', 'u006A'): -1,
+        ('u0072', 'u002C'): -1,
+        ('u0072', 'u002E'): -1,
+        ('u0072', 'u0061'): -1,
+        ('u0076', 'u002C'): -1,
+        ('u0076', 'u002E'): -1,
+        ('u0077', 'u002C'): -1,
+        ('u0077', 'u002E'): -1,
+        ('u0079', 'u002C'): -1,
+        ('u0079', 'u002E'): -1,
+    }
 
     return builder
 

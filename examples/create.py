@@ -2,7 +2,7 @@ import shutil
 from datetime import datetime
 
 from examples import BUILD_DIR
-from pixel_font_builder import FontBuilder, WeightName, SerifStyle, SlantStyle, WidthStyle, Glyph, opentype
+from pixel_font_builder import FontBuilder, WeightName, SerifStyle, SlantStyle, WidthStyle, Glyph, MonoRaster, ColorRaster, opentype
 
 
 def main() -> None:
@@ -43,56 +43,102 @@ def main() -> None:
 
     builder.glyphs.append(Glyph(
         name='.notdef',
-        horizontal_offset=(0, -2),
         advance_width=8,
-        vertical_offset=(-4, 0),
         advance_height=16,
-        bitmap=[
-            [1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1],
-        ],
+        mono_raster=MonoRaster(
+            horizontal_offset=(0, -2),
+            vertical_offset=(-4, 0),
+            bitmap=[
+                [1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 1],
+                [1, 1, 1, 1, 1, 1, 1, 1],
+            ],
+        ),
     ))
+
     builder.glyphs.append(Glyph(
         name='LATIN_CAPITAL_LETTER_A',
-        horizontal_offset=(0, -2),
         advance_width=8,
-        vertical_offset=(-4, 0),
         advance_height=16,
-        bitmap=[
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 1, 1, 0, 0, 0],
-            [0, 0, 1, 0, 0, 1, 0, 0],
-            [0, 0, 1, 0, 0, 1, 0, 0],
-            [0, 1, 0, 0, 0, 0, 1, 0],
-            [0, 1, 0, 0, 0, 0, 1, 0],
-            [0, 1, 1, 1, 1, 1, 1, 0],
-            [0, 1, 0, 0, 0, 0, 1, 0],
-            [0, 1, 0, 0, 0, 0, 1, 0],
-            [0, 1, 0, 0, 0, 0, 1, 0],
-            [0, 1, 0, 0, 0, 0, 1, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-        ],
+        mono_raster=MonoRaster(
+            horizontal_offset=(0, -2),
+            vertical_offset=(-4, 0),
+            bitmap=[
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 1, 1, 0, 0, 0],
+                [0, 0, 1, 0, 0, 1, 0, 0],
+                [0, 0, 1, 0, 0, 1, 0, 0],
+                [0, 1, 0, 0, 0, 0, 1, 0],
+                [0, 1, 0, 0, 0, 0, 1, 0],
+                [0, 1, 1, 1, 1, 1, 1, 0],
+                [0, 1, 0, 0, 0, 0, 1, 0],
+                [0, 1, 0, 0, 0, 0, 1, 0],
+                [0, 1, 0, 0, 0, 0, 1, 0],
+                [0, 1, 0, 0, 0, 0, 1, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+            ],
+        ),
+    ))
+
+    heart_bitmap = [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 1, 0, 1, 1, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 0],
+        [1, 1, 1, 1, 1, 1, 1, 0],
+        [1, 1, 1, 1, 1, 1, 1, 0],
+        [0, 1, 1, 1, 1, 1, 0, 0],
+        [0, 1, 1, 1, 1, 1, 0, 0],
+        [0, 0, 1, 1, 1, 0, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+    ]
+    builder.glyphs.append(Glyph(
+        name='HEAVY_BLACK_HEART',
+        advance_width=8,
+        advance_height=16,
+        mono_raster=MonoRaster(
+            horizontal_offset=(0, -2),
+            vertical_offset=(-4, 0),
+            bitmap=heart_bitmap,
+        ),
+        color_raster=ColorRaster(
+            horizontal_offset=(0, -2),
+            vertical_offset=(-4, 0),
+            bitmap=[
+                [
+                    (255, 0, 0, 255) if pixel != 0 else (0, 0, 0, 0)
+                    for pixel in bitmap_row
+                ]
+                for bitmap_row in heart_bitmap
+            ],
+        ),
     ))
 
     builder.character_mapping[0x0041] = 'LATIN_CAPITAL_LETTER_A'
+    builder.character_mapping[0x2764] = 'HEAVY_BLACK_HEART'
 
     builder.save_otf(outputs_dir.joinpath('my-font.otf'))
     builder.save_otf_woff(outputs_dir.joinpath('my-font.otf.woff'))
@@ -108,21 +154,75 @@ def main() -> None:
 
     builder.meta_info.family_name = 'My Font SquareDot'
     builder.opentype_config.outline_painter = opentype.SquareDotOutlinePainter()
-    builder.save_otf(outputs_dir.joinpath('my-font-square_dot.otf'))
-    builder.save_otf_woff(outputs_dir.joinpath('my-font-square_dot.otf.woff'))
-    builder.save_otf_woff2(outputs_dir.joinpath('my-font-square_dot.otf.woff2'))
-    builder.save_ttf(outputs_dir.joinpath('my-font-square_dot.ttf'))
-    builder.save_ttf_woff(outputs_dir.joinpath('my-font-square_dot.ttf.woff'))
-    builder.save_ttf_woff2(outputs_dir.joinpath('my-font-square_dot.ttf.woff2'))
+    
+    builder.save_otf(outputs_dir.joinpath('my-font-square-dot.otf'))
+    builder.save_otf_woff(outputs_dir.joinpath('my-font-square-dot.otf.woff'))
+    builder.save_otf_woff2(outputs_dir.joinpath('my-font-square-dot.otf.woff2'))
+    builder.save_ttf(outputs_dir.joinpath('my-font-square-dot.ttf'))
+    builder.save_ttf_woff(outputs_dir.joinpath('my-font-square-dot.ttf.woff'))
+    builder.save_ttf_woff2(outputs_dir.joinpath('my-font-square-dot.ttf.woff2'))
 
     builder.meta_info.family_name = 'My Font CircleDot'
     builder.opentype_config.outline_painter = opentype.CircleDotOutlinePainter()
-    builder.save_otf(outputs_dir.joinpath('my-font-circle_dot.otf'))
-    builder.save_otf_woff(outputs_dir.joinpath('my-font-circle_dot.otf.woff'))
-    builder.save_otf_woff2(outputs_dir.joinpath('my-font-circle_dot.otf.woff2'))
-    builder.save_ttf(outputs_dir.joinpath('my-font-circle_dot.ttf'))
-    builder.save_ttf_woff(outputs_dir.joinpath('my-font-circle_dot.ttf.woff'))
-    builder.save_ttf_woff2(outputs_dir.joinpath('my-font-circle_dot.ttf.woff2'))
+    
+    builder.save_otf(outputs_dir.joinpath('my-font-circle-dot.otf'))
+    builder.save_otf_woff(outputs_dir.joinpath('my-font-circle-dot.otf.woff'))
+    builder.save_otf_woff2(outputs_dir.joinpath('my-font-circle-dot.otf.woff2'))
+    builder.save_ttf(outputs_dir.joinpath('my-font-circle-dot.ttf'))
+    builder.save_ttf_woff(outputs_dir.joinpath('my-font-circle-dot.ttf.woff'))
+    builder.save_ttf_woff2(outputs_dir.joinpath('my-font-circle-dot.ttf.woff2'))
+
+    builder.opentype_config.outline_painter = opentype.Config.DEFAULT_OUTLINE_PAINTER
+
+    builder.meta_info.family_name = 'My Font Color COLR'
+    builder.opentype_config.color_table_formats = {
+        opentype.ColorTableFormat.COLR,
+    }
+
+    builder.save_otf(outputs_dir.joinpath('my-font.colr.otf'))
+    builder.save_otf_woff(outputs_dir.joinpath('my-font.colr.otf.woff'))
+    builder.save_otf_woff2(outputs_dir.joinpath('my-font.colr.otf.woff2'))
+    builder.save_ttf(outputs_dir.joinpath('my-font.colr.ttf'))
+    builder.save_ttf_woff(outputs_dir.joinpath('my-font.colr.ttf.woff'))
+    builder.save_ttf_woff2(outputs_dir.joinpath('my-font.colr.ttf.woff2'))
+
+    builder.meta_info.family_name = 'My Font Color CBDT'
+    builder.opentype_config.color_table_formats = {
+        opentype.ColorTableFormat.CBDT,
+    }
+
+    builder.save_otf(outputs_dir.joinpath('my-font.cbdt.otf'))
+    builder.save_otf_woff(outputs_dir.joinpath('my-font.cbdt.otf.woff'))
+    builder.save_otf_woff2(outputs_dir.joinpath('my-font.cbdt.otf.woff2'))
+    builder.save_ttf(outputs_dir.joinpath('my-font.cbdt.ttf'))
+    builder.save_ttf_woff(outputs_dir.joinpath('my-font.cbdt.ttf.woff'))
+    builder.save_ttf_woff2(outputs_dir.joinpath('my-font.cbdt.ttf.woff2'))
+
+    builder.meta_info.family_name = 'My Font Color SBIX'
+    builder.opentype_config.color_table_formats = {
+        opentype.ColorTableFormat.SBIX,
+    }
+
+    builder.save_otf(outputs_dir.joinpath('my-font.sbix.otf'))
+    builder.save_otf_woff(outputs_dir.joinpath('my-font.sbix.otf.woff'))
+    builder.save_otf_woff2(outputs_dir.joinpath('my-font.sbix.otf.woff2'))
+    builder.save_ttf(outputs_dir.joinpath('my-font.sbix.ttf'))
+    builder.save_ttf_woff(outputs_dir.joinpath('my-font.sbix.ttf.woff'))
+    builder.save_ttf_woff2(outputs_dir.joinpath('my-font.sbix.ttf.woff2'))
+
+    builder.meta_info.family_name = 'My Font Color All'
+    builder.opentype_config.color_table_formats = {
+        opentype.ColorTableFormat.COLR,
+        opentype.ColorTableFormat.CBDT,
+        opentype.ColorTableFormat.SBIX,
+    }
+
+    builder.save_otf(outputs_dir.joinpath('my-font.color-all.otf'))
+    builder.save_otf_woff(outputs_dir.joinpath('my-font.color-all.otf.woff'))
+    builder.save_otf_woff2(outputs_dir.joinpath('my-font.color-all.otf.woff2'))
+    builder.save_ttf(outputs_dir.joinpath('my-font.color-all.ttf'))
+    builder.save_ttf_woff(outputs_dir.joinpath('my-font.color-all.ttf.woff'))
+    builder.save_ttf_woff2(outputs_dir.joinpath('my-font.color-all.ttf.woff2'))
 
 
 if __name__ == '__main__':
