@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from enum import StrEnum, unique
-
 from fontTools.feaLib import ast
 from fontTools.feaLib.builder import addOpenTypeFeatures
 from fontTools.fontBuilder import FontBuilder
@@ -18,50 +16,12 @@ from fontTools.ttLib.tables._b_l_o_c import table__b_l_o_c
 
 import pixel_font_builder
 from pixel_font_builder.opentype.bitmap import create_bitmap_strike_data
+from pixel_font_builder.opentype.enum import OutlineTableMode, BitmapTableMode, Flavor
 from pixel_font_builder.opentype.feature.kerning import add_generated_kern_feature
 from pixel_font_builder.opentype.feature.source.parser import parse_feature_inputs
 from pixel_font_builder.opentype.name import create_name_strings
 from pixel_font_builder.opentype.outline.pen.otf import OtfOutlinePen
 from pixel_font_builder.opentype.outline.pen.ttf import TtfOutlinePen
-
-
-@unique
-class OutlineTableMode(StrEnum):
-    # Generate standard outline data.
-    # - TTF: write glyf/loca tables with full glyph outlines.
-    # - OTF: write normal CFF table data.
-    NORMAL = 'Normal'
-
-    # Do not generate outline tables.
-    OMIT = 'Omit'
-
-    # Generate an outline table shell with zero-length table data.
-    ZERO_LENGTH = 'Zero Length'
-
-    # Generate outline tables for the full glyph order, but make glyph outlines empty.
-    # Intended for fake scalable bitmap fonts where layout metrics still come from sfnt metrics tables.
-    BLANK_GLYPHS = 'Blank Glyphs'
-
-
-@unique
-class BitmapTableMode(StrEnum):
-    # Do not generate embedded bitmap tables.
-    NONE = 'None'
-
-    # Generate standard OpenType embedded bitmap tables.
-    # Typically, EBDT + EBLC.
-    STANDARD = 'Standard'
-
-    # Generate Apple-style embedded bitmap tables.
-    # Uses the same binary structure as EBDT/EBLC, but writes bdat/bloc tags instead.
-    # Also generates a bhed table copied from head.
-    APPLE = 'Apple'
-
-
-@unique
-class Flavor(StrEnum):
-    WOFF = 'woff'
-    WOFF2 = 'woff2'
 
 
 def create_font_builder(

@@ -4,7 +4,7 @@ from collections.abc import Mapping
 
 from fontTools.feaLib import ast
 
-from pixel_font_builder.opentype.config import UserKerningMode
+from pixel_font_builder.opentype.enum import UserKerningMode
 
 
 def _create_kern_feature(kerning_values: Mapping[tuple[str, str], int], px_to_units: int) -> ast.FeatureBlock:

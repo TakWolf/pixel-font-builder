@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from enum import StrEnum, unique
 from typing import Any, Final
 
+from pixel_font_builder.opentype.enum import UserKerningMode
 from pixel_font_builder.opentype.feature.source.source import FeatureSource
 from pixel_font_builder.opentype.outline.painter.painter import OutlinePainter
 from pixel_font_builder.opentype.outline.painter.solid import SolidOutlinePainter
@@ -55,22 +55,6 @@ class FieldOverrides:
 
     def deepcopy(self) -> FieldOverrides:
         return self.copy()
-
-
-@unique
-class UserKerningMode(StrEnum):
-    # Let any user kern feature or variation block take over all kerning.
-    # Skip all generated kerning when such a block exists, even if it is empty
-    # or limited to particular glyph pairs, scripts, languages, or conditions.
-    # Generate kerning normally when no user kern block exists.
-    TAKEOVER = 'Takeover'
-
-    # Prepend generated kerning while preserving all user feature statements.
-    # Rules are not deduplicated or merged by glyph pair. When both sets of rules
-    # apply to the same pair, their positioning adjustments can accumulate.
-    # Generated kerning uses DFLT/dflt; user script and language declarations
-    # still determine where user rules apply.
-    COEXIST = 'Coexist'
 
 
 class Config:
