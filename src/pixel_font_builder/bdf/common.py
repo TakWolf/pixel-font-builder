@@ -20,8 +20,8 @@ def _create_bdf_glyph(glyph: Glyph, encoding: int, font_metric: FontMetric, conf
         encoding=encoding,
         scalable_width=(math.ceil((glyph.advance_width / font_metric.font_size) * (75 / config.resolution_x) * 1000), 0),
         device_width=(glyph.advance_width, 0),
-        bounding_box=(glyph.width, glyph.height, glyph.horizontal_offset_x, glyph.horizontal_offset_y),
-        bitmap=glyph.bitmap,
+        bounding_box=(glyph.mono_raster.width, glyph.mono_raster.height, glyph.mono_raster.horizontal_offset_x, glyph.mono_raster.horizontal_offset_y) if glyph.mono_raster is not None else (0, 0, 0, 0),
+        bitmap=glyph.mono_raster.bitmap if glyph.mono_raster is not None else None,
     )
 
 
@@ -32,8 +32,8 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
     config = context.bdf_config
     font_metric = context.font_metric
     meta_info = context.meta_info
-    _, name_to_glyph = context.prepare_glyphs()
-    character_mapping = context.character_mapping
+    _, name_to_glyph = context.prepare_glyphs(no_color_mode=True)
+    character_mapping = context.prepare_character_mapping(name_to_glyph)
 
     font = BdfFont(
         point_size=font_metric.font_size,
