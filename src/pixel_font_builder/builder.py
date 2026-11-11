@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import UserList
 from os import PathLike
-from typing import Any
+from typing import Any, Mapping
 
 import bdffont
 import fontTools.fontBuilder
@@ -56,15 +56,23 @@ class FontBuilder:
                 self.bdf_config == other.bdf_config and
                 self.pcf_config == other.pcf_config)
 
-    def prepare_glyphs(self) -> tuple[list[str], dict[str, Glyph]]:
+    def prepare_glyphs(
+            self,
+            no_color_mode: bool = False,
+    ) -> tuple[list[str], dict[str, Glyph]]:
         glyph_order = ['.notdef']
         name_to_glyph = {}
+        color_only_glyphs = set()
 
         for glyph in self.glyphs:
             if glyph.name in name_to_glyph:
                 raise RuntimeError(f'duplicate glyph name: {glyph.name!r}')
+
             if glyph.name != '.notdef':
                 glyph_order.append(glyph.name)
+                if glyph.is_color_raster_only:
+                    color_only_glyphs.add(glyph.name)
+
             name_to_glyph[glyph.name] = glyph
 
         if '.notdef' not in name_to_glyph:
@@ -73,16 +81,50 @@ class FontBuilder:
         for code_point, glyph_name in self.character_mapping.items():
             if code_point < 0:
                 raise RuntimeError('code point must >= 0')
+
             if glyph_name not in name_to_glyph:
-                raise RuntimeError(f'missing glyph: {glyph_name!r}')
+                raise RuntimeError(f'missing glyph in character mapping: {glyph_name!r}')
 
         for (left_glyph_name, right_glyph_name), _ in self.kerning_values.items():
             if left_glyph_name not in name_to_glyph:
-                raise RuntimeError(f'missing glyph: {left_glyph_name!r}')
+                raise RuntimeError(f'missing glyph in kerning pairs: {left_glyph_name!r}')
+
             if right_glyph_name not in name_to_glyph:
-                raise RuntimeError(f'missing glyph: {right_glyph_name!r}')
+                raise RuntimeError(f'missing glyph in kerning pairs: {right_glyph_name!r}')
+
+        if no_color_mode:
+            glyph_order = [
+                glyph_name
+                for glyph_name in glyph_order
+                if glyph_name not in color_only_glyphs
+            ]
+            name_to_glyph = {
+                glyph_name: glyph
+                for glyph_name, glyph in name_to_glyph.items()
+                if glyph_name not in color_only_glyphs
+            }
 
         return glyph_order, name_to_glyph
+
+    def prepare_character_mapping(
+            self,
+            name_to_glyph: Mapping[str, Glyph],
+    ) -> dict[int, str]:
+        return {
+            code_point: glyph_name
+            for code_point, glyph_name in self.character_mapping.items()
+            if glyph_name in name_to_glyph
+        }
+
+    def prepare_kerning_values(
+            self,
+            name_to_glyph: Mapping[str, Glyph],
+    ) -> dict[tuple[str, str], int]:
+        return {
+            (left_glyph_name, right_glyph_name): offset
+            for (left_glyph_name, right_glyph_name), offset in self.kerning_values.items()
+            if left_glyph_name in name_to_glyph and right_glyph_name in name_to_glyph
+        }
 
     def to_otf_builder(
             self,

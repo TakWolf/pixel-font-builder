@@ -1,9 +1,9 @@
 from copy import copy, deepcopy
 
-from pixel_font_builder import FontBuilder, Glyph
+from pixel_font_builder import FontBuilder, Glyph, ColorRaster
 
 
-def test_prepare_glyphs() -> None:
+def test_prepare_glyphs_1() -> None:
     builder = FontBuilder()
     builder.glyphs = [
         Glyph(name='.notdef'),
@@ -29,12 +29,44 @@ def test_prepare_glyphs() -> None:
         'CAP_LETTER_B',
         'CAP_LETTER_C',
     ]
-    assert builder.glyphs == [
-        name_to_glyph['.notdef'],
-        name_to_glyph['CAP_LETTER_A'],
-        name_to_glyph['CAP_LETTER_B'],
-        name_to_glyph['CAP_LETTER_C'],
+    assert set(glyph_order) == set(name_to_glyph.keys())
+
+
+def test_prepare_glyphs_2() -> None:
+    builder = FontBuilder()
+    builder.glyphs = [
+        Glyph(name='.notdef', color_raster=ColorRaster()),
+        Glyph(name='CAP_LETTER_A'),
+        Glyph(name='CAP_LETTER_B'),
+        Glyph(name='CAP_LETTER_C', color_raster=ColorRaster()),
     ]
+    builder.character_mapping = {
+        65: 'CAP_LETTER_A',
+        66: 'CAP_LETTER_B',
+        67: 'CAP_LETTER_C',
+    }
+    builder.kerning_values = {
+        ('CAP_LETTER_A', 'CAP_LETTER_B'): 1,
+        ('CAP_LETTER_A', 'CAP_LETTER_C'): 2,
+    }
+
+    glyph_order, name_to_glyph = builder.prepare_glyphs(no_color_mode=True)
+    character_mapping = builder.prepare_character_mapping(name_to_glyph)
+    kerning_values = builder.prepare_kerning_values(name_to_glyph)
+
+    assert glyph_order == [
+        '.notdef',
+        'CAP_LETTER_A',
+        'CAP_LETTER_B',
+    ]
+    assert set(glyph_order) == set(name_to_glyph.keys())
+    assert character_mapping == {
+        65: 'CAP_LETTER_A',
+        66: 'CAP_LETTER_B',
+    }
+    assert kerning_values == {
+        ('CAP_LETTER_A', 'CAP_LETTER_B'): 1,
+    }
 
 
 def test_copy() -> None:
