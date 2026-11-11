@@ -18,8 +18,8 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuild
     config = context.pcf_config
     font_metric = context.font_metric
     meta_info = context.meta_info
-    glyph_order, name_to_glyph = context.prepare_glyphs()
-    character_mapping = context.character_mapping
+    glyph_order, name_to_glyph = context.prepare_glyphs(no_color_mode=True)
+    character_mapping = context.prepare_character_mapping(name_to_glyph)
 
     builder = PcfFontBuilder()
     builder.config.font_ascent = font_metric.horizontal_layout.ascent
@@ -53,13 +53,13 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuild
         encodings = name_to_encodings[glyph_name]
 
         builder.glyphs.append(PcfGlyph(
-            name=glyph.name,
+            name=glyph_name,
             encodings=encodings,
             scalable_width=math.ceil((glyph.advance_width / font_metric.font_size) * (75 / config.resolution_x) * 1000),
             character_width=glyph.advance_width,
-            dimensions=glyph.dimensions,
-            offset=glyph.horizontal_offset,
-            bitmap=glyph.bitmap,
+            dimensions=glyph.mono_raster.dimensions if glyph.mono_raster is not None else (0, 0),
+            offset=glyph.mono_raster.horizontal_offset if glyph.mono_raster is not None else (0, 0),
+            bitmap=glyph.mono_raster.bitmap if glyph.mono_raster is not None else None,
         ))
 
     if meta_info.manufacturer is not None:
