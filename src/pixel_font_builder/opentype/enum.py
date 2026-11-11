@@ -35,6 +35,21 @@ class BitmapTableMode(StrEnum):
 
 
 @unique
+class ColorTableFormat(StrEnum):
+    # Generate color vector glyphs using COLR + CPAL.
+    # Represents colored pixels as outline shapes with palette-based fills.
+    COLR = 'COLR'
+
+    # Generate color bitmap glyphs using CBDT + CBLC.
+    # Embeds PNG glyph images at specific pixel sizes.
+    CBDT = 'CBDT'
+
+    # Generate color bitmap glyphs using Apple's sbix table.
+    # Embeds PNG glyph images at specific pixel sizes.
+    SBIX = 'SBIX'
+
+
+@unique
 class UserKerningMode(StrEnum):
     # Let any user kern feature or variation block take over all kerning.
     # Skip all generated kerning when such a block exists, even if it is empty

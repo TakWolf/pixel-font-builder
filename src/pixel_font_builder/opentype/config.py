@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Set
 from typing import Any, Final
 
-from pixel_font_builder.opentype.enum import UserKerningMode
+from pixel_font_builder.opentype.enum import ColorTableFormat, UserKerningMode
 from pixel_font_builder.opentype.feature.source.source import FeatureSource
 from pixel_font_builder.opentype.outline.painter.painter import OutlinePainter
 from pixel_font_builder.opentype.outline.painter.solid import SolidOutlinePainter
@@ -62,6 +63,7 @@ class Config:
 
     px_to_units: int
     outline_painter: OutlinePainter
+    color_table_formats: Set[ColorTableFormat]
     has_vertical_metrics: bool
     is_fixed_pitch: bool
     field_overrides: FieldOverrides
@@ -72,6 +74,7 @@ class Config:
             self,
             px_to_units: int = 100,
             outline_painter: OutlinePainter | None = None,
+            color_table_formats: Set[ColorTableFormat] | None = None,
             has_vertical_metrics: bool = True,
             is_fixed_pitch: bool = False,
             field_overrides: FieldOverrides | None = None,
@@ -80,6 +83,7 @@ class Config:
     ) -> None:
         self.px_to_units = px_to_units
         self.outline_painter = outline_painter if outline_painter is not None else Config.DEFAULT_OUTLINE_PAINTER
+        self.color_table_formats = color_table_formats if color_table_formats is not None else set()
         self.has_vertical_metrics = has_vertical_metrics
         self.is_fixed_pitch = is_fixed_pitch
         self.field_overrides = field_overrides if field_overrides is not None else FieldOverrides()
@@ -97,6 +101,7 @@ class Config:
             return NotImplemented
         return (self.px_to_units == other.px_to_units and
                 self.outline_painter == other.outline_painter and
+                self.color_table_formats == other.color_table_formats and
                 self.has_vertical_metrics == other.has_vertical_metrics and
                 self.is_fixed_pitch == other.is_fixed_pitch and
                 self.field_overrides == other.field_overrides and
@@ -107,6 +112,7 @@ class Config:
         return Config(
             self.px_to_units,
             self.outline_painter,
+            self.color_table_formats,
             self.has_vertical_metrics,
             self.is_fixed_pitch,
             self.field_overrides,
@@ -118,6 +124,7 @@ class Config:
         return Config(
             self.px_to_units,
             self.outline_painter.deepcopy(),
+            set(self.color_table_formats),
             self.has_vertical_metrics,
             self.is_fixed_pitch,
             self.field_overrides.deepcopy(),

@@ -1,13 +1,16 @@
 from copy import copy, deepcopy
 from pathlib import Path
 
-from pixel_font_builder.opentype import Config, SolidOutlinePainter, FieldOverrides, UserKerningMode, FeatureFile
+from pixel_font_builder.opentype import Config, SolidOutlinePainter, ColorTableFormat, FieldOverrides, UserKerningMode, FeatureFile
 
 
 def test_copy() -> None:
     config_1 = Config(
         px_to_units=1,
         outline_painter=SolidOutlinePainter(),
+        color_table_formats={
+            ColorTableFormat.CBDT,
+        },
         has_vertical_metrics=False,
         is_fixed_pitch=True,
         field_overrides=FieldOverrides(
@@ -25,6 +28,7 @@ def test_copy() -> None:
     assert config_1 == config_2
     assert config_1 is not config_2
     assert config_1.outline_painter is config_2.outline_painter
+    assert config_1.color_table_formats is config_2.color_table_formats
     assert config_1.field_overrides is config_2.field_overrides
     assert config_1.features is config_2.features
 
@@ -33,6 +37,9 @@ def test_deepcopy() -> None:
     config_1 = Config(
         px_to_units=1,
         outline_painter=SolidOutlinePainter(),
+        color_table_formats={
+            ColorTableFormat.CBDT,
+        },
         has_vertical_metrics=False,
         is_fixed_pitch=True,
         field_overrides=FieldOverrides(
@@ -50,6 +57,7 @@ def test_deepcopy() -> None:
     assert config_1 == config_2
     assert config_1 is not config_2
     assert config_1.outline_painter is config_2.outline_painter
+    assert config_1.color_table_formats is not config_2.color_table_formats
     assert config_1.field_overrides is not config_2.field_overrides
     assert config_1.features is not config_2.features
 
@@ -58,6 +66,9 @@ def test_eq() -> None:
     config_1 = Config(
         px_to_units=1,
         outline_painter=SolidOutlinePainter(),
+        color_table_formats={
+            ColorTableFormat.CBDT,
+        },
         has_vertical_metrics=False,
         is_fixed_pitch=True,
         field_overrides=FieldOverrides(
@@ -73,6 +84,9 @@ def test_eq() -> None:
     config_2 = Config(
         px_to_units=1,
         outline_painter=SolidOutlinePainter(),
+        color_table_formats={
+            ColorTableFormat.CBDT,
+        },
         has_vertical_metrics=False,
         is_fixed_pitch=True,
         field_overrides=FieldOverrides(

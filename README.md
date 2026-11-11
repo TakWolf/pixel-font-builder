@@ -171,6 +171,12 @@ Use the same coordinate systems as OpenType.
 | [Glyph Bitmap Distribution Format](https://en.wikipedia.org/wiki/Glyph_Bitmap_Distribution_Format) | `.bdf` |
 | [Portable Compiled Format](https://en.wikipedia.org/wiki/Portable_Compiled_Format) | `.pcf` |
 
+## Supported Color Table Formats
+
+- [COLR](https://learn.microsoft.com/en-us/typography/opentype/spec/colr)
+- [CBDT](https://learn.microsoft.com/en-us/typography/opentype/spec/cbdt)
+- [sbix](https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6sbix.html)
+
 ## Dependencies
 
 - [FontTools](https://github.com/fonttools/fonttools)
