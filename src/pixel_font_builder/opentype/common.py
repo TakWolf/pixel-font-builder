@@ -31,6 +31,12 @@ def create_font_builder(
         bitmap_table_mode: BitmapTableMode = BitmapTableMode.NONE,
         flavor: Flavor | None = None,
 ) -> FontBuilder:
+    emit_outlines = outline_table_mode in (OutlineTableMode.NORMAL, OutlineTableMode.BLANK_GLYPHS)
+    emit_bitmaps = bitmap_table_mode != BitmapTableMode.NONE
+
+    if not emit_outlines and not emit_bitmaps:
+        raise RuntimeError("at least one of outlines or bitmaps must be emitted")
+
     config = context.opentype_config
     font_metric = context.font_metric * config.px_to_units
     meta_info = context.meta_info
@@ -111,18 +117,18 @@ def create_font_builder(
                 vertical_metrics[glyph_name] = advance_height, top_side_bearing
             builder.setupVerticalMetrics(vertical_metrics)
 
-            if outline_table_mode in (OutlineTableMode.NORMAL, OutlineTableMode.BLANK_GLYPHS):
+            if emit_outlines:
                 builder.setupVerticalOrigins(vertical_origins)
 
-    if bitmap_table_mode in (BitmapTableMode.STANDARD, BitmapTableMode.APPLE):
+    if emit_bitmaps:
         strike, strike_data = create_bitmap_strike_data(context.font_metric, config.has_vertical_metrics, glyph_order, name_to_glyph)
 
-        if bitmap_table_mode == BitmapTableMode.STANDARD:
-            tb_eblc = table_E_B_L_C_()
-            tb_ebdt = table_E_B_D_T_()
-        else:
+        if bitmap_table_mode == BitmapTableMode.APPLE:
             tb_eblc = table__b_l_o_c()
             tb_ebdt = table__b_d_a_t()
+        else:
+            tb_eblc = table_E_B_L_C_()
+            tb_ebdt = table_E_B_D_T_()
 
         tb_eblc.version = 2.0
         tb_eblc.strikes = [strike]
@@ -217,7 +223,7 @@ def create_font_builder(
                 builder.setupCFF('', {}, {}, {})
                 builder.font.glyphOrder = glyph_order_backup
 
-    if outline_table_mode in (OutlineTableMode.OMIT, OutlineTableMode.ZERO_LENGTH):
+    if not emit_outlines:
         del builder.font['hmtx']
         del builder.font['hhea']
         if config.has_vertical_metrics:

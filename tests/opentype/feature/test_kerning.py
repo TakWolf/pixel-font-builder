@@ -4,7 +4,7 @@ import pytest
 from fontTools.feaLib import ast
 
 from pixel_font_builder import FontBuilder, Glyph
-from pixel_font_builder.opentype import OutlineTableMode, UserKerningMode, FeatureText, FeatureFile, FeatureIncludes
+from pixel_font_builder.opentype import OutlineTableMode, BitmapTableMode, UserKerningMode, FeatureText, FeatureFile, FeatureIncludes
 from pixel_font_builder.opentype.feature.kerning import add_generated_kern_feature
 from pixel_font_builder.opentype.feature.source.parser import parse_feature_inputs
 
@@ -257,16 +257,20 @@ def test_included_user_kerning_replaces_generated_kerning(builder: FontBuilder, 
 
 
 @pytest.mark.parametrize(
-    'outline_table_mode',
+    ('outline_table_mode', 'bitmap_table_mode'),
     [
-        OutlineTableMode.OMIT,
-        OutlineTableMode.ZERO_LENGTH,
-        OutlineTableMode.BLANK_GLYPHS,
+        (OutlineTableMode.OMIT, BitmapTableMode.STANDARD),
+        (OutlineTableMode.ZERO_LENGTH, BitmapTableMode.STANDARD),
+        (OutlineTableMode.BLANK_GLYPHS, BitmapTableMode.NONE),
     ],
 )
-def test_kerning_is_omitted_without_normal_outlines(builder: FontBuilder, outline_table_mode: OutlineTableMode) -> None:
+def test_kerning_is_omitted_without_normal_outlines(
+        builder: FontBuilder,
+        outline_table_mode: OutlineTableMode,
+        bitmap_table_mode: BitmapTableMode,
+) -> None:
     builder.kerning_values[('a', 'b')] = -1
 
-    font = builder.to_ttf_builder(outline_table_mode=outline_table_mode).font
+    font = builder.to_ttf_builder(outline_table_mode=outline_table_mode, bitmap_table_mode=bitmap_table_mode).font
 
     assert 'GPOS' not in font
