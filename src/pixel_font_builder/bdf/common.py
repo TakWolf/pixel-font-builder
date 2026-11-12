@@ -26,14 +26,14 @@ def _create_glyph(glyph: Glyph, encoding: int, font_metric: FontMetric, config: 
 
 
 def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
+    if _DEFAULT_CHAR in context.character_mapping:
+        raise RuntimeError(f'encoding 0x{_DEFAULT_CHAR:04X} is reserved for the BDF default glyph')
+
     config = context.bdf_config
     font_metric = context.font_metric
     meta_info = context.meta_info
     _, name_to_glyph = context.prepare_glyphs()
     character_mapping = context.character_mapping
-
-    if _DEFAULT_CHAR in character_mapping:
-        raise RuntimeError(f'encoding 0x{_DEFAULT_CHAR:04X} is reserved for the BDF default glyph')
 
     font = BdfFont(
         point_size=font_metric.font_size,

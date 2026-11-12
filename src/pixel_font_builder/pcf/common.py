@@ -12,14 +12,14 @@ _DEFAULT_CHAR = 0xFFFE
 
 
 def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuilder:
+    if _DEFAULT_CHAR in context.character_mapping:
+        raise RuntimeError(f'encoding 0x{_DEFAULT_CHAR:04X} is reserved for the PCF default glyph')
+
     config = context.pcf_config
     font_metric = context.font_metric
     meta_info = context.meta_info
     glyph_order, name_to_glyph = context.prepare_glyphs()
     character_mapping = context.character_mapping
-
-    if _DEFAULT_CHAR in character_mapping:
-        raise RuntimeError(f'encoding 0x{_DEFAULT_CHAR:04X} is reserved for the PCF default glyph')
 
     builder = PcfFontBuilder()
     builder.config.font_ascent = font_metric.horizontal_layout.ascent
