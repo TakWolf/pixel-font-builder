@@ -5,7 +5,7 @@ from fontTools.ttLib.tables.E_B_D_T_ import ebdt_bitmap_format_1, ebdt_bitmap_fo
 from fontTools.ttLib.tables.E_B_L_C_ import BitmapSizeTable, SbitLineMetrics, Strike, eblc_index_sub_table_1, eblc_index_sub_table_2, eblc_index_sub_table_5
 
 from pixel_font_builder.glyph import Glyph
-from pixel_font_builder.metric import LineMetric, FontMetric
+from pixel_font_builder.metric import FontMetric, LineMetric
 
 GlyphBitmapFormat = ebdt_bitmap_format_1 | ebdt_bitmap_format_2 | ebdt_bitmap_format_5 | ebdt_bitmap_format_6 | ebdt_bitmap_format_7
 BigMetricsSignature = tuple[int, int, int, int, int, int, int, int]
@@ -19,14 +19,29 @@ def _create_horizontal_sbit_line_metrics(
     line_metrics = SbitLineMetrics()
     line_metrics.ascender = horizontal_layout.ascent
     line_metrics.descender = horizontal_layout.descent
-    line_metrics.widthMax = max((glyph.width for glyph in name_to_glyph.values()), default=0)
+    line_metrics.widthMax = max((
+        glyph.width
+        for glyph in name_to_glyph.values()
+    ), default=0)
     line_metrics.caretSlopeNumerator = 1
     line_metrics.caretSlopeDenominator = 0
     line_metrics.caretOffset = 0
-    line_metrics.minOriginSB = min((glyph.horizontal_offset_x for glyph in name_to_glyph.values()), default=0)
-    line_metrics.minAdvanceSB = min((glyph.advance_width - glyph.horizontal_offset_x - glyph.width for glyph in name_to_glyph.values()), default=0)
-    line_metrics.maxBeforeBL = max((glyph.height + glyph.horizontal_offset_y for glyph in name_to_glyph.values()), default=0)
-    line_metrics.minAfterBL = min((glyph.horizontal_offset_y for glyph in name_to_glyph.values()), default=0)
+    line_metrics.minOriginSB = min((
+        glyph.horizontal_offset_x
+        for glyph in name_to_glyph.values()
+    ), default=0)
+    line_metrics.minAdvanceSB = min((
+        glyph.advance_width - glyph.horizontal_offset_x - glyph.width
+        for glyph in name_to_glyph.values()
+    ), default=0)
+    line_metrics.maxBeforeBL = max((
+        glyph.height + glyph.horizontal_offset_y
+        for glyph in name_to_glyph.values()
+    ), default=0)
+    line_metrics.minAfterBL = min((
+        glyph.horizontal_offset_y
+        for glyph in name_to_glyph.values()
+    ), default=0)
     line_metrics.pad1 = 0
     line_metrics.pad2 = 0
     return line_metrics
@@ -39,14 +54,29 @@ def _create_vertical_sbit_line_metrics(
     line_metrics = SbitLineMetrics()
     line_metrics.ascender = vertical_layout.ascent
     line_metrics.descender = vertical_layout.descent
-    line_metrics.widthMax = max((glyph.height for glyph in name_to_glyph.values()), default=0)
+    line_metrics.widthMax = max((
+        glyph.height
+        for glyph in name_to_glyph.values()
+    ), default=0)
     line_metrics.caretSlopeNumerator = 0
     line_metrics.caretSlopeDenominator = 1
     line_metrics.caretOffset = 0
-    line_metrics.minOriginSB = min((glyph.vertical_offset_y for glyph in name_to_glyph.values()), default=0)
-    line_metrics.minAdvanceSB = min((glyph.advance_height - glyph.vertical_offset_y - glyph.height for glyph in name_to_glyph.values()), default=0)
-    line_metrics.maxBeforeBL = max((glyph.vertical_offset_x + glyph.width for glyph in name_to_glyph.values()), default=0)
-    line_metrics.minAfterBL = min((glyph.vertical_offset_x for glyph in name_to_glyph.values()), default=0)
+    line_metrics.minOriginSB = min((
+        glyph.vertical_offset_y
+        for glyph in name_to_glyph.values()
+    ), default=0)
+    line_metrics.minAdvanceSB = min((
+        glyph.advance_height - glyph.vertical_offset_y - glyph.height
+        for glyph in name_to_glyph.values()
+    ), default=0)
+    line_metrics.maxBeforeBL = max((
+        glyph.vertical_offset_x + glyph.width
+        for glyph in name_to_glyph.values()
+    ), default=0)
+    line_metrics.minAfterBL = min((
+        glyph.vertical_offset_x
+        for glyph in name_to_glyph.values()
+    ), default=0)
     line_metrics.pad1 = 0
     line_metrics.pad2 = 0
     return line_metrics
@@ -110,11 +140,9 @@ def _pack_bitmap_row(bitmap_row: list[int]) -> bytes:
     return bytes(data)
 
 
-def _pack_bitmap_rows(glyph: Glyph) -> list[bytes]:
-    return [_pack_bitmap_row(bitmap_row) for bitmap_row in glyph.bitmap]
-
-
 def _create_bitmap_format(glyph: Glyph, image_format: int) -> GlyphBitmapFormat:
+    big_metrics = _create_big_metrics(glyph)
+    rows = [_pack_bitmap_row(bitmap_row) for bitmap_row in glyph.bitmap]
     match image_format:
         case 1:
             bitmap_glyph = ebdt_bitmap_format_1(None, None)
@@ -124,13 +152,13 @@ def _create_bitmap_format(glyph: Glyph, image_format: int) -> GlyphBitmapFormat:
             bitmap_glyph.metrics = _create_small_metrics(glyph)
         case 6:
             bitmap_glyph = ebdt_bitmap_format_6(None, None)
-            bitmap_glyph.metrics = _create_big_metrics(glyph)
+            bitmap_glyph.metrics = big_metrics
         case 7:
             bitmap_glyph = ebdt_bitmap_format_7(None, None)
-            bitmap_glyph.metrics = _create_big_metrics(glyph)
+            bitmap_glyph.metrics = big_metrics
         case _:
             bitmap_glyph = ebdt_bitmap_format_5(None, None)
-    bitmap_glyph.setRows(_pack_bitmap_rows(glyph), bitDepth=1, metrics=_create_big_metrics(glyph))
+    bitmap_glyph.setRows(rows, bitDepth=1, metrics=big_metrics)
     return bitmap_glyph
 
 
@@ -220,7 +248,10 @@ def create_bitmap_strike_data(
         name_to_glyph: Mapping[str, Glyph],
 ) -> tuple[Strike, dict[str, GlyphBitmapFormat]]:
     use_big_metrics = has_vertical_metrics
-    name_to_glyph_id = {glyph_name: glyph_id for glyph_id, glyph_name in enumerate(glyph_order)}
+    name_to_glyph_id = {
+        glyph_name: glyph_id
+        for glyph_id, glyph_name in enumerate(glyph_order)
+    }
 
     strike = Strike()
     strike.bitmapSizeTable = _create_bitmap_size_table(font_metric, has_vertical_metrics, name_to_glyph)
