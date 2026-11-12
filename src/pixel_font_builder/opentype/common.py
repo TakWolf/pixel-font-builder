@@ -15,13 +15,18 @@ from fontTools.ttLib.tables._b_h_e_d import table__b_h_e_d
 from fontTools.ttLib.tables._b_l_o_c import table__b_l_o_c
 
 import pixel_font_builder
+from pixel_font_builder.glyph import Raster
 from pixel_font_builder.opentype.bitmap.ebdt import create_bitmap_strike_data
-from pixel_font_builder.opentype.enum import OutlineTableMode, BitmapTableMode, Flavor
+from pixel_font_builder.opentype.enum import OutlineTableMode, BitmapTableMode, ColorTableFormat, Flavor
 from pixel_font_builder.opentype.feature.kerning import add_generated_kern_feature
 from pixel_font_builder.opentype.feature.source.parser import parse_feature_inputs
 from pixel_font_builder.opentype.name import create_name_strings
 from pixel_font_builder.opentype.outline.pen.otf import OtfOutlinePen
 from pixel_font_builder.opentype.outline.pen.ttf import TtfOutlinePen
+
+
+def _get_vertical_origin(raster: Raster, px_to_units: int) -> int:
+    return (raster.height + raster.horizontal_offset_y + raster.vertical_offset_y) * px_to_units
 
 
 def create_font_builder(
@@ -31,23 +36,40 @@ def create_font_builder(
         bitmap_table_mode: BitmapTableMode = BitmapTableMode.NONE,
         flavor: Flavor | None = None,
 ) -> FontBuilder:
-    emit_outlines = outline_table_mode in (OutlineTableMode.NORMAL, OutlineTableMode.BLANK_GLYPHS)
-    emit_bitmaps = bitmap_table_mode != BitmapTableMode.NONE
-
-    if not emit_outlines and not emit_bitmaps:
-        raise RuntimeError("at least one of outlines or bitmaps must be emitted")
-
     config = context.opentype_config
+
+    emit_outlines = outline_table_mode in (OutlineTableMode.NORMAL, OutlineTableMode.BLANK_GLYPHS)
+    emit_ebdt = bitmap_table_mode != BitmapTableMode.NONE
+    emit_colr = ColorTableFormat.COLR in config.color_table_formats and emit_outlines
+    emit_cbdt = ColorTableFormat.CBDT in config.color_table_formats
+    emit_sbix = ColorTableFormat.SBIX in config.color_table_formats
+    no_color_mode = not (emit_colr or emit_cbdt or emit_sbix)
+    apple_bitmap_only = bitmap_table_mode == BitmapTableMode.APPLE and outline_table_mode == OutlineTableMode.OMIT and not (emit_cbdt or emit_sbix)
+
+    if not (emit_outlines or emit_ebdt or emit_cbdt or emit_sbix):
+        raise RuntimeError('at least one valid glyph table must be emitted')
+
     font_metric = context.font_metric * config.px_to_units
     meta_info = context.meta_info
-    glyph_order, name_to_glyph = context.prepare_glyphs()
-    character_mapping = context.character_mapping
-    kerning_values = context.kerning_values
+    glyph_order, name_to_glyph = context.prepare_glyphs(no_color_mode=no_color_mode)
+    character_mapping = context.prepare_character_mapping(name_to_glyph)
+    kerning_values = context.prepare_kerning_values(name_to_glyph)
 
     if config.has_vertical_metrics:
         vertical_origins = {}
         for glyph_name, glyph in name_to_glyph.items():
-            vertical_origin = (glyph.height + glyph.horizontal_offset_y + glyph.vertical_offset_y) * config.px_to_units
+            if glyph.mono_raster is not None:
+                vertical_origin = _get_vertical_origin(glyph.mono_raster, config.px_to_units)
+            elif glyph.color_raster is not None and not no_color_mode:
+                vertical_origin = _get_vertical_origin(glyph.color_raster, config.px_to_units)
+            else:
+                vertical_origin = 0
+
+            if (emit_colr or emit_sbix) and glyph.mono_raster is not None and glyph.color_raster is not None:
+                color_vertical_origin = _get_vertical_origin(glyph.color_raster, config.px_to_units)
+                if vertical_origin != color_vertical_origin:
+                    raise RuntimeError(f'conflicting vertical origins for glyph {glyph_name!r}: mono={vertical_origin}, color={color_vertical_origin}')
+
             vertical_origins[glyph_name] = vertical_origin
     else:
         vertical_origins = None
@@ -64,8 +86,8 @@ def create_font_builder(
         ttf_glyphs = {}
         for glyph_name, glyph in name_to_glyph.items():
             pen = TtfOutlinePen()
-            if outline_table_mode == OutlineTableMode.NORMAL:
-                config.outline_painter.draw_outlines(glyph, pen, config.px_to_units)
+            if outline_table_mode == OutlineTableMode.NORMAL and glyph.mono_raster is not None:
+                config.outline_painter.draw_outlines(glyph.mono_raster, pen, config.px_to_units)
             ttf_glyphs[glyph_name] = pen.to_glyph()
         builder.setupGlyf(ttf_glyphs)
 
@@ -73,7 +95,9 @@ def create_font_builder(
         for glyph_name, glyph in name_to_glyph.items():
             ttf_glyph = ttf_glyphs[glyph_name]
             advance_width = glyph.advance_width * config.px_to_units
-            left_side_bearing = ttf_glyph.xMin if ttf_glyph.numberOfContours > 0 else 0
+            left_side_bearing = 0
+            if ttf_glyph.numberOfContours > 0 and glyph.mono_raster is not None:
+                left_side_bearing = ttf_glyph.xMin
             horizontal_metrics[glyph_name] = advance_width, left_side_bearing
         builder.setupHorizontalMetrics(horizontal_metrics)
 
@@ -82,16 +106,17 @@ def create_font_builder(
             for glyph_name, glyph in name_to_glyph.items():
                 ttf_glyph = ttf_glyphs[glyph_name]
                 advance_height = glyph.advance_height * config.px_to_units
-                vertical_origin = vertical_origins[glyph_name]
-                top_side_bearing = vertical_origin - ttf_glyph.yMax if ttf_glyph.numberOfContours > 0 else vertical_origin
+                top_side_bearing = vertical_origins[glyph_name]
+                if ttf_glyph.numberOfContours > 0 and glyph.mono_raster is not None:
+                    top_side_bearing -= ttf_glyph.yMax
                 vertical_metrics[glyph_name] = advance_height, top_side_bearing
             builder.setupVerticalMetrics(vertical_metrics)
     else:
         otf_glyphs = {}
         for glyph_name, glyph in name_to_glyph.items():
             pen = OtfOutlinePen(glyph.advance_width * config.px_to_units)
-            if outline_table_mode == OutlineTableMode.NORMAL:
-                config.outline_painter.draw_outlines(glyph, pen, config.px_to_units)
+            if outline_table_mode == OutlineTableMode.NORMAL and glyph.mono_raster is not None:
+                config.outline_painter.draw_outlines(glyph.mono_raster, pen, config.px_to_units)
             otf_glyphs[glyph_name] = pen.to_glyph()
         builder.setupCFF('', {
             'isFixedPitch': config.is_fixed_pitch,
@@ -103,7 +128,9 @@ def create_font_builder(
         for glyph_name, glyph in name_to_glyph.items():
             otf_bounds = name_to_otf_bounds[glyph_name]
             advance_width = glyph.advance_width * config.px_to_units
-            left_side_bearing = otRound(otf_bounds[0]) if otf_bounds is not None else 0
+            left_side_bearing = 0
+            if otf_bounds is not None and glyph.mono_raster is not None:
+                left_side_bearing = otRound(otf_bounds[0])
             horizontal_metrics[glyph_name] = advance_width, left_side_bearing
         builder.setupHorizontalMetrics(horizontal_metrics)
 
@@ -112,15 +139,16 @@ def create_font_builder(
             for glyph_name, glyph in name_to_glyph.items():
                 otf_bounds = name_to_otf_bounds[glyph_name]
                 advance_height = glyph.advance_height * config.px_to_units
-                vertical_origin = vertical_origins[glyph_name]
-                top_side_bearing = otRound(vertical_origin - otf_bounds[3]) if otf_bounds is not None else vertical_origin
+                top_side_bearing = vertical_origins[glyph_name]
+                if otf_bounds is not None and glyph.mono_raster is not None:
+                    top_side_bearing = otRound(top_side_bearing - otf_bounds[3])
                 vertical_metrics[glyph_name] = advance_height, top_side_bearing
             builder.setupVerticalMetrics(vertical_metrics)
 
             if emit_outlines:
                 builder.setupVerticalOrigins(vertical_origins)
 
-    if emit_bitmaps:
+    if emit_ebdt:
         strike, strike_data = create_bitmap_strike_data(context.font_metric, config.has_vertical_metrics, glyph_order, name_to_glyph)
 
         if bitmap_table_mode == BitmapTableMode.APPLE:
@@ -182,7 +210,7 @@ def create_font_builder(
     if is_ttf:
         builder.font['maxp'].recalc(builder.font)
     else:
-        cff = builder.font["CFF "].cff
+        cff = builder.font['CFF '].cff
         for top_dict in cff.topDictIndex:
             top_dict.recalcFontBBox()
         tb_head.xMin, tb_head.yMin, tb_head.xMax, tb_head.yMax = intRect(cff.topDictIndex[0].FontBBox)
@@ -223,22 +251,19 @@ def create_font_builder(
                 builder.setupCFF('', {}, {}, {})
                 builder.font.glyphOrder = glyph_order_backup
 
-    if not emit_outlines:
-        del builder.font['hmtx']
-        del builder.font['hhea']
-        if config.has_vertical_metrics:
-            del builder.font['vmtx']
-            del builder.font['vhea']
-
-    if bitmap_table_mode == BitmapTableMode.APPLE:
+    if apple_bitmap_only:
         tb_bhed = table__b_h_e_d()
         tb_bhed_props = tb_head.__dict__.copy()
         tb_bhed_props.pop('tableTag')
         tb_bhed.__dict__.update(tb_bhed_props)
         builder.font[tb_bhed.tableTag] = tb_bhed
+        del builder.font[tb_head.tableTag]
 
-        if outline_table_mode == OutlineTableMode.OMIT:
-            del builder.font[tb_head.tableTag]
+        del builder.font['hmtx']
+        del builder.font['hhea']
+        if config.has_vertical_metrics:
+            del builder.font['vmtx']
+            del builder.font['vhea']
 
     feature_ast = parse_feature_inputs(config.features.create_inputs(), glyph_order) if config.features is not None else ast.FeatureFile()
 
