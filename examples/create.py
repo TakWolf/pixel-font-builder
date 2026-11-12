@@ -100,7 +100,7 @@ def main() -> None:
     builder.save_ttf(outputs_dir.joinpath('my-font.ttf'))
     builder.save_ttf_woff(outputs_dir.joinpath('my-font.ttf.woff'))
     builder.save_ttf_woff2(outputs_dir.joinpath('my-font.ttf.woff2'))
-    builder.save_ms_bitmap_ttf(outputs_dir.joinpath('my-font.ms.bitmap.ttf'))
+    builder.save_ms_bitmap_ttf(outputs_dir.joinpath('my-font.ms-bitmap.ttf'))
     builder.save_otb(outputs_dir.joinpath('my-font.otb'))
     builder.save_dfont(outputs_dir.joinpath('my-font.dfont'))
     builder.save_bdf(outputs_dir.joinpath('my-font.bdf'))
