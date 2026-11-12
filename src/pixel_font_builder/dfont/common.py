@@ -10,9 +10,12 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> DFontBuilder
 
     config = context.dfont_config
     font_metric = context.font_metric
-    glyphs = context.glyphs
 
-    width_max = max((glyph.advance_width for glyph in glyphs), default=font_metric.font_size)
+    width_max = max((
+        glyph.advance_width
+        for glyph in context.glyphs
+        if glyph.name == '.notdef' or not glyph.is_color_raster_only
+    ), default=font_metric.font_size)
 
     return DFontBuilder(
         font,
