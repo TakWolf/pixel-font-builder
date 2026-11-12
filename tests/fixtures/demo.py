@@ -117,7 +117,7 @@ def demo_builder(assets_dir: Path) -> FontBuilder:
     builder.meta_info.serif_style = SerifStyle.SANS_SERIF
     builder.meta_info.slant_style = SlantStyle.NORMAL
     builder.meta_info.width_style = WidthStyle.PROPORTIONAL
-    builder.meta_info.manufacturer = 'Pixel Font Studio'
+    builder.meta_info.manufacturer = 'TakWolf'
     builder.meta_info.designer = 'TakWolf'
     builder.meta_info.description = 'A demo font'
     builder.meta_info.copyright_info = 'Copyright (c) TakWolf'
