@@ -15,11 +15,13 @@ from fontTools.ttLib.tables.E_B_L_C_ import table_E_B_L_C_
 from fontTools.ttLib.tables._b_d_a_t import table__b_d_a_t
 from fontTools.ttLib.tables._b_h_e_d import table__b_h_e_d
 from fontTools.ttLib.tables._b_l_o_c import table__b_l_o_c
+from fontTools.ttLib.tables._s_b_i_x import table__s_b_i_x
 
 import pixel_font_builder
 from pixel_font_builder.glyph import Raster
 from pixel_font_builder.opentype.bitmap.cbdt import create_color_bitmap_strike_data
 from pixel_font_builder.opentype.bitmap.ebdt import create_bitmap_strike_data
+from pixel_font_builder.opentype.bitmap.sbix import draw_sbix_bounds, create_sbix_strike
 from pixel_font_builder.opentype.enum import OutlineTableMode, BitmapTableMode, ColorTableFormat, Flavor
 from pixel_font_builder.opentype.feature.kerning import add_generated_kern_feature
 from pixel_font_builder.opentype.feature.source.parser import parse_feature_inputs
@@ -91,6 +93,8 @@ def create_font_builder(
             pen = TtfOutlinePen()
             if outline_table_mode == OutlineTableMode.NORMAL and glyph.mono_raster is not None:
                 config.outline_painter.draw_outlines(glyph.mono_raster, pen, config.px_to_units)
+            if emit_sbix and emit_outlines and glyph.color_raster is not None:
+                draw_sbix_bounds(glyph_name, glyph.color_raster, pen, config.px_to_units)
             ttf_glyphs[glyph_name] = pen.to_glyph()
         builder.setupGlyf(ttf_glyphs)
 
@@ -170,6 +174,13 @@ def create_font_builder(
             tb_cbdt.version = 3.0
             tb_cbdt.strikeData = [color_strike_data]
             builder.font[tb_cbdt.tableTag] = tb_cbdt
+
+    if emit_sbix:
+        sbix_strike = create_sbix_strike(context.font_metric, glyph_order, name_to_glyph, name_to_glyph_bounds, config.px_to_units)
+        if sbix_strike is not None:
+            tb_sbix = table__s_b_i_x()
+            tb_sbix.strikes = {sbix_strike.ppem: sbix_strike}
+            builder.font[tb_sbix.tableTag] = tb_sbix
 
     has_bitmap_tables = any(
         table_tag in builder.font
