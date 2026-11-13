@@ -153,6 +153,14 @@ def create_font_builder(
         tb_ebdt.strikeData = [strike_data]
         builder.font[tb_ebdt.tableTag] = tb_ebdt
 
+    has_bitmap_tables = any(
+        table_tag in builder.font
+        for table_tag in ('EBDT', 'bdat', 'CBDT', 'sbix')
+    )
+
+    if not emit_outlines and not has_bitmap_tables:
+        raise RuntimeError('at least one valid glyph table must be emitted')
+
     builder.setupHorizontalHeader(
         ascent=font_metric.horizontal_layout.ascent,
         descent=font_metric.horizontal_layout.descent,
