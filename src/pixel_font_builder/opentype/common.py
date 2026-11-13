@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from itertools import chain
+
 from fontTools.feaLib import ast
 from fontTools.feaLib.builder import addOpenTypeFeatures
 from fontTools.fontBuilder import FontBuilder
@@ -26,6 +28,7 @@ from pixel_font_builder.opentype.enum import OutlineTableMode, BitmapTableMode, 
 from pixel_font_builder.opentype.feature.kerning import add_generated_kern_feature
 from pixel_font_builder.opentype.feature.source.parser import parse_feature_inputs
 from pixel_font_builder.opentype.name import create_name_strings
+from pixel_font_builder.opentype.outline.colr import create_color_outline_glyphs
 from pixel_font_builder.opentype.outline.pen.otf import OtfOutlinePen
 from pixel_font_builder.opentype.outline.pen.ttf import TtfOutlinePen
 
@@ -79,19 +82,29 @@ def create_font_builder(
     else:
         vertical_origins = None
 
+    if emit_colr:
+        color_layer_glyphs, color_layers, color_palette = create_color_outline_glyphs(glyph_order, name_to_glyph)
+    else:
+        color_layer_glyphs, color_layers, color_palette = {}, {}, []
+
+    if vertical_origins is not None:
+        for base_name, layers in color_layers.items():
+            for layer_name, _ in layers:
+                vertical_origins[layer_name] = vertical_origins[base_name]
+
     builder = FontBuilder(font_metric.font_size, isTTF=is_ttf)
 
     name_strings = create_name_strings(meta_info)
     builder.setupNameTable(name_strings)
 
-    builder.setupGlyphOrder(glyph_order)
+    builder.setupGlyphOrder(glyph_order + list(color_layer_glyphs))
     builder.setupCharacterMap(character_mapping)
 
     if is_ttf:
         ttf_glyphs = {}
-        for glyph_name, glyph in name_to_glyph.items():
+        for glyph_name, glyph in chain(name_to_glyph.items(), color_layer_glyphs.items()):
             pen = TtfOutlinePen()
-            if outline_table_mode == OutlineTableMode.NORMAL and glyph.mono_raster is not None:
+            if (outline_table_mode == OutlineTableMode.NORMAL or glyph_name in color_layer_glyphs) and glyph.mono_raster is not None:
                 config.outline_painter.draw_outlines(glyph.mono_raster, pen, config.px_to_units)
             if emit_sbix and emit_outlines and glyph.color_raster is not None:
                 draw_sbix_bounds(glyph_name, glyph.color_raster, pen, config.px_to_units)
@@ -104,9 +117,9 @@ def create_font_builder(
         }
     else:
         otf_glyphs = {}
-        for glyph_name, glyph in name_to_glyph.items():
+        for glyph_name, glyph in chain(name_to_glyph.items(), color_layer_glyphs.items()):
             pen = OtfOutlinePen(glyph.advance_width * config.px_to_units)
-            if outline_table_mode == OutlineTableMode.NORMAL and glyph.mono_raster is not None:
+            if (outline_table_mode == OutlineTableMode.NORMAL or glyph_name in color_layer_glyphs) and glyph.mono_raster is not None:
                 config.outline_painter.draw_outlines(glyph.mono_raster, pen, config.px_to_units)
             otf_glyphs[glyph_name] = pen.to_glyph()
         builder.setupCFF('', {
@@ -122,7 +135,7 @@ def create_font_builder(
             builder.setupVerticalOrigins(vertical_origins)
 
     horizontal_metrics = {}
-    for glyph_name, glyph in name_to_glyph.items():
+    for glyph_name, glyph in chain(name_to_glyph.items(), color_layer_glyphs.items()):
         glyph_bounds = name_to_glyph_bounds[glyph_name]
         advance_width = glyph.advance_width * config.px_to_units
         left_side_bearing = 0
@@ -133,7 +146,7 @@ def create_font_builder(
 
     if config.has_vertical_metrics:
         vertical_metrics = {}
-        for glyph_name, glyph in name_to_glyph.items():
+        for glyph_name, glyph in chain(name_to_glyph.items(), color_layer_glyphs.items()):
             glyph_bounds = name_to_glyph_bounds[glyph_name]
             advance_height = glyph.advance_height * config.px_to_units
             top_side_bearing = vertical_origins[glyph_name]
@@ -141,6 +154,10 @@ def create_font_builder(
                 top_side_bearing = otRound(top_side_bearing - glyph_bounds[3])
             vertical_metrics[glyph_name] = advance_height, top_side_bearing
         builder.setupVerticalMetrics(vertical_metrics)
+
+    if color_layers:
+        builder.setupCOLR(color_layers, version=0)
+        builder.setupCPAL([color_palette])
 
     if emit_ebdt:
         strike, strike_data = create_bitmap_strike_data(context.font_metric, glyph_order, name_to_glyph, config.has_vertical_metrics)
