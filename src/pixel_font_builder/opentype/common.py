@@ -52,7 +52,6 @@ def create_font_builder(
     emit_cbdt = ColorTableFormat.CBDT in config.color_table_formats
     emit_sbix = ColorTableFormat.SBIX in config.color_table_formats
     no_color_mode = not (emit_colr or emit_cbdt or emit_sbix)
-    apple_bitmap_only = bitmap_table_mode == BitmapTableMode.APPLE and outline_table_mode == OutlineTableMode.OMIT and not (emit_cbdt or emit_sbix)
 
     if not (emit_outlines or emit_ebdt or emit_cbdt or emit_sbix):
         raise RuntimeError('at least one valid glyph table must be emitted')
@@ -292,6 +291,12 @@ def create_font_builder(
                 builder.setupCFF('', {}, {}, {})
                 builder.font.glyphOrder = glyph_order_backup
 
+    apple_bitmap_only = (
+            bitmap_table_mode == BitmapTableMode.APPLE and
+            outline_table_mode == OutlineTableMode.OMIT and
+            'CBDT' not in builder.font and
+            'sbix' not in builder.font
+    )
     if apple_bitmap_only:
         tb_bhed = table__b_h_e_d()
         tb_bhed_props = tb_head.__dict__.copy()
