@@ -8,6 +8,8 @@ from fontTools.misc.arrayTools import intRect
 from fontTools.misc.roundTools import otRound
 from fontTools.ttLib import TTCollection
 from fontTools.ttLib.tables import DefaultTable
+from fontTools.ttLib.tables.C_B_D_T_ import table_C_B_D_T_
+from fontTools.ttLib.tables.C_B_L_C_ import table_C_B_L_C_
 from fontTools.ttLib.tables.E_B_D_T_ import table_E_B_D_T_
 from fontTools.ttLib.tables.E_B_L_C_ import table_E_B_L_C_
 from fontTools.ttLib.tables._b_d_a_t import table__b_d_a_t
@@ -16,6 +18,7 @@ from fontTools.ttLib.tables._b_l_o_c import table__b_l_o_c
 
 import pixel_font_builder
 from pixel_font_builder.glyph import Raster
+from pixel_font_builder.opentype.bitmap.cbdt import create_color_bitmap_strike_data
 from pixel_font_builder.opentype.bitmap.ebdt import create_bitmap_strike_data
 from pixel_font_builder.opentype.enum import OutlineTableMode, BitmapTableMode, ColorTableFormat, Flavor
 from pixel_font_builder.opentype.feature.kerning import add_generated_kern_feature
@@ -136,7 +139,7 @@ def create_font_builder(
         builder.setupVerticalMetrics(vertical_metrics)
 
     if emit_ebdt:
-        strike, strike_data = create_bitmap_strike_data(context.font_metric, config.has_vertical_metrics, glyph_order, name_to_glyph)
+        strike, strike_data = create_bitmap_strike_data(context.font_metric, glyph_order, name_to_glyph, config.has_vertical_metrics)
 
         if bitmap_table_mode == BitmapTableMode.APPLE:
             tb_eblc = table__b_l_o_c()
@@ -152,6 +155,21 @@ def create_font_builder(
         tb_ebdt.version = 2.0
         tb_ebdt.strikeData = [strike_data]
         builder.font[tb_ebdt.tableTag] = tb_ebdt
+
+    if emit_cbdt:
+        color_bitmap_strike_data = create_color_bitmap_strike_data(context.font_metric, glyph_order, name_to_glyph, config.has_vertical_metrics)
+        if color_bitmap_strike_data is not None:
+            color_strike, color_strike_data = color_bitmap_strike_data
+
+            tb_cblc = table_C_B_L_C_()
+            tb_cblc.version = 3.0
+            tb_cblc.strikes = [color_strike]
+            builder.font[tb_cblc.tableTag] = tb_cblc
+
+            tb_cbdt = table_C_B_D_T_()
+            tb_cbdt.version = 3.0
+            tb_cbdt.strikeData = [color_strike_data]
+            builder.font[tb_cbdt.tableTag] = tb_cbdt
 
     has_bitmap_tables = any(
         table_tag in builder.font

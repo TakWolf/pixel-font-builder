@@ -1,125 +1,15 @@
 from collections.abc import Mapping, Sequence
 
-from fontTools.ttLib.tables.BitmapGlyphMetrics import BigGlyphMetrics, SmallGlyphMetrics
 from fontTools.ttLib.tables.E_B_D_T_ import ebdt_bitmap_format_1, ebdt_bitmap_format_2, ebdt_bitmap_format_5, ebdt_bitmap_format_6, ebdt_bitmap_format_7
-from fontTools.ttLib.tables.E_B_L_C_ import BitmapSizeTable, SbitLineMetrics, Strike, eblc_index_sub_table_1, eblc_index_sub_table_2, eblc_index_sub_table_5
+from fontTools.ttLib.tables.E_B_L_C_ import Strike, eblc_index_sub_table_1, eblc_index_sub_table_2, eblc_index_sub_table_5
 
 from pixel_font_builder.glyph import Glyph, MonoRaster
-from pixel_font_builder.metric import FontMetric, LineMetric
-from pixel_font_builder.opentype.bitmap.xbdt import RasterGlyph
+from pixel_font_builder.metric import FontMetric
+from pixel_font_builder.opentype.bitmap.xbdt import RasterGlyph, create_bitmap_size_table, create_big_glyph_metrics, create_small_glyph_metrics
 
 GlyphBitmapFormat = ebdt_bitmap_format_1 | ebdt_bitmap_format_2 | ebdt_bitmap_format_5 | ebdt_bitmap_format_6 | ebdt_bitmap_format_7
 BigMetricsSignature = tuple[int, int, int, int, int, int, int, int]
 GroupSignature = tuple[bool, int]
-
-
-def _create_horizontal_sbit_line_metrics(
-        horizontal_layout: LineMetric,
-        name_to_mono_glyph: Mapping[str, RasterGlyph[MonoRaster]],
-) -> SbitLineMetrics:
-    line_metrics = SbitLineMetrics()
-    line_metrics.ascender = horizontal_layout.ascent
-    line_metrics.descender = horizontal_layout.descent
-    line_metrics.widthMax = max((
-        glyph.raster.width
-        for glyph in name_to_mono_glyph.values()
-    ), default=0)
-    line_metrics.caretSlopeNumerator = 1
-    line_metrics.caretSlopeDenominator = 0
-    line_metrics.caretOffset = 0
-    line_metrics.minOriginSB = min((
-        glyph.raster.horizontal_offset_x
-        for glyph in name_to_mono_glyph.values()
-    ), default=0)
-    line_metrics.minAdvanceSB = min((
-        glyph.advance_width - glyph.raster.horizontal_offset_x - glyph.raster.width
-        for glyph in name_to_mono_glyph.values()
-    ), default=0)
-    line_metrics.maxBeforeBL = max((
-        glyph.raster.height + glyph.raster.horizontal_offset_y
-        for glyph in name_to_mono_glyph.values()
-    ), default=0)
-    line_metrics.minAfterBL = min((
-        glyph.raster.horizontal_offset_y
-        for glyph in name_to_mono_glyph.values()
-    ), default=0)
-    line_metrics.pad1 = 0
-    line_metrics.pad2 = 0
-    return line_metrics
-
-
-def _create_vertical_sbit_line_metrics(
-        vertical_layout: LineMetric,
-        name_to_mono_glyph: Mapping[str, RasterGlyph[MonoRaster]],
-) -> SbitLineMetrics:
-    line_metrics = SbitLineMetrics()
-    line_metrics.ascender = vertical_layout.ascent
-    line_metrics.descender = vertical_layout.descent
-    line_metrics.widthMax = max((
-        glyph.raster.height
-        for glyph in name_to_mono_glyph.values()
-    ), default=0)
-    line_metrics.caretSlopeNumerator = 0
-    line_metrics.caretSlopeDenominator = 1
-    line_metrics.caretOffset = 0
-    line_metrics.minOriginSB = min((
-        glyph.raster.vertical_offset_y
-        for glyph in name_to_mono_glyph.values()
-    ), default=0)
-    line_metrics.minAdvanceSB = min((
-        glyph.advance_height - glyph.raster.vertical_offset_y - glyph.raster.height
-        for glyph in name_to_mono_glyph.values()
-    ), default=0)
-    line_metrics.maxBeforeBL = max((
-        glyph.raster.vertical_offset_x + glyph.raster.width
-        for glyph in name_to_mono_glyph.values()
-    ), default=0)
-    line_metrics.minAfterBL = min((
-        glyph.raster.vertical_offset_x
-        for glyph in name_to_mono_glyph.values()
-    ), default=0)
-    line_metrics.pad1 = 0
-    line_metrics.pad2 = 0
-    return line_metrics
-
-
-def _create_bitmap_size_table(
-        font_metric: FontMetric,
-        has_vertical_metrics: bool,
-        name_to_mono_glyph: Mapping[str, RasterGlyph[MonoRaster]],
-) -> BitmapSizeTable:
-    bitmap_size_table = BitmapSizeTable()
-    bitmap_size_table.colorRef = 0
-    bitmap_size_table.hori = _create_horizontal_sbit_line_metrics(font_metric.horizontal_layout, name_to_mono_glyph)
-    bitmap_size_table.vert = _create_vertical_sbit_line_metrics(font_metric.vertical_layout, name_to_mono_glyph)
-    bitmap_size_table.ppemX = font_metric.font_size
-    bitmap_size_table.ppemY = font_metric.font_size
-    bitmap_size_table.bitDepth = 1
-    bitmap_size_table.flags = 0b_11 if has_vertical_metrics else 0b_01
-    return bitmap_size_table
-
-
-def _create_big_metrics(glyph: RasterGlyph[MonoRaster]) -> BigGlyphMetrics:
-    metrics = BigGlyphMetrics()
-    metrics.height = glyph.raster.height
-    metrics.width = glyph.raster.width
-    metrics.horiBearingX = glyph.raster.horizontal_offset_x
-    metrics.horiBearingY = glyph.raster.height + glyph.raster.horizontal_offset_y
-    metrics.horiAdvance = glyph.advance_width
-    metrics.vertBearingX = glyph.raster.vertical_offset_x
-    metrics.vertBearingY = glyph.raster.vertical_offset_y
-    metrics.vertAdvance = glyph.advance_height
-    return metrics
-
-
-def _create_small_metrics(glyph: RasterGlyph[MonoRaster]) -> SmallGlyphMetrics:
-    metrics = SmallGlyphMetrics()
-    metrics.height = glyph.raster.height
-    metrics.width = glyph.raster.width
-    metrics.BearingX = glyph.raster.horizontal_offset_x
-    metrics.BearingY = glyph.raster.height + glyph.raster.horizontal_offset_y
-    metrics.Advance = glyph.advance_width
-    return metrics
 
 
 def _pack_bitmap_row(bitmap_row: list[int]) -> bytes:
@@ -142,15 +32,15 @@ def _pack_bitmap_row(bitmap_row: list[int]) -> bytes:
 
 
 def _create_bitmap_format(glyph: RasterGlyph[MonoRaster], image_format: int) -> GlyphBitmapFormat:
-    big_metrics = _create_big_metrics(glyph)
+    big_metrics = create_big_glyph_metrics(glyph)
     rows = [_pack_bitmap_row(bitmap_row) for bitmap_row in glyph.raster.bitmap]
     match image_format:
         case 1:
             bitmap_glyph = ebdt_bitmap_format_1(None, None)
-            bitmap_glyph.metrics = _create_small_metrics(glyph)
+            bitmap_glyph.metrics = create_small_glyph_metrics(glyph)
         case 2:
             bitmap_glyph = ebdt_bitmap_format_2(None, None)
-            bitmap_glyph.metrics = _create_small_metrics(glyph)
+            bitmap_glyph.metrics = create_small_glyph_metrics(glyph)
         case 6:
             bitmap_glyph = ebdt_bitmap_format_6(None, None)
             bitmap_glyph.metrics = big_metrics
@@ -177,7 +67,7 @@ def _bitmap_data_size(glyph: RasterGlyph[MonoRaster], image_format: int) -> int:
 
 
 def _big_metrics_signature(glyph: RasterGlyph[MonoRaster]) -> BigMetricsSignature:
-    metrics = _create_big_metrics(glyph)
+    metrics = create_big_glyph_metrics(glyph)
     return (
         metrics.height,
         metrics.width,
@@ -202,10 +92,10 @@ def _uses_consecutive_glyph_ids(glyph_names: Sequence[str], name_to_glyph_id: Ma
 
 def _append_index_sub_table(
         strike: Strike,
-        use_big_metrics: bool,
         glyphs: Sequence[RasterGlyph[MonoRaster]],
         glyph_names: Sequence[str],
         name_to_glyph_id: Mapping[str, int],
+        use_big_metrics: bool,
 ) -> int:
     image_format = _select_image_format(glyphs, use_big_metrics)
     if use_big_metrics:
@@ -223,7 +113,7 @@ def _append_index_sub_table(
             index_sub_table.imageFormat = 5
             index_sub_table.imageDataOffset = 0
             index_sub_table.names = glyph_names
-            index_sub_table.metrics = _create_big_metrics(glyphs[0])
+            index_sub_table.metrics = create_big_glyph_metrics(glyphs[0])
             index_sub_table.imageSize = first_image_size
         else:
             index_sub_table = eblc_index_sub_table_1(None, None)
@@ -244,11 +134,10 @@ def _append_index_sub_table(
 
 def create_bitmap_strike_data(
         font_metric: FontMetric,
-        has_vertical_metrics: bool,
         glyph_order: Sequence[str],
         name_to_glyph: Mapping[str, Glyph],
+        has_vertical_metrics: bool,
 ) -> tuple[Strike, dict[str, GlyphBitmapFormat]]:
-    use_big_metrics = has_vertical_metrics
     name_to_glyph_id = {
         glyph_name: glyph_id
         for glyph_id, glyph_name in enumerate(glyph_order)
@@ -262,9 +151,10 @@ def create_bitmap_strike_data(
         glyph_name: RasterGlyph.create_mono(name_to_glyph[glyph_name])
         for glyph_name in glyph_order
     }
+    use_big_metrics = has_vertical_metrics
 
     strike = Strike()
-    strike.bitmapSizeTable = _create_bitmap_size_table(font_metric, has_vertical_metrics, name_to_mono_glyph)
+    strike.bitmapSizeTable = create_bitmap_size_table(font_metric, name_to_mono_glyph, has_vertical_metrics, 1)
 
     strike_data = {}
 
@@ -280,7 +170,7 @@ def create_bitmap_strike_data(
             current_glyphs.append(glyph)
             current_names.append(glyph_name)
         else:
-            image_format = _append_index_sub_table(strike, use_big_metrics, current_glyphs, current_names, name_to_glyph_id)
+            image_format = _append_index_sub_table(strike, current_glyphs, current_names, name_to_glyph_id, use_big_metrics)
             for name in current_names:
                 name_to_image_format[name] = image_format
             current_glyphs = [glyph]
@@ -288,7 +178,7 @@ def create_bitmap_strike_data(
         current_signature = signature
 
     if current_names:
-        image_format = _append_index_sub_table(strike, use_big_metrics, current_glyphs, current_names, name_to_glyph_id)
+        image_format = _append_index_sub_table(strike, current_glyphs, current_names, name_to_glyph_id, use_big_metrics)
         for name in current_names:
             name_to_image_format[name] = image_format
 
