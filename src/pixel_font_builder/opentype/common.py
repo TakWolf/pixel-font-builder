@@ -91,26 +91,10 @@ def create_font_builder(
             ttf_glyphs[glyph_name] = pen.to_glyph()
         builder.setupGlyf(ttf_glyphs)
 
-        horizontal_metrics = {}
-        for glyph_name, glyph in name_to_glyph.items():
-            ttf_glyph = ttf_glyphs[glyph_name]
-            advance_width = glyph.advance_width * config.px_to_units
-            left_side_bearing = 0
-            if ttf_glyph.numberOfContours > 0 and glyph.mono_raster is not None:
-                left_side_bearing = ttf_glyph.xMin
-            horizontal_metrics[glyph_name] = advance_width, left_side_bearing
-        builder.setupHorizontalMetrics(horizontal_metrics)
-
-        if config.has_vertical_metrics:
-            vertical_metrics = {}
-            for glyph_name, glyph in name_to_glyph.items():
-                ttf_glyph = ttf_glyphs[glyph_name]
-                advance_height = glyph.advance_height * config.px_to_units
-                top_side_bearing = vertical_origins[glyph_name]
-                if ttf_glyph.numberOfContours > 0 and glyph.mono_raster is not None:
-                    top_side_bearing -= ttf_glyph.yMax
-                vertical_metrics[glyph_name] = advance_height, top_side_bearing
-            builder.setupVerticalMetrics(vertical_metrics)
+        name_to_glyph_bounds = {
+            glyph_name: (ttf_glyph.xMin, ttf_glyph.yMin, ttf_glyph.xMax, ttf_glyph.yMax) if ttf_glyph.numberOfContours > 0 else None
+            for glyph_name, ttf_glyph in ttf_glyphs.items()
+        }
     else:
         otf_glyphs = {}
         for glyph_name, glyph in name_to_glyph.items():
@@ -122,31 +106,34 @@ def create_font_builder(
             'isFixedPitch': config.is_fixed_pitch,
         }, otf_glyphs, {})
 
-        name_to_otf_bounds = {glyph_name: otf_glyph.calcBounds(None) for glyph_name, otf_glyph in otf_glyphs.items()}
+        name_to_glyph_bounds = {
+            glyph_name: otf_glyph.calcBounds(None)
+            for glyph_name, otf_glyph in otf_glyphs.items()
+        }
 
-        horizontal_metrics = {}
+        if config.has_vertical_metrics and emit_outlines:
+            builder.setupVerticalOrigins(vertical_origins)
+
+    horizontal_metrics = {}
+    for glyph_name, glyph in name_to_glyph.items():
+        glyph_bounds = name_to_glyph_bounds[glyph_name]
+        advance_width = glyph.advance_width * config.px_to_units
+        left_side_bearing = 0
+        if glyph_bounds is not None and glyph.mono_raster is not None:
+            left_side_bearing = otRound(glyph_bounds[0])
+        horizontal_metrics[glyph_name] = advance_width, left_side_bearing
+    builder.setupHorizontalMetrics(horizontal_metrics)
+
+    if config.has_vertical_metrics:
+        vertical_metrics = {}
         for glyph_name, glyph in name_to_glyph.items():
-            otf_bounds = name_to_otf_bounds[glyph_name]
-            advance_width = glyph.advance_width * config.px_to_units
-            left_side_bearing = 0
-            if otf_bounds is not None and glyph.mono_raster is not None:
-                left_side_bearing = otRound(otf_bounds[0])
-            horizontal_metrics[glyph_name] = advance_width, left_side_bearing
-        builder.setupHorizontalMetrics(horizontal_metrics)
-
-        if config.has_vertical_metrics:
-            vertical_metrics = {}
-            for glyph_name, glyph in name_to_glyph.items():
-                otf_bounds = name_to_otf_bounds[glyph_name]
-                advance_height = glyph.advance_height * config.px_to_units
-                top_side_bearing = vertical_origins[glyph_name]
-                if otf_bounds is not None and glyph.mono_raster is not None:
-                    top_side_bearing = otRound(top_side_bearing - otf_bounds[3])
-                vertical_metrics[glyph_name] = advance_height, top_side_bearing
-            builder.setupVerticalMetrics(vertical_metrics)
-
-            if emit_outlines:
-                builder.setupVerticalOrigins(vertical_origins)
+            glyph_bounds = name_to_glyph_bounds[glyph_name]
+            advance_height = glyph.advance_height * config.px_to_units
+            top_side_bearing = vertical_origins[glyph_name]
+            if glyph_bounds is not None and glyph.mono_raster is not None:
+                top_side_bearing = otRound(top_side_bearing - glyph_bounds[3])
+            vertical_metrics[glyph_name] = advance_height, top_side_bearing
+        builder.setupVerticalMetrics(vertical_metrics)
 
     if emit_ebdt:
         strike, strike_data = create_bitmap_strike_data(context.font_metric, config.has_vertical_metrics, glyph_order, name_to_glyph)
