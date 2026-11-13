@@ -140,8 +140,8 @@ def demo_builder(assets_dir: Path) -> FontBuilder:
             bitmap=glyph_info.bitmap,
         ))
 
-    builder.character_mapping.update(character_mapping)
-    builder.kerning_values.update(kerning_values)
+    builder.character_mapping = character_mapping
+    builder.kerning_values = kerning_values
 
     return builder
 

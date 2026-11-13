@@ -20,16 +20,16 @@ def builder() -> FontBuilder:
     builder.font_metric.vertical_layout.ascent = 5
     builder.font_metric.vertical_layout.descent = -5
 
-    builder.glyphs.extend([
+    builder.glyphs = [
         Glyph(name='.notdef', advance_width=5, advance_height=10),
         Glyph(name='a', advance_width=5, advance_height=10),
         Glyph(name='b', advance_width=5, advance_height=10),
-    ])
+    ]
 
-    builder.character_mapping.update({
+    builder.character_mapping = {
         0x61: 'a',
         0x62: 'b',
-    })
+    }
 
     return builder
 
@@ -152,10 +152,10 @@ def test_kerning_uses_scaled_pair_positioning(builder: FontBuilder) -> None:
 
 
 def test_kerning_pair_positioning_is_sorted_by_glyph_order(builder: FontBuilder) -> None:
-    builder.kerning_values.update({
+    builder.kerning_values = {
         ('b', 'a'): -1,
         ('a', 'b'): -2,
-    })
+    }
 
     font = builder.to_ttf_builder().font
     tb_gpos = font['GPOS'].table

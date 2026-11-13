@@ -5,21 +5,21 @@ from pixel_font_builder import FontBuilder, Glyph
 
 def test_prepare_glyphs() -> None:
     builder = FontBuilder()
-    builder.glyphs.extend([
+    builder.glyphs = [
         Glyph(name='.notdef'),
         Glyph(name='CAP_LETTER_A'),
         Glyph(name='CAP_LETTER_B'),
         Glyph(name='CAP_LETTER_C'),
-    ])
-    builder.character_mapping.update({
+    ]
+    builder.character_mapping = {
         65: 'CAP_LETTER_A',
         66: 'CAP_LETTER_B',
         67: 'CAP_LETTER_C',
-    })
-    builder.kerning_values.update({
+    }
+    builder.kerning_values = {
         ('CAP_LETTER_A', 'CAP_LETTER_B'): 1,
         ('CAP_LETTER_A', 'CAP_LETTER_C'): 2,
-    })
+    }
 
     glyph_order, name_to_glyph = builder.prepare_glyphs()
 
@@ -39,21 +39,21 @@ def test_prepare_glyphs() -> None:
 
 def test_copy() -> None:
     builder_1 = FontBuilder()
-    builder_1.glyphs.extend([
+    builder_1.glyphs = [
         Glyph(name='.notdef'),
         Glyph(name='CAP_LETTER_A'),
         Glyph(name='CAP_LETTER_B'),
         Glyph(name='CAP_LETTER_C'),
-    ])
-    builder_1.character_mapping.update({
+    ]
+    builder_1.character_mapping = {
         65: 'CAP_LETTER_A',
         66: 'CAP_LETTER_B',
         67: 'CAP_LETTER_C',
-    })
-    builder_1.kerning_values.update({
+    }
+    builder_1.kerning_values = {
         ('CAP_LETTER_A', 'CAP_LETTER_B'): 1,
         ('CAP_LETTER_A', 'CAP_LETTER_C'): 2,
-    })
+    }
     builder_2 = copy(builder_1)
 
     assert builder_1 == builder_2
@@ -71,21 +71,21 @@ def test_copy() -> None:
 
 def test_deepcopy() -> None:
     builder_1 = FontBuilder()
-    builder_1.glyphs.extend([
+    builder_1.glyphs = [
         Glyph(name='.notdef'),
         Glyph(name='CAP_LETTER_A'),
         Glyph(name='CAP_LETTER_B'),
         Glyph(name='CAP_LETTER_C'),
-    ])
-    builder_1.character_mapping.update({
+    ]
+    builder_1.character_mapping = {
         65: 'CAP_LETTER_A',
         66: 'CAP_LETTER_B',
         67: 'CAP_LETTER_C',
-    })
-    builder_1.kerning_values.update({
+    }
+    builder_1.kerning_values = {
         ('CAP_LETTER_A', 'CAP_LETTER_B'): 1,
         ('CAP_LETTER_A', 'CAP_LETTER_C'): 2,
-    })
+    }
     builder_2 = deepcopy(builder_1)
 
     assert builder_1 == builder_2
@@ -106,37 +106,37 @@ def test_deepcopy() -> None:
 
 def test_eq() -> None:
     builder_1 = FontBuilder()
-    builder_1.glyphs.extend([
+    builder_1.glyphs = [
         Glyph(name='.notdef'),
         Glyph(name='CAP_LETTER_A'),
         Glyph(name='CAP_LETTER_B'),
         Glyph(name='CAP_LETTER_C'),
-    ])
-    builder_1.character_mapping.update({
+    ]
+    builder_1.character_mapping = {
         65: 'CAP_LETTER_A',
         66: 'CAP_LETTER_B',
         67: 'CAP_LETTER_C',
-    })
-    builder_1.kerning_values.update({
+    }
+    builder_1.kerning_values = {
         ('CAP_LETTER_A', 'CAP_LETTER_B'): 1,
         ('CAP_LETTER_A', 'CAP_LETTER_C'): 2,
-    })
+    }
 
     builder_2 = FontBuilder()
-    builder_2.glyphs.extend([
+    builder_2.glyphs = [
         Glyph(name='.notdef'),
         Glyph(name='CAP_LETTER_A'),
         Glyph(name='CAP_LETTER_B'),
         Glyph(name='CAP_LETTER_C'),
-    ])
-    builder_2.character_mapping.update({
+    ]
+    builder_2.character_mapping = {
         65: 'CAP_LETTER_A',
         66: 'CAP_LETTER_B',
         67: 'CAP_LETTER_C',
-    })
-    builder_2.kerning_values.update({
+    }
+    builder_2.kerning_values = {
         ('CAP_LETTER_A', 'CAP_LETTER_B'): 1,
         ('CAP_LETTER_A', 'CAP_LETTER_C'): 2,
-    })
+    }
 
     assert builder_1 == builder_2
