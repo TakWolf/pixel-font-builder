@@ -15,7 +15,7 @@ from fontTools.ttLib.tables._b_h_e_d import table__b_h_e_d
 from fontTools.ttLib.tables._b_l_o_c import table__b_l_o_c
 
 import pixel_font_builder
-from pixel_font_builder.opentype.bitmap import create_bitmap_strike_data
+from pixel_font_builder.opentype.bitmap.ebdt import create_bitmap_strike_data
 from pixel_font_builder.opentype.enum import OutlineTableMode, BitmapTableMode, Flavor
 from pixel_font_builder.opentype.feature.kerning import add_generated_kern_feature
 from pixel_font_builder.opentype.feature.source.parser import parse_feature_inputs
