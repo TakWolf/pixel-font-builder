@@ -1,97 +1,29 @@
 from __future__ import annotations
 
 import math
-import struct
-import zlib
 from datetime import datetime
 from pathlib import Path
 
 import pytest
 
 from pixel_font_builder import FontBuilder, FontCollectionBuilder, WeightName, SerifStyle, SlantStyle, WidthStyle, Glyph, MonoRaster, ColorRaster, ColorRgba
+from tests.fixtures.png import read_png
 
 
 def _load_color_bitmap(file_path: Path) -> tuple[int, int, list[list[ColorRgba]]]:
-    data = file_path.read_bytes()
-    if data[:8] != b'\x89PNG\r\n\x1a\n':
-        raise ValueError(f'invalid PNG signature: {file_path}')
-
-    header = None
-    compressed = bytearray()
-    offset = 8
-    while offset < len(data):
-        if offset + 12 > len(data):
-            raise ValueError(f'truncated PNG chunk: {file_path}')
-        length, tag = struct.unpack_from('>I4s', data, offset)
-        end = offset + 12 + length
-        if end > len(data):
-            raise ValueError(f'truncated PNG chunk: {file_path}')
-        payload = data[offset + 8:end - 4]
-        checksum = struct.unpack_from('>I', data, end - 4)[0]
-        if checksum != zlib.crc32(tag + payload):
-            raise ValueError(f'invalid PNG chunk checksum: {file_path}')
-        if tag == b'IHDR':
-            if header is not None or offset != 8 or length != 13:
-                raise ValueError(f'invalid PNG header: {file_path}')
-            header = struct.unpack('>IIBBBBB', payload)
-        elif tag == b'IDAT':
-            compressed.extend(payload)
-        elif tag == b'IEND':
-            break
-        offset = end
-    else:
-        raise ValueError(f'missing PNG end chunk: {file_path}')
-
-    if header is None:
-        raise ValueError(f'missing PNG header: {file_path}')
-    width, height, bitdepth, color_type, compression, filtering, interlace = header
-    if width == 0 or height == 0 or (bitdepth, color_type, compression, filtering, interlace) != (8, 6, 0, 0, 0):
-        raise ValueError(f'expected a non-interlaced 8-bit RGBA PNG: {file_path}')
-    raw = zlib.decompress(compressed)
-    stride = width * 4
-    if len(raw) != height * (stride + 1):
-        raise ValueError(f'invalid PNG pixel data length: {file_path}')
-
-    bitmap = []
-    previous = bytearray(stride)
-    for y in range(height):
-        start = y * (stride + 1)
-        row_filter = raw[start]
-        row = bytearray(raw[start + 1:start + 1 + stride])
-        if row_filter not in (0, 1, 2, 3, 4):
-            raise ValueError(f'unsupported PNG row filter {row_filter}: {file_path}')
-        for x in range(stride):
-            left = row[x - 4] if x >= 4 else 0
-            above = previous[x]
-            upper_left = previous[x - 4] if x >= 4 else 0
-            if row_filter == 0:
-                predictor = 0
-            elif row_filter == 1:
-                predictor = left
-            elif row_filter == 2:
-                predictor = above
-            elif row_filter == 3:
-                predictor = (left + above) // 2
-            else:
-                prediction = left + above - upper_left
-                left_distance = abs(prediction - left)
-                above_distance = abs(prediction - above)
-                upper_left_distance = abs(prediction - upper_left)
-                if left_distance <= above_distance and left_distance <= upper_left_distance:
-                    predictor = left
-                elif above_distance <= upper_left_distance:
-                    predictor = above
-                else:
-                    predictor = upper_left
-            row[x] = (row[x] + predictor) & 255
-        bitmap.append([tuple(row[x:x + 4]) for x in range(0, stride, 4)])
-        previous = row
-    return width, height, bitmap
+    return read_png(file_path.read_bytes())
 
 
 def _load_mono_bitmap(file_path: Path) -> tuple[int, int, list[list[int]]]:
     width, height, color_bitmap = _load_color_bitmap(file_path)
-    return width, height, [[int(pixel[3] >= 128) for pixel in row] for row in color_bitmap]
+    mono_bitmap = [
+        [
+            int(pixel[3] >= 128)
+            for pixel in row
+        ]
+        for row in color_bitmap
+    ]
+    return width, height, mono_bitmap
 
 
 def _collect_glyphs(
