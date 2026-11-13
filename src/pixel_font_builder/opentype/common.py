@@ -119,7 +119,7 @@ def create_font_builder(
         glyph_bounds = name_to_glyph_bounds[glyph_name]
         advance_width = glyph.advance_width * config.px_to_units
         left_side_bearing = 0
-        if glyph_bounds is not None and glyph.mono_raster is not None:
+        if glyph_bounds is not None:
             left_side_bearing = otRound(glyph_bounds[0])
         horizontal_metrics[glyph_name] = advance_width, left_side_bearing
     builder.setupHorizontalMetrics(horizontal_metrics)
@@ -130,7 +130,7 @@ def create_font_builder(
             glyph_bounds = name_to_glyph_bounds[glyph_name]
             advance_height = glyph.advance_height * config.px_to_units
             top_side_bearing = vertical_origins[glyph_name]
-            if glyph_bounds is not None and glyph.mono_raster is not None:
+            if glyph_bounds is not None:
                 top_side_bearing = otRound(top_side_bearing - glyph_bounds[3])
             vertical_metrics[glyph_name] = advance_height, top_side_bearing
         builder.setupVerticalMetrics(vertical_metrics)
