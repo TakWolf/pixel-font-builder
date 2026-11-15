@@ -8,49 +8,8 @@ from pixel_font_builder.metric import FontMetric
 from pixel_font_builder.opentype.bitmap.common import RasterGlyph, create_bitmap_size_table, create_big_glyph_metrics, create_small_glyph_metrics
 
 GlyphBitmapFormat = ebdt_bitmap_format_1 | ebdt_bitmap_format_2 | ebdt_bitmap_format_5 | ebdt_bitmap_format_6 | ebdt_bitmap_format_7
-BigMetricsSignature = tuple[int, int, int, int, int, int, int, int]
 GroupSignature = tuple[bool, int]
-
-
-def _pack_bitmap_row(bitmap_row: list[int]) -> bytes:
-    data = bytearray()
-    b = 0
-    bit_count = 0
-
-    for pixel in bitmap_row:
-        b = (b << 1) | (1 if pixel != 0 else 0)
-        bit_count += 1
-        if bit_count == 8:
-            data.append(b)
-            b = 0
-            bit_count = 0
-
-    if bit_count > 0:
-        data.append(b << (8 - bit_count))
-
-    return bytes(data)
-
-
-def _create_bitmap_format(glyph: RasterGlyph[MonoRaster], image_format: int) -> GlyphBitmapFormat:
-    big_metrics = create_big_glyph_metrics(glyph)
-    rows = [_pack_bitmap_row(bitmap_row) for bitmap_row in glyph.raster.bitmap]
-    match image_format:
-        case 1:
-            bitmap_glyph = ebdt_bitmap_format_1(None, None)
-            bitmap_glyph.metrics = create_small_glyph_metrics(glyph)
-        case 2:
-            bitmap_glyph = ebdt_bitmap_format_2(None, None)
-            bitmap_glyph.metrics = create_small_glyph_metrics(glyph)
-        case 6:
-            bitmap_glyph = ebdt_bitmap_format_6(None, None)
-            bitmap_glyph.metrics = big_metrics
-        case 7:
-            bitmap_glyph = ebdt_bitmap_format_7(None, None)
-            bitmap_glyph.metrics = big_metrics
-        case _:
-            bitmap_glyph = ebdt_bitmap_format_5(None, None)
-    bitmap_glyph.setRows(rows, bitDepth=1, metrics=big_metrics)
-    return bitmap_glyph
+BigMetricsSignature = tuple[int, int, int, int, int, int, int, int]
 
 
 def _select_image_format(glyphs: Sequence[RasterGlyph[MonoRaster]], use_big_metrics: bool) -> int:
@@ -66,6 +25,11 @@ def _bitmap_data_size(glyph: RasterGlyph[MonoRaster], image_format: int) -> int:
     return (glyph.raster.width * glyph.raster.height + 7) // 8
 
 
+def _group_signature(glyph: RasterGlyph[MonoRaster], use_big_metrics: bool) -> GroupSignature:
+    image_format = _select_image_format([glyph], use_big_metrics)
+    return use_big_metrics, image_format
+
+
 def _big_metrics_signature(glyph: RasterGlyph[MonoRaster]) -> BigMetricsSignature:
     metrics = create_big_glyph_metrics(glyph)
     return (
@@ -78,11 +42,6 @@ def _big_metrics_signature(glyph: RasterGlyph[MonoRaster]) -> BigMetricsSignatur
         metrics.vertBearingY,
         metrics.vertAdvance,
     )
-
-
-def _group_signature(glyph: RasterGlyph[MonoRaster], use_big_metrics: bool) -> GroupSignature:
-    image_format = _select_image_format([glyph], use_big_metrics)
-    return use_big_metrics, image_format
 
 
 def _uses_consecutive_glyph_ids(glyph_names: Sequence[str], name_to_glyph_id: Mapping[str, int]) -> bool:
@@ -130,6 +89,47 @@ def _append_index_sub_table(
 
     strike.indexSubTables.append(index_sub_table)
     return index_sub_table.imageFormat
+
+
+def _pack_bitmap_row(bitmap_row: list[int]) -> bytes:
+    data = bytearray()
+    b = 0
+    bit_count = 0
+
+    for pixel in bitmap_row:
+        b = (b << 1) | (1 if pixel != 0 else 0)
+        bit_count += 1
+        if bit_count == 8:
+            data.append(b)
+            b = 0
+            bit_count = 0
+
+    if bit_count > 0:
+        data.append(b << (8 - bit_count))
+
+    return bytes(data)
+
+
+def _create_bitmap_format(glyph: RasterGlyph[MonoRaster], image_format: int) -> GlyphBitmapFormat:
+    big_metrics = create_big_glyph_metrics(glyph)
+    rows = [_pack_bitmap_row(bitmap_row) for bitmap_row in glyph.raster.bitmap]
+    match image_format:
+        case 1:
+            bitmap_glyph = ebdt_bitmap_format_1(None, None)
+            bitmap_glyph.metrics = create_small_glyph_metrics(glyph)
+        case 2:
+            bitmap_glyph = ebdt_bitmap_format_2(None, None)
+            bitmap_glyph.metrics = create_small_glyph_metrics(glyph)
+        case 6:
+            bitmap_glyph = ebdt_bitmap_format_6(None, None)
+            bitmap_glyph.metrics = big_metrics
+        case 7:
+            bitmap_glyph = ebdt_bitmap_format_7(None, None)
+            bitmap_glyph.metrics = big_metrics
+        case _:
+            bitmap_glyph = ebdt_bitmap_format_5(None, None)
+    bitmap_glyph.setRows(rows, bitDepth=1, metrics=big_metrics)
+    return bitmap_glyph
 
 
 def create_bitmap_strike_data(
