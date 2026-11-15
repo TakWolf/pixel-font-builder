@@ -110,25 +110,33 @@ def _pack_bitmap_row(bitmap_row: list[int]) -> bytes:
     return bytes(data)
 
 
+def _pack_bitmap(bitmap: list[list[int]]) -> list[bytes]:
+    return [_pack_bitmap_row(bitmap_row) for bitmap_row in bitmap]
+
+
 def _create_bitmap_format(glyph: RasterGlyph[MonoRaster], image_format: int) -> GlyphBitmapFormat:
-    big_metrics = create_big_glyph_metrics(glyph)
-    rows = [_pack_bitmap_row(bitmap_row) for bitmap_row in glyph.raster.bitmap]
     match image_format:
         case 1:
             bitmap_glyph = ebdt_bitmap_format_1(None, None)
             bitmap_glyph.metrics = create_small_glyph_metrics(glyph)
+            bitmap_glyph.setRows(_pack_bitmap(glyph.raster.bitmap), bitDepth=1)
         case 2:
             bitmap_glyph = ebdt_bitmap_format_2(None, None)
             bitmap_glyph.metrics = create_small_glyph_metrics(glyph)
+            bitmap_glyph.setRows(_pack_bitmap(glyph.raster.bitmap), bitDepth=1)
+        case 5:
+            bitmap_glyph = ebdt_bitmap_format_5(None, None)
+            bitmap_glyph.setRows(_pack_bitmap(glyph.raster.bitmap), bitDepth=1, metrics=create_big_glyph_metrics(glyph))
         case 6:
             bitmap_glyph = ebdt_bitmap_format_6(None, None)
-            bitmap_glyph.metrics = big_metrics
+            bitmap_glyph.metrics = create_big_glyph_metrics(glyph)
+            bitmap_glyph.setRows(_pack_bitmap(glyph.raster.bitmap), bitDepth=1)
         case 7:
             bitmap_glyph = ebdt_bitmap_format_7(None, None)
-            bitmap_glyph.metrics = big_metrics
+            bitmap_glyph.metrics = create_big_glyph_metrics(glyph)
+            bitmap_glyph.setRows(_pack_bitmap(glyph.raster.bitmap), bitDepth=1)
         case _:
-            bitmap_glyph = ebdt_bitmap_format_5(None, None)
-    bitmap_glyph.setRows(rows, bitDepth=1, metrics=big_metrics)
+            raise ValueError(f'unsupported image format: {image_format!r}')
     return bitmap_glyph
 
 
