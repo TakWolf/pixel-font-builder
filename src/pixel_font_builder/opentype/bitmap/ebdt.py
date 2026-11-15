@@ -5,7 +5,7 @@ from fontTools.ttLib.tables.E_B_L_C_ import Strike, eblc_index_sub_table_1, eblc
 
 from pixel_font_builder.glyph import Glyph, MonoRaster
 from pixel_font_builder.metric import FontMetric
-from pixel_font_builder.opentype.bitmap.xbdt import RasterGlyph, create_bitmap_size_table, create_big_glyph_metrics, create_small_glyph_metrics
+from pixel_font_builder.opentype.bitmap.common import RasterGlyph, create_bitmap_size_table, create_big_glyph_metrics, create_small_glyph_metrics
 
 GlyphBitmapFormat = ebdt_bitmap_format_1 | ebdt_bitmap_format_2 | ebdt_bitmap_format_5 | ebdt_bitmap_format_6 | ebdt_bitmap_format_7
 BigMetricsSignature = tuple[int, int, int, int, int, int, int, int]
