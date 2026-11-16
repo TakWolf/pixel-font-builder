@@ -58,6 +58,10 @@ def create_font_builder(
 
     font_metric = context.font_metric * config.px_to_units
     meta_info = context.meta_info
+
+    if font_metric.font_size <= 0:
+        raise RuntimeError(f'font_size must be greater than 0, got {font_metric.font_size!r}')
+
     glyph_order, name_to_glyph = context.prepare_glyphs(no_color_mode=no_color_mode)
     character_mapping = context.prepare_character_mapping(name_to_glyph)
     kerning_values = context.prepare_kerning_values(name_to_glyph)

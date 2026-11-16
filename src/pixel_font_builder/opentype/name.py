@@ -30,8 +30,12 @@ def create_name_strings(meta_info: MetaInfo) -> dict[str, str]:
     darkBackgroundPalette (nameID 24)
     variationsPostScriptNamePrefix (nameID 25)
     """
+    if meta_info.family_name is None:
+        raise RuntimeError('family_name must not be None')
+
     unique_name = meta_info.family_name.replace(' ', '-')
     style_name = meta_info.weight.display_name
+
     name_strings = {
         'familyName': meta_info.family_name,
         'styleName': style_name,
