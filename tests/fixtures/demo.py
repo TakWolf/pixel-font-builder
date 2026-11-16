@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from pixel_font_builder import FontBuilder, FontCollectionBuilder, WeightName, SerifStyle, SlantStyle, WidthStyle, Glyph, MonoRaster, ColorRaster, ColorRgba
+from pixel_font_builder import FontBuilder, FontCollectionBuilder, Weight, SerifStyle, Spacing, Slant, Glyph, MonoRaster, ColorRaster, ColorRgba
 from tests.fixtures.png import read_png
 
 
@@ -113,10 +113,10 @@ def demo_builder(assets_dir: Path) -> FontBuilder:
     builder.meta_info.created_time = datetime.fromisoformat('2024-01-01T00:00:00Z')
     builder.meta_info.modified_time = builder.meta_info.created_time
     builder.meta_info.family_name = 'Demo'
-    builder.meta_info.weight_name = WeightName.REGULAR
+    builder.meta_info.weight = Weight.REGULAR
     builder.meta_info.serif_style = SerifStyle.SANS_SERIF
-    builder.meta_info.slant_style = SlantStyle.NORMAL
-    builder.meta_info.width_style = WidthStyle.PROPORTIONAL
+    builder.meta_info.spacing = Spacing.PROPORTIONAL
+    builder.meta_info.slant = Slant.UPRIGHT
     builder.meta_info.manufacturer = 'TakWolf'
     builder.meta_info.designer = 'TakWolf'
     builder.meta_info.description = 'A demo font'

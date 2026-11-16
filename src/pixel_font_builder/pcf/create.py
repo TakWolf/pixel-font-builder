@@ -6,7 +6,7 @@ import statistics
 from pcffont import PcfFontBuilder, PcfGlyph
 
 import pixel_font_builder
-from pixel_font_builder.meta import WeightName, SlantStyle, WidthStyle
+from pixel_font_builder.meta import Spacing, Slant
 
 _DEFAULT_CHAR = 0xFFFE
 
@@ -65,19 +65,19 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuild
     if meta_info.manufacturer is not None:
         builder.properties.foundry = meta_info.manufacturer.replace('-', '_')
     builder.properties.family_name = meta_info.family_name.replace('-', '_')
-    builder.properties.weight_name = (meta_info.weight_name or WeightName.REGULAR).value
-    match meta_info.slant_style:
-        case None | SlantStyle.NORMAL | SlantStyle.ROMAN:
+    builder.properties.weight_name = meta_info.weight.display_name
+    match meta_info.slant:
+        case Slant.UPRIGHT:
             builder.properties.slant = 'R'
-        case SlantStyle.ITALIC:
+        case Slant.ITALIC:
             builder.properties.slant = 'I'
-        case SlantStyle.OBLIQUE:
+        case Slant.OBLIQUE:
             builder.properties.slant = 'O'
-        case SlantStyle.REVERSE_ITALIC:
+        case Slant.REVERSE_ITALIC:
             builder.properties.slant = 'RI'
-        case SlantStyle.REVERSE_OBLIQUE:
+        case Slant.REVERSE_OBLIQUE:
             builder.properties.slant = 'RO'
-        case SlantStyle.OTHER:
+        case Slant.OTHER:
             builder.properties.slant = 'OT'
     builder.properties.setwidth_name = 'Normal'
     if meta_info.serif_style is not None:
@@ -86,14 +86,14 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuild
     builder.properties.point_size = font_metric.font_size * 10
     builder.properties.resolution_x = config.resolution_x
     builder.properties.resolution_y = config.resolution_y
-    match meta_info.width_style:
-        case WidthStyle.MONOSPACED:
+    match meta_info.spacing:
+        case Spacing.MONOSPACED:
             builder.properties.spacing = 'M'
-        case WidthStyle.DUOSPACED:
+        case Spacing.DUOSPACED:
             builder.properties.spacing = 'D'
-        case WidthStyle.CHARACTER_CELL:
+        case Spacing.CHARACTER_CELL:
             builder.properties.spacing = 'C'
-        case WidthStyle.PROPORTIONAL:
+        case Spacing.PROPORTIONAL:
             builder.properties.spacing = 'P'
     builder.properties.average_width = round(statistics.fmean(glyph.character_width * 10 for glyph in builder.glyphs))
     builder.properties.charset_registry = 'ISO10646'

@@ -219,7 +219,7 @@ def create_font_builder(
         )
     builder.setupOS2(
         xAvgCharWidth=0,
-        usWeightClass=meta_info.weight_name.number if meta_info.weight_name is not None else 400,
+        usWeightClass=meta_info.weight.value,
         sTypoAscender=font_metric.horizontal_layout.ascent,
         sTypoDescender=font_metric.horizontal_layout.descent,
         sTypoLineGap=font_metric.horizontal_layout.line_gap,

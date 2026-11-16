@@ -1,7 +1,7 @@
 from copy import copy, deepcopy
 from datetime import datetime
 
-from pixel_font_builder import WeightName, SerifStyle, SlantStyle, WidthStyle, MetaInfo
+from pixel_font_builder import MetaInfo, Weight, SerifStyle, Spacing, Slant
 
 
 def test_copy() -> None:
@@ -10,10 +10,10 @@ def test_copy() -> None:
         created_time=datetime.fromisoformat('2000-01-01T00:00:00Z'),
         modified_time=datetime.fromisoformat('9999-12-31T23:59:59Z'),
         family_name='Demo Font',
-        weight_name=WeightName.REGULAR,
+        weight=Weight.BOLD,
         serif_style=SerifStyle.SANS_SERIF,
-        slant_style=SlantStyle.NORMAL,
-        width_style=WidthStyle.MONOSPACED,
+        spacing=Spacing.MONOSPACED,
+        slant=Slant.UPRIGHT,
         manufacturer='TakWolf',
         designer='TakWolf',
         description='A pixel font',
@@ -39,10 +39,10 @@ def test_eq() -> None:
         created_time=datetime.fromisoformat('2000-01-01T00:00:00Z'),
         modified_time=datetime.fromisoformat('9999-12-31T23:59:59Z'),
         family_name='Demo Font',
-        weight_name=WeightName.REGULAR,
+        weight=Weight.BOLD,
         serif_style=SerifStyle.SANS_SERIF,
-        slant_style=SlantStyle.NORMAL,
-        width_style=WidthStyle.MONOSPACED,
+        spacing=Spacing.MONOSPACED,
+        slant=Slant.UPRIGHT,
         manufacturer='TakWolf',
         designer='TakWolf',
         description='A pixel font',
@@ -58,10 +58,10 @@ def test_eq() -> None:
         created_time=datetime.fromisoformat('2000-01-01T00:00:00Z'),
         modified_time=datetime.fromisoformat('9999-12-31T23:59:59Z'),
         family_name='Demo Font',
-        weight_name=WeightName.REGULAR,
+        weight=Weight.BOLD,
         serif_style=SerifStyle.SANS_SERIF,
-        slant_style=SlantStyle.NORMAL,
-        width_style=WidthStyle.MONOSPACED,
+        spacing=Spacing.MONOSPACED,
+        slant=Slant.UPRIGHT,
         manufacturer='TakWolf',
         designer='TakWolf',
         description='A pixel font',

@@ -1,96 +1,70 @@
 from __future__ import annotations
 
 from datetime import datetime
-from enum import StrEnum, unique
+from enum import IntEnum, StrEnum, unique
 from typing import Any
 
 
 @unique
-class WeightName(StrEnum):
-    THIN = 'Thin'                # 100
-    EXTRA_LIGHT = 'Extra Light'  # 200
-    LIGHT = 'Light'              # 300
-    REGULAR = 'Regular'          # 400
-    NORMAL = 'Normal'            # Same as 'Regular'
-    MEDIUM = 'Medium'            # 500
-    SEMI_BOLD = 'Semi Bold'      # 600
-    BOLD = 'Bold'                # 700
-    EXTRA_BOLD = 'Extra Bold'    # 800
-    BLACK = 'Black'              # 900
-    HEAVY = 'Heavy'              # Same as 'Black'
-
-    @staticmethod
-    def from_number(number: int) -> WeightName:
-        match number:
-            case 100:
-                return WeightName.THIN
-            case 200:
-                return WeightName.EXTRA_LIGHT
-            case 300:
-                return WeightName.LIGHT
-            case 400:
-                return WeightName.REGULAR
-            case 500:
-                return WeightName.MEDIUM
-            case 600:
-                return WeightName.SEMI_BOLD
-            case 700:
-                return WeightName.BOLD
-            case 800:
-                return WeightName.EXTRA_BOLD
-            case 900:
-                return WeightName.BLACK
-            case _:
-                raise ValueError(f'unsupported weight number: {number}')
+class Weight(IntEnum):
+    THIN = 100
+    EXTRA_LIGHT = 200
+    LIGHT = 300
+    REGULAR = 400
+    MEDIUM = 500
+    SEMI_BOLD = 600
+    BOLD = 700
+    EXTRA_BOLD = 800
+    HEAVY = 900
 
     @property
-    def number(self) -> int:
-        match self:
-            case WeightName.THIN:
-                return 100
-            case WeightName.EXTRA_LIGHT:
-                return 200
-            case WeightName.LIGHT:
-                return 300
-            case WeightName.REGULAR | WeightName.NORMAL:
-                return 400
-            case WeightName.MEDIUM:
-                return 500
-            case WeightName.SEMI_BOLD:
-                return 600
-            case WeightName.BOLD:
-                return 700
-            case WeightName.EXTRA_BOLD:
-                return 800
-            case WeightName.BLACK | WeightName.HEAVY:
-                return 900
-            case _:
-                raise AssertionError()
+    def display_name(self) -> str:
+        return self.name.replace('_', '').title()
 
 
 @unique
 class SerifStyle(StrEnum):
+    # Letterforms with decorative strokes at the ends of main strokes
     SERIF = 'Serif'
+
+    # Letterforms without decorative strokes at the ends of main strokes
     SANS_SERIF = 'Sans Serif'
 
 
 @unique
-class SlantStyle(StrEnum):
-    NORMAL = 'Normal'                    # Upright design
-    ROMAN = 'Roman'                      # Same as 'NORMAL'
-    ITALIC = 'Italic'                    # Italic design, slanted clockwise from the vertical
-    OBLIQUE = 'Oblique'                  # Obliqued upright design, slanted clockwise from the vertical
-    REVERSE_ITALIC = 'Reverse Italic'    # Italic design, slanted counterclockwise from the vertical
-    REVERSE_OBLIQUE = 'Reverse Oblique'  # Obliqued upright design, slanted counterclockwise from the vertical
-    OTHER = 'Other'                      # Other
+class Spacing(StrEnum):
+    # Glyphs share the same advance width
+    MONOSPACED = 'Monospaced'
+
+    # Glyphs use two advance widths, with the wider twice the narrower
+    DUOSPACED = 'Duospaced'
+
+    # Glyphs share the same advance width and fit within a common fixed cell
+    CHARACTER_CELL = 'Character Cell'
+
+    # Glyph advance widths vary according to their design
+    PROPORTIONAL = 'Proportional'
 
 
 @unique
-class WidthStyle(StrEnum):
-    MONOSPACED = 'Monospaced'
-    DUOSPACED = 'Duospaced'
-    CHARACTER_CELL = 'Character Cell'
-    PROPORTIONAL = 'Proportional'
+class Slant(StrEnum):
+    # Upright design
+    UPRIGHT = 'Upright'
+
+    # Italic design, slanted clockwise from the vertical
+    ITALIC = 'Italic'
+
+    # Obliqued upright design, slanted clockwise from the vertical
+    OBLIQUE = 'Oblique'
+
+    # Italic design, slanted counterclockwise from the vertical
+    REVERSE_ITALIC = 'Reverse Italic'
+
+    # Obliqued upright design, slanted counterclockwise from the vertical
+    REVERSE_OBLIQUE = 'Reverse Oblique'
+
+    # Other
+    OTHER = 'Other'
 
 
 class MetaInfo:
@@ -98,10 +72,10 @@ class MetaInfo:
     created_time: datetime | None
     modified_time: datetime | None
     family_name: str | None
-    weight_name: WeightName | None
+    weight: Weight
     serif_style: SerifStyle | None
-    slant_style: SlantStyle | None
-    width_style: WidthStyle | None
+    spacing: Spacing | None
+    slant: Slant | None
     manufacturer: str | None
     designer: str | None
     description: str | None
@@ -118,10 +92,10 @@ class MetaInfo:
             created_time: datetime | None = None,
             modified_time: datetime | None = None,
             family_name: str | None = None,
-            weight_name: WeightName | None = None,
+            weight: Weight = Weight.REGULAR,
             serif_style: SerifStyle | None = None,
-            slant_style: SlantStyle | None = None,
-            width_style: WidthStyle | None = None,
+            spacing: Spacing | None = None,
+            slant: Slant | None = None,
             manufacturer: str | None = None,
             designer: str | None = None,
             description: str | None = None,
@@ -136,10 +110,10 @@ class MetaInfo:
         self.created_time = created_time
         self.modified_time = modified_time
         self.family_name = family_name
-        self.weight_name = weight_name
+        self.weight = weight
         self.serif_style = serif_style
-        self.slant_style = slant_style
-        self.width_style = width_style
+        self.spacing = spacing
+        self.slant = slant
         self.manufacturer = manufacturer
         self.designer = designer
         self.description = description
@@ -163,10 +137,10 @@ class MetaInfo:
                 self.created_time == other.created_time and
                 self.modified_time == other.modified_time and
                 self.family_name == other.family_name and
-                self.weight_name == other.weight_name and
+                self.weight == other.weight and
                 self.serif_style == other.serif_style and
-                self.slant_style == other.slant_style and
-                self.width_style == other.width_style and
+                self.spacing == other.spacing and
+                self.slant == other.slant and
                 self.manufacturer == other.manufacturer and
                 self.designer == other.designer and
                 self.description == other.description and
@@ -183,10 +157,10 @@ class MetaInfo:
             self.created_time,
             self.modified_time,
             self.family_name,
-            self.weight_name,
+            self.weight,
             self.serif_style,
-            self.slant_style,
-            self.width_style,
+            self.spacing,
+            self.slant,
             self.manufacturer,
             self.designer,
             self.description,

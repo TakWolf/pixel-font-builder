@@ -2,7 +2,7 @@ import shutil
 from datetime import datetime
 
 from examples import BUILD_DIR
-from pixel_font_builder import FontBuilder, WeightName, SerifStyle, SlantStyle, WidthStyle, Glyph, MonoRaster, ColorRaster, opentype
+from pixel_font_builder import FontBuilder, Weight, SerifStyle, Spacing, Slant, Glyph, MonoRaster, ColorRaster, opentype
 
 
 def main() -> None:
@@ -28,10 +28,10 @@ def main() -> None:
     builder.meta_info.created_time = datetime.fromisoformat('2024-01-01T00:00:00Z')
     builder.meta_info.modified_time = builder.meta_info.created_time
     builder.meta_info.family_name = 'My Font'
-    builder.meta_info.weight_name = WeightName.REGULAR
+    builder.meta_info.weight = Weight.REGULAR
     builder.meta_info.serif_style = SerifStyle.SANS_SERIF
-    builder.meta_info.slant_style = SlantStyle.NORMAL
-    builder.meta_info.width_style = WidthStyle.MONOSPACED
+    builder.meta_info.spacing = Spacing.MONOSPACED
+    builder.meta_info.slant = Slant.UPRIGHT
     builder.meta_info.manufacturer = 'TakWolf'
     builder.meta_info.designer = 'TakWolf'
     builder.meta_info.description = 'A pixel font'
