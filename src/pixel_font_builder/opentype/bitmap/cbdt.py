@@ -10,28 +10,6 @@ from pixel_font_builder.utils.png import encode_png_rgba
 
 ColorBitmapFormat = cbdt_bitmap_format_17 | cbdt_bitmap_format_18
 
-_GLYPH_METRICS_UNSIGNED_FIELDS = {
-    'height',
-    'width',
-    'horiAdvance',
-    'vertAdvance',
-    'Advance',
-}
-
-_GLYPH_METRICS_SIGNED_FIELDS = {
-    'horiBearingX',
-    'horiBearingY',
-    'vertBearingX',
-    'vertBearingY',
-    'BearingX',
-    'BearingY',
-}
-
-
-def _check_integer(value: int, minimum: int, maximum: int, field: str) -> None:
-    if not isinstance(value, int) or not minimum <= value <= maximum:
-        raise ValueError(f'CBDT {field} must be an integer in [{minimum}, {maximum}], got {value!r}')
-
 
 def create_color_bitmap_strike_data(
         font_metric: FontMetric,
@@ -47,8 +25,6 @@ def create_color_bitmap_strike_data(
     if not glyph_order:
         return None
 
-    _check_integer(font_metric.font_size, 1, 255, 'pixels per em')
-
     name_to_color_glyph = {
         glyph_name: RasterGlyph.create_color(
             name_to_glyph[glyph_name],
@@ -59,15 +35,6 @@ def create_color_bitmap_strike_data(
 
     strike = Strike()
     strike.bitmapSizeTable = create_bitmap_size_table(font_metric, name_to_color_glyph, has_vertical_metrics, 32)
-
-    for field, value in vars(strike.bitmapSizeTable.hori).items():
-        minimum, maximum = (0, 255) if field == 'widthMax' else (-128, 127)
-        _check_integer(value, minimum, maximum, f'horizontal sbit line metric {field}')
-
-    if has_vertical_metrics:
-        for field, value in vars(strike.bitmapSizeTable.vert).items():
-            minimum, maximum = (0, 255) if field == 'widthMax' else (-128, 127)
-            _check_integer(value, minimum, maximum, f'vertical sbit line metric {field}')
 
     index_sub_table = eblc_index_sub_table_1(None, None)
     index_sub_table.indexFormat = 1
@@ -86,13 +53,6 @@ def create_color_bitmap_strike_data(
         else:
             bitmap_glyph = cbdt_bitmap_format_17(None, None)
             bitmap_glyph.metrics = create_small_glyph_metrics(glyph)
-
-        for field, value in vars(bitmap_glyph.metrics).items():
-            if field in _GLYPH_METRICS_UNSIGNED_FIELDS:
-                _check_integer(value, 0, 255, f'{field} for glyph {glyph_name!r}')
-
-            if field in _GLYPH_METRICS_SIGNED_FIELDS:
-                _check_integer(value, -128, 127, f'{field} for glyph {glyph_name!r}')
 
         bitmap_glyph.imageData = encode_png_rgba(glyph.raster.width, glyph.raster.height, glyph.raster.bitmap)
         strike_data[glyph_name] = bitmap_glyph

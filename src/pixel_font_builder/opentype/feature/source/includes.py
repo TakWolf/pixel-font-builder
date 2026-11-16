@@ -51,7 +51,7 @@ class FeatureIncludes(FeatureSource):
         for path in paths:
             path_text = fspath(path)
             if ')' in path_text or '\r' in path_text or '\n' in path_text:
-                raise ValueError(f'invalid feature include path: {path_text!r}')
+                raise ValueError(f'feature include path must not contain a closing parenthesis or a line break, got {path_text!r}')
 
         text = '\n'.join(f'include({fspath(path)});' for path in paths)
 

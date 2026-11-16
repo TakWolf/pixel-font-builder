@@ -20,7 +20,7 @@ class LineMetric:
 
     def __mul__(self, other: Any) -> LineMetric:
         if not isinstance(other, int):
-            raise TypeError(f"can't multiply 'LineMetric' by non-int of type '{type(other).__name__}'")
+            raise TypeError(f'LineMetric multiplier must be an integer, got {other!r}')
         return LineMetric(
             self.ascent * other,
             self.descent * other,
@@ -90,7 +90,7 @@ class FontMetric:
 
     def __mul__(self, other: Any) -> FontMetric:
         if not isinstance(other, int):
-            raise TypeError(f"can't multiply 'FontMetric' by non-int of type '{type(other).__name__}'")
+            raise TypeError(f'FontMetric multiplier must be an integer, got {other!r}')
         return FontMetric(
             self.font_size * other,
             self.horizontal_layout * other,

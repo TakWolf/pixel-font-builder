@@ -99,7 +99,7 @@ def test_parse_absolute_path_ignores_include_directory(tmp_path: Path) -> None:
     ],
 )
 def test_parse_rejects_unrepresentable_include_path(invalid_path: str) -> None:
-    with pytest.raises(ValueError, match=re.escape('invalid feature include path')):
+    with pytest.raises(ValueError, match=re.escape('feature include path must not contain')):
         parse_feature_inputs(
             FeatureIncludes([invalid_path]).create_inputs(),
             ['a', 'b'],

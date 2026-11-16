@@ -4,19 +4,13 @@ from pixel_font_builder.glyph import Glyph, MonoRaster, ColorRaster
 from pixel_font_builder.utils.color import ColorRgba
 
 
-def _iter_color_layers(glyph_name: str, raster: ColorRaster) -> Iterator[tuple[ColorRgba, MonoRaster]]:
+def _iter_color_layers(raster: ColorRaster) -> Iterator[tuple[ColorRgba, MonoRaster]]:
     positions = dict[ColorRgba, list[tuple[int, int]]]()
 
     for y, bitmap_row in enumerate(raster.bitmap):
-        if len(bitmap_row) != raster.width:
-            raise ValueError(f'color bitmap for glyph {glyph_name!r} must be rectangular: row {y} has {len(bitmap_row)} pixels, expected {raster.width}')
-
         for x, pixel in enumerate(bitmap_row):
-            if not isinstance(pixel, (tuple, list)) or len(pixel) != 4 or any(not isinstance(channel, int) or not 0 <= channel <= 255 for channel in pixel):
-                raise ValueError(f'invalid RGBA pixel for glyph {glyph_name!r} at ({x}, {y}): expected four integers in [0, 255]')
-
             if pixel[3] != 0:
-                positions.setdefault(tuple(pixel), []).append((x, y))
+                positions.setdefault(pixel, []).append((x, y))
 
     if not positions:
         # An explicit transparent layer prevents fallback to the base outline.
@@ -59,14 +53,14 @@ def create_color_outline_glyphs(
             continue
 
         layers = []
-        for color, raster in _iter_color_layers(glyph_name, glyph.color_raster):
+        for color, raster in _iter_color_layers(glyph.color_raster):
             if len(glyph_order) + len(layer_glyphs) >= 65535:
-                raise ValueError(f'COLR glyph count exceeds 65535 while adding layers for glyph {glyph_name!r}')
+                raise ValueError(f'COLR glyph count must be at most 65535, got {len(glyph_order) + len(layer_glyphs) + 1} while adding glyph {glyph_name!r}')
 
             if color not in palette_indices:
                 # 0xFFFF is reserved for the foreground color, not a CPAL entry.
                 if len(palette) >= 65535:
-                    raise ValueError(f'COLR palette exceeds 65535 colors for glyph {glyph_name!r}')
+                    raise ValueError(f'COLR palette size must be at most 65535, got {len(palette) + 1} while adding glyph {glyph_name!r}')
 
                 palette_indices[color] = len(palette)
                 palette.append(tuple(channel / 255 for channel in color))

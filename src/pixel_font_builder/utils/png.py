@@ -32,8 +32,8 @@ def encode_png_rgba(width: int, height: int, bitmap: list[list[ColorRgba]]) -> b
         rows.append(0)
 
         for x, pixel in enumerate(row):
-            if not isinstance(pixel, (tuple, list)) or len(pixel) != 4 or any(not isinstance(channel, int) or not 0 <= channel <= 255 for channel in pixel):
-                raise ValueError(f'invalid RGBA pixel at ({x}, {y}): expected four integers in [0, 255]')
+            if any(not 0 <= channel <= 255 for channel in pixel):
+                raise ValueError(f'RGBA pixel at ({x}, {y}) must have channels in [0, 255], got {pixel!r}')
             rows.extend(pixel)
 
     header = struct.pack('>IIBBBBB', width, height, 8, 6, 0, 0, 0)

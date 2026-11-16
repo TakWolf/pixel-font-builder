@@ -80,17 +80,17 @@ class FontBuilder:
 
         for code_point, glyph_name in self.character_mapping.items():
             if code_point < 0:
-                raise RuntimeError('code point must >= 0')
+                raise RuntimeError(f'code point must be greater than or equal to 0, got {code_point!r}')
 
             if glyph_name not in name_to_glyph:
-                raise RuntimeError(f'missing glyph in character mapping: {glyph_name!r}')
+                raise RuntimeError(f'missing glyph in character mapping for code point {code_point!r}: {glyph_name!r}')
 
         for (left_glyph_name, right_glyph_name), _ in self.kerning_values.items():
             if left_glyph_name not in name_to_glyph:
-                raise RuntimeError(f'missing glyph in kerning pairs: {left_glyph_name!r}')
+                raise RuntimeError(f'missing left glyph in kerning pair {(left_glyph_name, right_glyph_name)!r}: {left_glyph_name!r}')
 
             if right_glyph_name not in name_to_glyph:
-                raise RuntimeError(f'missing glyph in kerning pairs: {right_glyph_name!r}')
+                raise RuntimeError(f'missing right glyph in kerning pair {(left_glyph_name, right_glyph_name)!r}: {right_glyph_name!r}')
 
         if no_color_mode:
             glyph_order = [
