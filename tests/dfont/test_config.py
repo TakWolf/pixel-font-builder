@@ -5,7 +5,8 @@ from pixel_font_builder.dfont import Config
 
 def test_copy() -> None:
     config_1 = Config(
-        is_monospaced=True,
+        resource_id=1000,
+        is_fixed_width=True,
     )
     config_2 = copy(config_1)
     config_3 = deepcopy(config_1)
@@ -18,9 +19,11 @@ def test_copy() -> None:
 
 def test_eq() -> None:
     config_1 = Config(
-        is_monospaced=True,
+        resource_id=1000,
+        is_fixed_width=True,
     )
     config_2 = Config(
-        is_monospaced=True,
+        resource_id=1000,
+        is_fixed_width=True,
     )
     assert config_1 == config_2

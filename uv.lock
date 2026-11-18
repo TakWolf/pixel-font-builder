@@ -235,6 +235,15 @@ wheels = [
 ]
 
 [[package]]
+name = "dfont"
+version = "0.0.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b5/94/728fd2934449be7ce72fb1c4910a65cebe7bf3dd608d50bc7ce441951e83/dfont-0.0.1.tar.gz", hash = "sha256:1a87812778b73fc71b9edcb52cd5625418d60750ebc9800158b5e273b4fc71ed", size = 17648, upload-time = "2026-11-18T13:36:03.709Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/68/a8/21a5b88f0c9a8372f73663631e3390fa23fd145c99d195845da1c692b013/dfont-0.0.1-py3-none-any.whl", hash = "sha256:4549010914a6c84b8ba53a23a0913c5470b4d4d4ff45f91d2187d053fdff4ba4", size = 24459, upload-time = "2026-11-18T13:36:02.655Z" },
+]
+
+[[package]]
 name = "fonttools"
 version = "4.68.0"
 source = { registry = "https://pypi.org/simple" }
@@ -346,6 +355,7 @@ version = "0.0.63"
 source = { editable = "." }
 dependencies = [
     { name = "bdffont" },
+    { name = "dfont" },
     { name = "fonttools", extra = ["woff"] },
     { name = "pcffont" },
 ]
@@ -358,6 +368,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "bdffont", specifier = ">=0.0.41" },
+    { name = "dfont", specifier = ">=0.0.1" },
     { name = "fonttools", extras = ["woff"], specifier = ">=4.68.0" },
     { name = "pcffont", specifier = ">=0.0.34" },
 ]

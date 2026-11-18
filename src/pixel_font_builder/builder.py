@@ -4,10 +4,11 @@ from collections import UserList
 from os import PathLike
 from typing import Any, Mapping
 
-import bdffont
 import fontTools.fontBuilder
 import fontTools.ttLib
-import pcffont
+from bdffont import BdfFont
+from dfont import DFont
+from pcffont import PcfFontBuilder
 
 from pixel_font_builder import opentype, dfont, bdf, pcf
 from pixel_font_builder.glyph import Glyph
@@ -232,19 +233,19 @@ class FontBuilder:
     def save_otb(self, file_path: str | PathLike[str]) -> None:
         self.to_otb_builder().save(file_path)
 
-    def to_dfont_builder(self) -> dfont.DFontBuilder:
+    def to_dfont_builder(self) -> DFont:
         return dfont.create_font_builder(self)
 
     def save_dfont(self, file_path: str | PathLike[str]) -> None:
         self.to_dfont_builder().save(file_path)
 
-    def to_bdf_builder(self) -> bdffont.BdfFont:
+    def to_bdf_builder(self) -> BdfFont:
         return bdf.create_font_builder(self)
 
     def save_bdf(self, file_path: str | PathLike[str]) -> None:
         self.to_bdf_builder().save(file_path)
 
-    def to_pcf_builder(self) -> pcffont.PcfFontBuilder:
+    def to_pcf_builder(self) -> PcfFontBuilder:
         return pcf.create_font_builder(self)
 
     def save_pcf(self, file_path: str | PathLike[str]) -> None:

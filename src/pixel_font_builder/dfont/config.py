@@ -4,13 +4,16 @@ from typing import Any
 
 
 class Config:
-    is_monospaced: bool
+    resource_id: int
+    is_fixed_width: bool
 
     def __init__(
             self,
-            is_monospaced: bool = False,
+            resource_id: int = 128,
+            is_fixed_width: bool = False,
     ) -> None:
-        self.is_monospaced = is_monospaced
+        self.resource_id = resource_id
+        self.is_fixed_width = is_fixed_width
 
     def __copy__(self) -> Config:
         return self.copy()
@@ -21,11 +24,13 @@ class Config:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Config):
             return NotImplemented
-        return self.is_monospaced == other.is_monospaced
+        return (self.resource_id == other.resource_id and
+                self.is_fixed_width == other.is_fixed_width)
 
     def copy(self) -> Config:
         return Config(
-            self.is_monospaced,
+            self.resource_id,
+            self.is_fixed_width,
         )
 
     def deepcopy(self) -> Config:
