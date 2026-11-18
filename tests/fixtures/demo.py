@@ -5,25 +5,33 @@ from datetime import datetime
 from pathlib import Path
 
 import pytest
+from png import PngImage
 
 from pixel_font_builder import FontBuilder, FontCollectionBuilder, Weight, SerifStyle, Spacing, Slant, Glyph, MonoRaster, ColorRaster, ColorRgba
-from tests.fixtures.png import read_png
 
 
 def _load_color_bitmap(file_path: Path) -> tuple[int, int, list[list[ColorRgba]]]:
-    return read_png(file_path.read_bytes())
+    image = PngImage.load(file_path).to_rgba(bit_depth=8)
+    bitmap = [
+        [
+            (row[x], row[x + 1], row[x + 2], row[x + 3])
+            for x in range(0, len(row), 4)
+        ]
+        for row in image.bitmap
+    ]
+    return image.header.width, image.header.height, bitmap
 
 
 def _load_mono_bitmap(file_path: Path) -> tuple[int, int, list[list[int]]]:
-    width, height, color_bitmap = _load_color_bitmap(file_path)
-    mono_bitmap = [
+    image = PngImage.load(file_path).to_rgba(bit_depth=8)
+    bitmap = [
         [
-            int(pixel[3] >= 128)
-            for pixel in row
+            1 if row[x + 3] >= 128 else 0
+            for x in range(0, len(row), 4)
         ]
-        for row in color_bitmap
+        for row in image.bitmap
     ]
-    return width, height, mono_bitmap
+    return image.header.width, image.header.height, bitmap
 
 
 def _collect_glyphs(
