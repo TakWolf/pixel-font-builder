@@ -5,16 +5,18 @@ from datetime import datetime
 from pathlib import Path
 
 import pytest
-from png import PngImage
+from png import PngImage, PngColorType
 
 from pixel_font_builder import FontBuilder, FontCollectionBuilder, Weight, SerifStyle, Spacing, Slant, Glyph, MonoRaster, ColorRaster, ColorRgba
 
 
-def _load_color_bitmap(file_path: Path) -> tuple[int, int, list[list[ColorRgba]]]:
-    image = PngImage.load(file_path).to_rgba(bit_depth=8)
+def _load_mono_bitmap(file_path: Path) -> tuple[int, int, list[list[int]]]:
+    image = PngImage.load(file_path)
+    if image.header.color_type != PngColorType.TRUECOLOR_ALPHA or image.header.bit_depth != 8:
+        image = image.to_rgba(bit_depth=8)
     bitmap = [
         [
-            (row[x], row[x + 1], row[x + 2], row[x + 3])
+            1 if row[x + 3] >= 128 else 0
             for x in range(0, len(row), 4)
         ]
         for row in image.bitmap
@@ -22,11 +24,13 @@ def _load_color_bitmap(file_path: Path) -> tuple[int, int, list[list[ColorRgba]]
     return image.header.width, image.header.height, bitmap
 
 
-def _load_mono_bitmap(file_path: Path) -> tuple[int, int, list[list[int]]]:
-    image = PngImage.load(file_path).to_rgba(bit_depth=8)
+def _load_color_bitmap(file_path: Path) -> tuple[int, int, list[list[ColorRgba]]]:
+    image = PngImage.load(file_path)
+    if image.header.color_type != PngColorType.TRUECOLOR_ALPHA or image.header.bit_depth != 8:
+        image = image.to_rgba(bit_depth=8)
     bitmap = [
         [
-            1 if row[x + 3] >= 128 else 0
+            (row[x], row[x + 1], row[x + 2], row[x + 3])
             for x in range(0, len(row), 4)
         ]
         for row in image.bitmap
