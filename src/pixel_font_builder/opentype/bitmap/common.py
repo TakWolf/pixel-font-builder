@@ -5,8 +5,9 @@ from typing import Generic, TypeVar
 
 from fontTools.ttLib.tables.BitmapGlyphMetrics import BigGlyphMetrics, SmallGlyphMetrics
 from fontTools.ttLib.tables.E_B_L_C_ import SbitLineMetrics, BitmapSizeTable
+from png import PngImage, PngHeader, PngSrgb, PngFilterType
 
-from pixel_font_builder.glyph import Glyph, MonoRaster, ColorRaster
+from pixel_font_builder.glyph import Glyph, MonoRaster, ColorRaster, ColorRgba
 from pixel_font_builder.metric import FontMetric, LineMetric
 
 RasterT = TypeVar('RasterT', MonoRaster, ColorRaster)
@@ -184,3 +185,21 @@ def create_small_glyph_metrics(glyph: RasterGlyph) -> SmallGlyphMetrics:
     metrics.BearingY = glyph.raster.height + glyph.raster.horizontal_offset_y
     metrics.Advance = glyph.advance_width
     return metrics
+
+
+def encode_png_rgba(width: int, height: int, bitmap: list[list[ColorRgba]]) -> bytes:
+    rows = []
+    for y, row in enumerate(bitmap):
+        samples = []
+        for x, pixel in enumerate(row):
+            if len(pixel) != 4:
+                raise ValueError(f'RGBA pixel at ({x}, {y}) must have 4 channels, got {pixel!r}')
+            samples.extend(pixel)
+        rows.append(samples)
+
+    image = PngImage(
+        header=PngHeader((width, height)),
+        bitmap=rows,
+        metadata=[PngSrgb()],
+    )
+    return image.dump_to_bytes(filter_type=PngFilterType.NONE)

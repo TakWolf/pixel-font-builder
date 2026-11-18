@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Generic, TypeVar, Self, cast
 
-from pixel_font_builder.utils.color import ColorRgba
-
+ColorRgba = tuple[int, int, int, int]
 PixelT = TypeVar('PixelT', int, ColorRgba)
 
 

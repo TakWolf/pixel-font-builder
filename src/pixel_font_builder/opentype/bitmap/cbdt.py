@@ -5,8 +5,7 @@ from fontTools.ttLib.tables.E_B_L_C_ import Strike, eblc_index_sub_table_1
 
 from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.metric import FontMetric
-from pixel_font_builder.opentype.bitmap.common import RasterGlyph, create_bitmap_size_table, create_big_glyph_metrics, create_small_glyph_metrics
-from pixel_font_builder.utils.png import encode_png_rgba
+from pixel_font_builder.opentype.bitmap.common import RasterGlyph, create_bitmap_size_table, create_big_glyph_metrics, create_small_glyph_metrics, encode_png_rgba
 
 ColorBitmapFormat = cbdt_bitmap_format_17 | cbdt_bitmap_format_18
 

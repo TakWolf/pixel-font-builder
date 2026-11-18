@@ -6,9 +6,8 @@ from fontTools.ttLib.tables.sbixStrike import Strike
 
 from pixel_font_builder.glyph import Glyph, ColorRaster
 from pixel_font_builder.metric import FontMetric
-from pixel_font_builder.opentype.bitmap.common import RasterGlyph
+from pixel_font_builder.opentype.bitmap.common import RasterGlyph, encode_png_rgba
 from pixel_font_builder.opentype.outline.pen.pen import OutlinePen
-from pixel_font_builder.utils.png import encode_png_rgba
 
 
 def _check_integer(value: int, minimum: int, maximum: int, field: str) -> None:

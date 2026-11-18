@@ -1,7 +1,6 @@
 from collections.abc import Mapping, Sequence, Iterator
 
-from pixel_font_builder.glyph import Glyph, MonoRaster, ColorRaster
-from pixel_font_builder.utils.color import ColorRgba
+from pixel_font_builder.glyph import Glyph, MonoRaster, ColorRaster, ColorRgba
 
 
 def _iter_color_layers(raster: ColorRaster) -> Iterator[tuple[ColorRgba, MonoRaster]]:
