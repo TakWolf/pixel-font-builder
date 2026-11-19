@@ -1,4 +1,17 @@
-from pixel_font_builder.meta import MetaInfo
+from pixel_font_builder.meta import MetaInfo, Weight, Slant
+
+
+def _get_style_name(weight: Weight, slant: Slant) -> str:
+    if weight == Weight.REGULAR:
+        if slant == Slant.UPRIGHT:
+            style_name = Weight.REGULAR.display_name
+        else:
+            style_name = slant.value
+    else:
+        style_name = weight.display_name
+        if slant != Slant.UPRIGHT:
+            style_name = f'{style_name} {slant.value}'
+    return style_name
 
 
 def create_name_strings(meta_info: MetaInfo) -> dict[str, str]:
@@ -33,16 +46,16 @@ def create_name_strings(meta_info: MetaInfo) -> dict[str, str]:
     if meta_info.family_name is None:
         raise RuntimeError('family_name must not be None')
 
-    unique_name = meta_info.family_name.replace(' ', '-')
-    style_name = meta_info.weight.display_name
+    style_name = _get_style_name(meta_info.weight, meta_info.slant or Slant.UPRIGHT)
+    unique_name = f'{meta_info.family_name} {style_name}'.replace(' ', '-')
 
     name_strings = {
         'familyName': meta_info.family_name,
         'styleName': style_name,
-        'uniqueFontIdentifier': f'{unique_name}-{style_name};{meta_info.version}',
+        'uniqueFontIdentifier': f'{unique_name};{meta_info.version}',
         'fullName': f'{meta_info.family_name} {style_name}',
         'version': meta_info.version,
-        'psName': f'{unique_name}-{style_name}',
+        'psName': unique_name,
     }
     if meta_info.copyright_info is not None:
         name_strings['copyright'] = meta_info.copyright_info
