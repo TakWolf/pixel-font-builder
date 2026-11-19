@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import copy, deepcopy
 from typing import Any
 
 
@@ -16,10 +17,13 @@ class Config:
         self.is_fixed_width = is_fixed_width
 
     def __copy__(self) -> Config:
-        return self.copy()
+        return Config(
+            self.resource_id,
+            self.is_fixed_width,
+        )
 
     def __deepcopy__(self, memo: dict[int, Any]) -> Config:
-        return self.deepcopy()
+        return copy(self)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Config):
@@ -28,10 +32,7 @@ class Config:
                 self.is_fixed_width == other.is_fixed_width)
 
     def copy(self) -> Config:
-        return Config(
-            self.resource_id,
-            self.is_fixed_width,
-        )
+        return copy(self)
 
     def deepcopy(self) -> Config:
-        return self.copy()
+        return deepcopy(self)

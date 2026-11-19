@@ -1,7 +1,7 @@
-from __future__ import annotations
-
 from collections.abc import Iterable
+from copy import copy
 from os import PathLike
+from typing import Any, Self, cast
 
 from pixel_font_builder.opentype.feature.source.input import FeatureInput, FeatureTextInput
 from pixel_font_builder.opentype.feature.source.source import FeatureSource
@@ -31,6 +31,16 @@ class FeatureText(FeatureSource):
         self.filename = filename
         self.include_dir = include_dir
 
+    def __copy__(self) -> Self:
+        return cast(type[Self], type(self))(
+            self.text,
+            self.filename,
+            self.include_dir,
+        )
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> Self:
+        return copy(self)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, FeatureText):
             return NotImplemented
@@ -44,13 +54,3 @@ class FeatureText(FeatureSource):
             self.filename,
             self.include_dir,
         )
-
-    def copy(self) -> FeatureText:
-        return FeatureText(
-            self.text,
-            self.filename,
-            self.include_dir,
-        )
-
-    def deepcopy(self) -> FeatureText:
-        return self.copy()

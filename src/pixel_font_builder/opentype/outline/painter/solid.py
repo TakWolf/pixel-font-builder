@@ -1,4 +1,5 @@
-from __future__ import annotations
+from copy import copy
+from typing import Any, Self
 
 from pixel_font_builder.glyph import MonoRaster
 from pixel_font_builder.opentype.outline.painter.painter import OutlinePainter
@@ -78,6 +79,12 @@ class SolidOutlinePainter(OutlinePainter):
             outlines.append(outline)
         return outlines
 
+    def __copy__(self) -> Self:
+        return self
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> Self:
+        return copy(self)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, SolidOutlinePainter):
             return NotImplemented
@@ -95,9 +102,3 @@ class SolidOutlinePainter(OutlinePainter):
                 else:
                     pen.line_to((x, y))
             pen.close_path()
-
-    def copy(self) -> SolidOutlinePainter:
-        return self
-
-    def deepcopy(self) -> SolidOutlinePainter:
-        return self.copy()

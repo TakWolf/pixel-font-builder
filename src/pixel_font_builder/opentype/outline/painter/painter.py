@@ -1,7 +1,6 @@
-from __future__ import annotations
-
 from abc import abstractmethod
-from typing import Any, Protocol, runtime_checkable
+from copy import copy, deepcopy
+from typing import Any, Protocol, Self, runtime_checkable
 
 from pixel_font_builder.glyph import MonoRaster
 from pixel_font_builder.opentype.outline.pen.pen import OutlinePen
@@ -9,11 +8,13 @@ from pixel_font_builder.opentype.outline.pen.pen import OutlinePen
 
 @runtime_checkable
 class OutlinePainter(Protocol):
-    def __copy__(self) -> OutlinePainter:
-        return self.copy()
+    @abstractmethod
+    def __copy__(self) -> Self:
+        raise NotImplementedError()
 
-    def __deepcopy__(self, memo: dict[int, Any]) -> OutlinePainter:
-        return self.deepcopy()
+    @abstractmethod
+    def __deepcopy__(self, memo: dict[int, Any]) -> Self:
+        raise NotImplementedError()
 
     @abstractmethod
     def __eq__(self, other: object) -> bool:
@@ -23,10 +24,8 @@ class OutlinePainter(Protocol):
     def draw_outlines(self, raster: MonoRaster, pen: OutlinePen, px_to_units: int) -> None:
         raise NotImplementedError()
 
-    @abstractmethod
-    def copy(self) -> OutlinePainter:
-        raise NotImplementedError()
+    def copy(self) -> Self:
+        return copy(self)
 
-    @abstractmethod
-    def deepcopy(self) -> OutlinePainter:
-        raise NotImplementedError()
+    def deepcopy(self) -> Self:
+        return deepcopy(self)

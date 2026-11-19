@@ -1,6 +1,5 @@
-from __future__ import annotations
-
 from collections.abc import Iterable
+from typing import Any, Self, cast
 
 from pixel_font_builder.opentype.feature.source.input import FeatureInput
 from pixel_font_builder.opentype.feature.source.source import FeatureSource
@@ -19,6 +18,12 @@ class FeatureProgram(FeatureSource):
     def __init__(self, sources: list[FeatureSource]) -> None:
         self.sources = sources
 
+    def __copy__(self) -> Self:
+        return cast(type[Self], type(self))(self.sources)
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> Self:
+        return cast(type[Self], type(self))([source.deepcopy() for source in self.sources])
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, FeatureProgram):
             return NotImplemented
@@ -27,9 +32,3 @@ class FeatureProgram(FeatureSource):
     def create_inputs(self) -> Iterable[FeatureInput]:
         for feature_source in self.sources:
             yield from feature_source.create_inputs()
-
-    def copy(self) -> FeatureProgram:
-        return FeatureProgram(self.sources)
-
-    def deepcopy(self) -> FeatureProgram:
-        return FeatureProgram([source.deepcopy() for source in self.sources])

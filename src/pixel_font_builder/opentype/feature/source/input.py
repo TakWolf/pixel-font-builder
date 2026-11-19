@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import copy, deepcopy
 from os import PathLike
 from typing import Any
 
@@ -28,10 +29,14 @@ class FeatureTextInput:
         self.include_dir = include_dir
 
     def __copy__(self) -> FeatureTextInput:
-        return self.copy()
+        return FeatureTextInput(
+            self.text,
+            self.filename,
+            self.include_dir,
+        )
 
     def __deepcopy__(self, memo: dict[int, Any]) -> FeatureTextInput:
-        return self.deepcopy()
+        return copy(self)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, FeatureTextInput):
@@ -41,14 +46,10 @@ class FeatureTextInput:
                 self.include_dir == other.include_dir)
 
     def copy(self) -> FeatureTextInput:
-        return FeatureTextInput(
-            self.text,
-            self.filename,
-            self.include_dir,
-        )
+        return copy(self)
 
     def deepcopy(self) -> FeatureTextInput:
-        return self.copy()
+        return deepcopy(self)
 
 
 class FeatureFileInput:
@@ -71,10 +72,13 @@ class FeatureFileInput:
         self.include_dir = include_dir
 
     def __copy__(self) -> FeatureFileInput:
-        return self.copy()
+        return FeatureFileInput(
+            self.path,
+            self.include_dir,
+        )
 
     def __deepcopy__(self, memo: dict[int, Any]) -> FeatureFileInput:
-        return self.deepcopy()
+        return copy(self)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, FeatureFileInput):
@@ -83,13 +87,10 @@ class FeatureFileInput:
                 self.include_dir == other.include_dir)
 
     def copy(self) -> FeatureFileInput:
-        return FeatureFileInput(
-            self.path,
-            self.include_dir,
-        )
+        return copy(self)
 
     def deepcopy(self) -> FeatureFileInput:
-        return self.copy()
+        return deepcopy(self)
 
 
 FeatureInput = FeatureTextInput | FeatureFileInput

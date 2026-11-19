@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import copy, deepcopy
 from typing import Any
 
 
@@ -19,10 +20,14 @@ class Config:
         self.only_basic_plane = only_basic_plane
 
     def __copy__(self) -> Config:
-        return self.copy()
+        return Config(
+            self.resolution_x,
+            self.resolution_y,
+            self.only_basic_plane,
+        )
 
     def __deepcopy__(self, memo: dict[int, Any]) -> Config:
-        return self.deepcopy()
+        return copy(self)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Config):
@@ -32,11 +37,7 @@ class Config:
                 self.only_basic_plane == other.only_basic_plane)
 
     def copy(self) -> Config:
-        return Config(
-            self.resolution_x,
-            self.resolution_y,
-            self.only_basic_plane,
-        )
+        return copy(self)
 
     def deepcopy(self) -> Config:
-        return self.copy()
+        return deepcopy(self)

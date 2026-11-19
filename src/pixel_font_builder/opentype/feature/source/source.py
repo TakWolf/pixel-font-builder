@@ -1,8 +1,7 @@
-from __future__ import annotations
-
 from abc import abstractmethod
 from collections.abc import Iterable
-from typing import Any, Protocol, runtime_checkable
+from copy import copy, deepcopy
+from typing import Any, Protocol, Self, runtime_checkable
 
 from pixel_font_builder.opentype.feature.source.input import FeatureInput
 
@@ -16,11 +15,13 @@ class FeatureSource(Protocol):
     independently defines how its relative ``include()`` paths are resolved.
     """
 
-    def __copy__(self) -> FeatureSource:
-        return self.copy()
+    @abstractmethod
+    def __copy__(self) -> Self:
+        raise NotImplementedError()
 
-    def __deepcopy__(self, memo: dict[int, Any]) -> FeatureSource:
-        return self.deepcopy()
+    @abstractmethod
+    def __deepcopy__(self, memo: dict[int, Any]) -> Self:
+        raise NotImplementedError()
 
     @abstractmethod
     def __eq__(self, other: object) -> bool:
@@ -35,10 +36,8 @@ class FeatureSource(Protocol):
         """
         raise NotImplementedError()
 
-    @abstractmethod
-    def copy(self) -> FeatureSource:
-        raise NotImplementedError()
+    def copy(self) -> Self:
+        return copy(self)
 
-    @abstractmethod
-    def deepcopy(self) -> FeatureSource:
-        raise NotImplementedError()
+    def deepcopy(self) -> Self:
+        return deepcopy(self)

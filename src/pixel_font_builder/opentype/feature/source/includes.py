@@ -1,8 +1,7 @@
-from __future__ import annotations
-
 from collections.abc import Iterable
 from os import PathLike, fspath
 from pathlib import Path
+from typing import Any, Self, cast
 
 from pixel_font_builder.opentype.feature.source.input import FeatureInput, FeatureTextInput
 from pixel_font_builder.opentype.feature.source.source import FeatureSource
@@ -32,6 +31,18 @@ class FeatureIncludes(FeatureSource):
         self.paths = paths
         self.include_dir = include_dir
 
+    def __copy__(self) -> Self:
+        return cast(type[Self], type(self))(
+            self.paths,
+            self.include_dir,
+        )
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> Self:
+        return cast(type[Self], type(self))(
+            self.paths.copy(),
+            self.include_dir,
+        )
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, FeatureIncludes):
             return NotImplemented
@@ -56,15 +67,3 @@ class FeatureIncludes(FeatureSource):
         text = '\n'.join(f'include({fspath(path)});' for path in paths)
 
         yield FeatureTextInput(text, include_dir=include_dir)
-
-    def copy(self) -> FeatureIncludes:
-        return FeatureIncludes(
-            self.paths,
-            self.include_dir,
-        )
-
-    def deepcopy(self) -> FeatureIncludes:
-        return FeatureIncludes(
-            self.paths.copy(),
-            self.include_dir,
-        )

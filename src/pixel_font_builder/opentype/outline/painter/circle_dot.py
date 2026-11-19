@@ -1,6 +1,6 @@
-from __future__ import annotations
-
 import math
+from copy import copy
+from typing import Any, Self, cast
 
 from pixel_font_builder.glyph import MonoRaster
 from pixel_font_builder.opentype.outline.painter.painter import OutlinePainter
@@ -12,6 +12,12 @@ class CircleDotOutlinePainter(OutlinePainter):
 
     def __init__(self, radius: float = 0.4) -> None:
         self.radius = radius
+
+    def __copy__(self) -> Self:
+        return cast(type[Self], type(self))(self.radius)
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> Self:
+        return copy(self)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, CircleDotOutlinePainter):
@@ -32,9 +38,3 @@ class CircleDotOutlinePainter(OutlinePainter):
                     pen.cubic_curve_to((x - c, y - radius), (x - radius, y - c), (x - radius, y))
                     pen.cubic_curve_to((x - radius, y + c), (x - c, y + radius), (x, y + radius))
                     pen.close_path()
-
-    def copy(self) -> CircleDotOutlinePainter:
-        return CircleDotOutlinePainter(self.radius)
-
-    def deepcopy(self) -> CircleDotOutlinePainter:
-        return self.copy()

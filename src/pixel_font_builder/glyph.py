@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import copy, deepcopy
 from typing import Any, Generic, TypeVar, Self, cast
 
 ColorRgba = tuple[int, int, int, int]
@@ -69,10 +70,18 @@ class Raster(Generic[PixelT]):
         self.bitmap = bitmap if bitmap is not None else []
 
     def __copy__(self) -> Self:
-        return self.copy()
+        return cast(type[Self], type(self))(
+            self.horizontal_offset,
+            self.vertical_offset,
+            self.bitmap,
+        )
 
     def __deepcopy__(self, memo: dict[int, Any]) -> Self:
-        return self.deepcopy()
+        return cast(type[Self], type(self))(
+            self.horizontal_offset,
+            self.vertical_offset,
+            [bitmap_row.copy() for bitmap_row in self.bitmap],
+        )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Raster) or type(self) is not type(other):
@@ -115,18 +124,10 @@ class Raster(Generic[PixelT]):
         return self.width, self.height
 
     def copy(self) -> Self:
-        return cast(type[Self], type(self))(
-            self.horizontal_offset,
-            self.vertical_offset,
-            self.bitmap,
-        )
+        return copy(self)
 
     def deepcopy(self) -> Self:
-        return cast(type[Self], type(self))(
-            self.horizontal_offset,
-            self.vertical_offset,
-            [bitmap_row.copy() for bitmap_row in self.bitmap],
-        )
+        return deepcopy(self)
 
 
 class MonoRaster(Raster[int]):
@@ -221,10 +222,22 @@ class Glyph:
         self.color_raster = color_raster
 
     def __copy__(self) -> Glyph:
-        return self.copy()
+        return Glyph(
+            self.name,
+            self.advance_width,
+            self.advance_height,
+            self.mono_raster,
+            self.color_raster,
+        )
 
     def __deepcopy__(self, memo: dict[int, Any]) -> Glyph:
-        return self.deepcopy()
+        return Glyph(
+            self.name,
+            self.advance_width,
+            self.advance_height,
+            self.mono_raster.deepcopy() if self.mono_raster is not None else None,
+            self.color_raster.deepcopy() if self.color_raster is not None else None,
+        )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Glyph):
@@ -240,19 +253,7 @@ class Glyph:
         return self.mono_raster is None and self.color_raster is not None
 
     def copy(self) -> Glyph:
-        return Glyph(
-            self.name,
-            self.advance_width,
-            self.advance_height,
-            self.mono_raster,
-            self.color_raster,
-        )
+        return copy(self)
 
     def deepcopy(self) -> Glyph:
-        return Glyph(
-            self.name,
-            self.advance_width,
-            self.advance_height,
-            self.mono_raster.deepcopy() if self.mono_raster is not None else None,
-            self.color_raster.deepcopy() if self.color_raster is not None else None,
-        )
+        return deepcopy(self)

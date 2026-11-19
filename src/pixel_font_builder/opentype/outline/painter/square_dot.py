@@ -1,4 +1,5 @@
-from __future__ import annotations
+from copy import copy
+from typing import Any, Self, cast
 
 from pixel_font_builder.glyph import MonoRaster
 from pixel_font_builder.opentype.outline.painter.painter import OutlinePainter
@@ -10,6 +11,12 @@ class SquareDotOutlinePainter(OutlinePainter):
 
     def __init__(self, size: float = 0.8) -> None:
         self.size = size
+
+    def __copy__(self) -> Self:
+        return cast(type[Self], type(self))(self.size)
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> Self:
+        return copy(self)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, SquareDotOutlinePainter):
@@ -29,9 +36,3 @@ class SquareDotOutlinePainter(OutlinePainter):
                     pen.line_to((x + size, y - size))
                     pen.line_to((x, y - size))
                     pen.close_path()
-
-    def copy(self) -> SquareDotOutlinePainter:
-        return SquareDotOutlinePainter(self.size)
-
-    def deepcopy(self) -> SquareDotOutlinePainter:
-        return self.copy()

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import copy, deepcopy
 from typing import Any
 
 
@@ -28,10 +29,14 @@ class LineMetric:
         )
 
     def __copy__(self) -> LineMetric:
-        return self.copy()
+        return LineMetric(
+            self.ascent,
+            self.descent,
+            self.line_gap,
+        )
 
     def __deepcopy__(self, memo: dict[int, Any]) -> LineMetric:
-        return self.deepcopy()
+        return copy(self)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, LineMetric):
@@ -45,14 +50,10 @@ class LineMetric:
         return self.ascent - self.descent
 
     def copy(self) -> LineMetric:
-        return LineMetric(
-            self.ascent,
-            self.descent,
-            self.line_gap,
-        )
+        return copy(self)
 
     def deepcopy(self) -> LineMetric:
-        return self.copy()
+        return deepcopy(self)
 
 
 class FontMetric:
@@ -104,10 +105,30 @@ class FontMetric:
         )
 
     def __copy__(self) -> FontMetric:
-        return self.copy()
+        return FontMetric(
+            self.font_size,
+            self.horizontal_layout,
+            self.vertical_layout,
+            self.x_height,
+            self.cap_height,
+            self.underline_position,
+            self.underline_thickness,
+            self.strikeout_position,
+            self.strikeout_thickness,
+        )
 
     def __deepcopy__(self, memo: dict[int, Any]) -> FontMetric:
-        return self.deepcopy()
+        return FontMetric(
+            self.font_size,
+            self.horizontal_layout.deepcopy(),
+            self.vertical_layout.deepcopy(),
+            self.x_height,
+            self.cap_height,
+            self.underline_position,
+            self.underline_thickness,
+            self.strikeout_position,
+            self.strikeout_thickness,
+        )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, FontMetric):
@@ -123,27 +144,7 @@ class FontMetric:
                 self.strikeout_thickness == other.strikeout_thickness)
 
     def copy(self) -> FontMetric:
-        return FontMetric(
-            self.font_size,
-            self.horizontal_layout,
-            self.vertical_layout,
-            self.x_height,
-            self.cap_height,
-            self.underline_position,
-            self.underline_thickness,
-            self.strikeout_position,
-            self.strikeout_thickness,
-        )
+        return copy(self)
 
     def deepcopy(self) -> FontMetric:
-        return FontMetric(
-            self.font_size,
-            self.horizontal_layout.deepcopy(),
-            self.vertical_layout.deepcopy(),
-            self.x_height,
-            self.cap_height,
-            self.underline_position,
-            self.underline_thickness,
-            self.strikeout_position,
-            self.strikeout_thickness,
-        )
+        return deepcopy(self)

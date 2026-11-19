@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Set
+from copy import copy, deepcopy
 from typing import Any, Final
 
 from pixel_font_builder.opentype.enum import ColorTableFormat, UserKerningMode
@@ -31,10 +32,16 @@ class FieldOverrides:
         self.os2_x_avg_char_width = os2_x_avg_char_width
 
     def __copy__(self) -> FieldOverrides:
-        return self.copy()
+        return FieldOverrides(
+            self.head_x_min,
+            self.head_y_min,
+            self.head_x_max,
+            self.head_y_max,
+            self.os2_x_avg_char_width,
+        )
 
     def __deepcopy__(self, memo: dict[int, Any]) -> FieldOverrides:
-        return self.deepcopy()
+        return copy(self)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, FieldOverrides):
@@ -46,16 +53,10 @@ class FieldOverrides:
                 self.os2_x_avg_char_width == other.os2_x_avg_char_width)
 
     def copy(self) -> FieldOverrides:
-        return FieldOverrides(
-            self.head_x_min,
-            self.head_y_min,
-            self.head_x_max,
-            self.head_y_max,
-            self.os2_x_avg_char_width,
-        )
+        return copy(self)
 
     def deepcopy(self) -> FieldOverrides:
-        return self.copy()
+        return deepcopy(self)
 
 
 class Config:
@@ -91,10 +92,28 @@ class Config:
         self.features = features
 
     def __copy__(self) -> Config:
-        return self.copy()
+        return Config(
+            self.px_to_units,
+            self.outline_painter,
+            self.color_table_formats,
+            self.has_vertical_metrics,
+            self.is_fixed_pitch,
+            self.field_overrides,
+            self.user_kerning_mode,
+            self.features,
+        )
 
     def __deepcopy__(self, memo: dict[int, Any]) -> Config:
-        return self.deepcopy()
+        return Config(
+            self.px_to_units,
+            self.outline_painter.deepcopy(),
+            set(self.color_table_formats),
+            self.has_vertical_metrics,
+            self.is_fixed_pitch,
+            self.field_overrides.deepcopy(),
+            self.user_kerning_mode,
+            self.features.deepcopy() if self.features is not None else None,
+        )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Config):
@@ -109,25 +128,7 @@ class Config:
                 self.features == other.features)
 
     def copy(self) -> Config:
-        return Config(
-            self.px_to_units,
-            self.outline_painter,
-            self.color_table_formats,
-            self.has_vertical_metrics,
-            self.is_fixed_pitch,
-            self.field_overrides,
-            self.user_kerning_mode,
-            self.features,
-        )
+        return copy(self)
 
     def deepcopy(self) -> Config:
-        return Config(
-            self.px_to_units,
-            self.outline_painter.deepcopy(),
-            set(self.color_table_formats),
-            self.has_vertical_metrics,
-            self.is_fixed_pitch,
-            self.field_overrides.deepcopy(),
-            self.user_kerning_mode,
-            self.features.deepcopy() if self.features is not None else None,
-        )
+        return deepcopy(self)
