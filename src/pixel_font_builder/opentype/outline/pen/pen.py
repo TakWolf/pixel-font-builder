@@ -1,9 +1,11 @@
 from abc import abstractmethod
-from typing import Any, Protocol, runtime_checkable
+from typing import Protocol, TypeVar, runtime_checkable
+
+GlyphT = TypeVar('GlyphT', covariant=True)
 
 
 @runtime_checkable
-class OutlinePen(Protocol):
+class OutlinePen(Protocol[GlyphT]):
     @abstractmethod
     def move_to(self, point: tuple[float, float]) -> None:
         raise NotImplementedError()
@@ -38,5 +40,5 @@ class OutlinePen(Protocol):
         raise NotImplementedError()
 
     @abstractmethod
-    def to_glyph(self) -> Any:
+    def to_glyph(self) -> GlyphT:
         raise NotImplementedError()
