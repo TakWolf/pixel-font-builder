@@ -115,18 +115,18 @@ class Raster(Generic[PixelT]):
         return self.width, self.height
 
     def copy(self) -> Self:
-        return cast(Self, type(self)(
+        return cast(type[Self], type(self))(
             self.horizontal_offset,
             self.vertical_offset,
             self.bitmap,
-        ))
+        )
 
     def deepcopy(self) -> Self:
-        return cast(Self, type(self)(
+        return cast(type[Self], type(self))(
             self.horizontal_offset,
             self.vertical_offset,
             [bitmap_row.copy() for bitmap_row in self.bitmap],
-        ))
+        )
 
 
 class MonoRaster(Raster[int]):
