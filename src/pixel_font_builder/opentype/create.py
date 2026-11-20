@@ -44,7 +44,13 @@ def create_font_builder(
         bitmap_table_mode: BitmapTableMode = BitmapTableMode.NONE,
         flavor: Flavor | None = None,
 ) -> FontBuilder:
+    if context.font_metric.font_size <= 0:
+        raise RuntimeError(f'font_size must be greater than 0, got {context.font_metric.font_size!r}')
+
     config = context.opentype_config
+
+    if config.px_to_units <= 0:
+        raise RuntimeError(f'px_to_units must be greater than 0, got {config.px_to_units!r}')
 
     emit_outlines = outline_table_mode in (OutlineTableMode.NORMAL, OutlineTableMode.BLANK_GLYPHS)
     emit_ebdt = bitmap_table_mode != BitmapTableMode.NONE
@@ -58,9 +64,6 @@ def create_font_builder(
 
     font_metric = context.font_metric * config.px_to_units
     meta_info = context.meta_info
-
-    if font_metric.font_size <= 0:
-        raise RuntimeError(f'font_size must be greater than 0, got {font_metric.font_size!r}')
 
     glyph_order, name_to_glyph = context.prepare_glyphs(no_color_mode=no_color_mode)
     character_mapping = context.prepare_character_mapping(name_to_glyph)
