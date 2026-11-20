@@ -7,6 +7,7 @@ def test_copy() -> None:
     config_1 = Config(
         resolution_x=1,
         resolution_y=2,
+        default_char=1,
         only_basic_plane=True,
     )
     config_2 = copy(config_1)
@@ -22,11 +23,13 @@ def test_eq() -> None:
     config_1 = Config(
         resolution_x=1,
         resolution_y=2,
+        default_char=1,
         only_basic_plane=True,
     )
     config_2 = Config(
         resolution_x=1,
         resolution_y=2,
+        default_char=1,
         only_basic_plane=True,
     )
     assert config_1 == config_2

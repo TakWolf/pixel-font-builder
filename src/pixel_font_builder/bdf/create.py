@@ -12,8 +12,6 @@ from pixel_font_builder.glyph import Glyph
 from pixel_font_builder.meta import Spacing, Slant
 from pixel_font_builder.metric import FontMetric
 
-_DEFAULT_CHAR = 0xFFFE
-
 
 def _create_bdf_glyph(glyph: Glyph, encoding: int, font_metric: FontMetric, config: Config) -> BdfGlyph:
     return BdfGlyph(
@@ -60,17 +58,26 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
     if meta_info.family_name is None:
         raise RuntimeError('family_name must not be None')
 
+    if config.only_basic_plane and config.default_char > 0xFFFF:
+        raise RuntimeError(f'default_char must be less than or equal to 0xFFFF when only_basic_plane is True, got 0x{config.default_char:04X}')
+
     _, name_to_glyph = context.prepare_glyphs(no_color_mode=True)
     character_mapping = context.prepare_character_mapping(name_to_glyph)
 
-    if _DEFAULT_CHAR in character_mapping:
-        raise RuntimeError(f'encoding 0x{_DEFAULT_CHAR:04X} is reserved for the BDF default glyph')
+    if config.default_char in character_mapping:
+        raise RuntimeError(f'encoding 0x{config.default_char:04X} is reserved for the BDF default glyph')
 
-    glyphs = [_create_bdf_glyph(name_to_glyph['.notdef'], _DEFAULT_CHAR, font_metric, config)]
+    glyphs = []
+    if config.default_char >= 0:
+        glyphs.append(_create_bdf_glyph(name_to_glyph['.notdef'], config.default_char, font_metric, config))
+
     for code_point, glyph_name in sorted(character_mapping.items()):
         if code_point > 0xFFFF and config.only_basic_plane:
             break
         glyphs.append(_create_bdf_glyph(name_to_glyph[glyph_name], code_point, font_metric, config))
+
+    if not glyphs:
+        raise RuntimeError('at least one glyph must be exported to BDF')
 
     font = BdfFont(
         point_size=font_metric.font_size,
@@ -117,7 +124,8 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
     font.properties.charset_encoding = '1'
     font.generate_name_as_xlfd()
 
-    font.properties.default_char = _DEFAULT_CHAR
+    if config.default_char >= 0:
+        font.properties.default_char = config.default_char
     font.properties.font_ascent = font_metric.horizontal_layout.ascent
     font.properties.font_descent = -font_metric.horizontal_layout.descent
     if font_metric.x_height != 0:
