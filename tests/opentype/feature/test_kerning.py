@@ -1,9 +1,12 @@
+from io import BytesIO
 from pathlib import Path
 
 import pytest
+from dfont import SfntResource
 from fontTools.feaLib import ast
+from fontTools.ttLib import TTFont
 
-from pixel_font_builder import FontBuilder, Glyph
+from pixel_font_builder import FontBuilder, Glyph, MonoRaster
 from pixel_font_builder.opentype import OutlineTableMode, BitmapTableMode, UserKerningMode, FeatureText, FeatureFile, FeatureIncludes
 from pixel_font_builder.opentype.feature.kerning import add_generated_kern_feature
 from pixel_font_builder.opentype.feature.source.parser import parse_feature_inputs
@@ -264,7 +267,7 @@ def test_included_user_kerning_replaces_generated_kerning(builder: FontBuilder, 
         (OutlineTableMode.BLANK_GLYPHS, BitmapTableMode.NONE),
     ],
 )
-def test_kerning_is_omitted_without_normal_outlines(
+def test_kerning_is_generated_without_normal_outlines(
         builder: FontBuilder,
         outline_table_mode: OutlineTableMode,
         bitmap_table_mode: BitmapTableMode,
@@ -272,5 +275,71 @@ def test_kerning_is_omitted_without_normal_outlines(
     builder.kerning_values[('a', 'b')] = -1
 
     font = builder.to_ttf_builder(outline_table_mode=outline_table_mode, bitmap_table_mode=bitmap_table_mode).font
+    tb_gpos = font['GPOS'].table
+    pair_pos = tb_gpos.LookupList.Lookup[0].SubTable[0]
 
-    assert 'GPOS' not in font
+    assert pair_pos.Coverage.glyphs == ['a']
+    assert pair_pos.PairSet[0].PairValueRecord[0].SecondGlyph == 'b'
+    assert pair_pos.PairSet[0].PairValueRecord[0].Value1.XAdvance == -100
+
+
+@pytest.mark.parametrize('is_ttf', [True, False])
+@pytest.mark.parametrize('bitmap_table_mode', [BitmapTableMode.STANDARD, BitmapTableMode.APPLE])
+def test_bitmap_only_kerning_roundtrip(
+        builder: FontBuilder,
+        is_ttf: bool,
+        bitmap_table_mode: BitmapTableMode,
+) -> None:
+    for glyph in builder.glyphs:
+        glyph.mono_raster = MonoRaster(bitmap=[[1]])
+    builder.kerning_values[('a', 'b')] = -1
+
+    if is_ttf:
+        font_builder = builder.to_ttf_builder(OutlineTableMode.OMIT, bitmap_table_mode)
+    else:
+        font_builder = builder.to_otf_builder(OutlineTableMode.OMIT, bitmap_table_mode)
+
+    stream = BytesIO()
+    font_builder.save(stream)
+    stream.seek(0)
+
+    with TTFont(stream) as font:
+        assert 'glyf' not in font
+        assert 'CFF ' not in font
+        if bitmap_table_mode == BitmapTableMode.STANDARD:
+            assert 'EBDT' in font
+            assert 'EBLC' in font
+            assert font['head'].unitsPerEm == 1000
+            assert font['hmtx']['a'][0] == 500
+
+            tb_gpos = font['GPOS'].table
+            pair_pos = tb_gpos.LookupList.Lookup[0].SubTable[0]
+
+            assert pair_pos.PairSet[0].PairValueRecord[0].SecondGlyph == 'b'
+            assert pair_pos.PairSet[0].PairValueRecord[0].Value1.XAdvance == -100
+        else:
+            assert 'bdat' in font
+            assert 'bloc' in font
+            assert 'bhed' in font
+            assert 'head' not in font
+            assert 'hmtx' not in font
+            assert 'GPOS' not in font
+
+
+def test_dfont_omits_generated_kerning(builder: FontBuilder) -> None:
+    for glyph in builder.glyphs:
+        glyph.mono_raster = MonoRaster(bitmap=[[1]])
+    builder.kerning_values[('a', 'b')] = -1
+
+    dfont = builder.to_dfont_builder()
+    resource = next(
+        resource
+        for resource in dfont.resources
+        if isinstance(resource, SfntResource)
+    )
+
+    with TTFont(BytesIO(resource.data)) as font:
+        assert 'bhed' in font
+        assert 'head' not in font
+        assert 'GPOS' not in font
+        assert 'kern' not in font
