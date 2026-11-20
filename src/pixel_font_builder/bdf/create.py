@@ -55,6 +55,12 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
     if font_metric.font_size <= 0:
         raise RuntimeError(f'font_size must be greater than 0, got {font_metric.font_size!r}')
 
+    if config.resolution_x <= 0:
+        raise RuntimeError(f'resolution_x must be greater than 0, got {config.resolution_x!r}')
+
+    if config.resolution_y <= 0:
+        raise RuntimeError(f'resolution_y must be greater than 0, got {config.resolution_y!r}')
+
     if meta_info.family_name is None:
         raise RuntimeError('family_name must not be None')
 
