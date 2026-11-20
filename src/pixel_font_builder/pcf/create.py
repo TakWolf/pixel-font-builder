@@ -8,8 +8,6 @@ from pcffont import PcfFontBuilder, PcfGlyph
 import pixel_font_builder
 from pixel_font_builder.meta import Spacing, Slant
 
-_DEFAULT_CHAR = 0xFFFE
-
 
 def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuilder:
     config = context.pcf_config
@@ -22,25 +20,30 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuild
     if meta_info.family_name is None:
         raise RuntimeError('family_name must not be None')
 
+    if config.default_char > 0xFFFF:
+        raise RuntimeError(f'default_char must be less than or equal to 0xFFFF, got 0x{config.default_char:04X}')
+
     glyph_order, name_to_glyph = context.prepare_glyphs(no_color_mode=True)
     character_mapping = context.prepare_character_mapping(name_to_glyph)
 
-    if _DEFAULT_CHAR in character_mapping:
-        raise RuntimeError(f'encoding 0x{_DEFAULT_CHAR:04X} is reserved for the PCF default glyph')
+    if config.default_char in character_mapping:
+        raise RuntimeError(f'encoding 0x{config.default_char:04X} is reserved for the PCF default glyph')
 
     builder = PcfFontBuilder()
     builder.config.font_ascent = font_metric.horizontal_layout.ascent
     builder.config.font_descent = -font_metric.horizontal_layout.descent
-    builder.config.default_char = _DEFAULT_CHAR
+    if config.default_char >= 0:
+        builder.config.default_char = config.default_char
     builder.config.draw_right_to_left = config.draw_right_to_left
     builder.config.ms_byte_first = config.ms_byte_first
     builder.config.ms_bit_first = config.ms_bit_first
     builder.config.glyph_pad = config.glyph_pad
     builder.config.scan_unit = config.scan_unit
 
-    name_to_encodings = {
-        '.notdef': {_DEFAULT_CHAR},
-    }
+    name_to_encodings = {}
+    if config.default_char >= 0:
+        name_to_encodings['.notdef'] = {config.default_char}
+
     for code_point, glyph_name in character_mapping.items():
         if code_point > 0xFFFF:
             continue
@@ -51,6 +54,9 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuild
             encodings = set()
             name_to_encodings[glyph_name] = encodings
         encodings.add(code_point)
+
+    if not name_to_encodings:
+        raise RuntimeError('at least one glyph must be exported to PCF')
 
     for glyph_name in glyph_order:
         if glyph_name not in name_to_encodings:

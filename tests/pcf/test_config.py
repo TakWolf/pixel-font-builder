@@ -12,6 +12,7 @@ def test_copy() -> None:
         ms_bit_first=False,
         glyph_pad=2,
         scan_unit=4,
+        default_char=1,
     )
     config_2 = copy(config_1)
     config_3 = deepcopy(config_1)
@@ -31,6 +32,7 @@ def test_eq() -> None:
         ms_bit_first=False,
         glyph_pad=2,
         scan_unit=4,
+        default_char=1,
     )
     config_2 = Config(
         resolution_x=1,
@@ -40,5 +42,6 @@ def test_eq() -> None:
         ms_bit_first=False,
         glyph_pad=2,
         scan_unit=4,
+        default_char=1,
     )
     assert config_1 == config_2
