@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 import statistics
+from collections.abc import Iterable
 
 from bdffont import BdfFont, BdfGlyph
 
@@ -25,6 +26,29 @@ def _create_bdf_glyph(glyph: Glyph, encoding: int, font_metric: FontMetric, conf
     )
 
 
+def _create_font_bounding_box(glyphs: Iterable[BdfGlyph]) -> tuple[int, int, int, int]:
+    bounds = None
+    for glyph in glyphs:
+        if glyph.width <= 0 or glyph.height <= 0:
+            continue
+        if bounds is None:
+            bounds = [
+                glyph.offset_x,
+                glyph.offset_y,
+                glyph.offset_x + glyph.width,
+                glyph.offset_y + glyph.height,
+            ]
+        else:
+            bounds[0] = min(bounds[0], glyph.offset_x)
+            bounds[1] = min(bounds[1], glyph.offset_y)
+            bounds[2] = max(bounds[2], glyph.offset_x + glyph.width)
+            bounds[3] = max(bounds[3], glyph.offset_y + glyph.height)
+    if bounds is None:
+        return 0, 0, 0, 0
+    left, bottom, right, top = bounds
+    return right - left, top - bottom, left, bottom
+
+
 def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
     config = context.bdf_config
     font_metric = context.font_metric
@@ -42,17 +66,18 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
     if _DEFAULT_CHAR in character_mapping:
         raise RuntimeError(f'encoding 0x{_DEFAULT_CHAR:04X} is reserved for the BDF default glyph')
 
-    font = BdfFont(
-        point_size=font_metric.font_size,
-        resolution=(config.resolution_x, config.resolution_y),
-        bounding_box=(font_metric.font_size, font_metric.horizontal_layout.line_height, 0, font_metric.horizontal_layout.descent),
-    )
-
-    font.glyphs.append(_create_bdf_glyph(name_to_glyph['.notdef'], _DEFAULT_CHAR, font_metric, config))
+    glyphs = [_create_bdf_glyph(name_to_glyph['.notdef'], _DEFAULT_CHAR, font_metric, config)]
     for code_point, glyph_name in sorted(character_mapping.items()):
         if code_point > 0xFFFF and config.only_basic_plane:
             break
-        font.glyphs.append(_create_bdf_glyph(name_to_glyph[glyph_name], code_point, font_metric, config))
+        glyphs.append(_create_bdf_glyph(name_to_glyph[glyph_name], code_point, font_metric, config))
+
+    font = BdfFont(
+        point_size=font_metric.font_size,
+        resolution=(config.resolution_x, config.resolution_y),
+        bounding_box=_create_font_bounding_box(glyphs),
+        glyphs=glyphs,
+    )
 
     if meta_info.manufacturer is not None:
         font.properties.foundry = meta_info.manufacturer.replace('-', '_')
@@ -87,7 +112,7 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
             font.properties.spacing = 'C'
         case Spacing.PROPORTIONAL:
             font.properties.spacing = 'P'
-    font.properties.average_width = round(statistics.fmean(glyph.device_width_x * 10 for glyph in font.glyphs))
+    font.properties.average_width = round(statistics.fmean(glyph.device_width_x * 10 for glyph in glyphs))
     font.properties.charset_registry = 'ISO10646'
     font.properties.charset_encoding = '1'
     font.generate_name_as_xlfd()
