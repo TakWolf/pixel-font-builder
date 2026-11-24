@@ -188,14 +188,14 @@ def create_small_glyph_metrics(glyph: RasterGlyph) -> SmallGlyphMetrics:
 
 
 def encode_png_rgba(width: int, height: int, bitmap: list[list[ColorRgba]]) -> bytes:
-    rows = []
-    for y, row in enumerate(bitmap):
-        samples = []
-        for x, pixel in enumerate(row):
-            if len(pixel) != 4:
-                raise ValueError(f'RGBA pixel at ({x}, {y}) must have 4 channels, got {pixel!r}')
-            samples.extend(pixel)
-        rows.append(samples)
+    rows = [
+        [
+            sample
+            for pixel in row
+            for sample in pixel
+        ]
+        for row in bitmap
+    ]
 
     image = PngImage(
         header=PngHeader((width, height)),
