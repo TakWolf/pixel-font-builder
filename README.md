@@ -257,7 +257,7 @@ Use the same coordinate systems as OpenType.
 
 ![Vertical Layout](https://freetype.org/freetype2/docs/glyphs/glyph-metrics-4.svg)
 
-## Supported Output Formats
+## Supported Font Formats
 
 | Format | File Extension |
 |---|---|
@@ -271,7 +271,7 @@ Use the same coordinate systems as OpenType.
 | [Glyph Bitmap Distribution Format](https://en.wikipedia.org/wiki/Glyph_Bitmap_Distribution_Format) | `.bdf` |
 | [Portable Compiled Format](https://en.wikipedia.org/wiki/Portable_Compiled_Format) | `.pcf` |
 
-## Supported Color Table Formats
+## Supported SFNT Color Tables
 
 - [COLR](https://learn.microsoft.com/en-us/typography/opentype/spec/colr)
 - [CBDT](https://learn.microsoft.com/en-us/typography/opentype/spec/cbdt)
