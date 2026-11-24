@@ -37,7 +37,11 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> DFont:
     sfnt_data = BytesIO()
     font.save(sfnt_data)
 
-    sfnt_resource = SfntResource(config.resource_id, sfnt_data.getvalue(), family_name)
+    sfnt_resource = SfntResource(
+        id=config.resource_id,
+        data=sfnt_data.getvalue(),
+        name=family_name,
+    )
 
     nfnt_resource = NfntResource(
         id=config.resource_id,
@@ -53,6 +57,7 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> DFont:
         ascent=font_metric.horizontal_layout.ascent,
         descent=-font_metric.horizontal_layout.descent,
         leading=font_metric.horizontal_layout.line_gap,
+        name=family_name,
     )
 
     fond_resource = FondResource(
