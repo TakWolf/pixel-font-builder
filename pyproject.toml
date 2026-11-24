@@ -27,7 +27,7 @@ dependencies = [
     "fonttools[woff]>=4.68.0",
     "bdffont>=0.0.42",
     "pcffont>=0.0.35",
-    "dfont>=0.0.2",
+    "dfont>=0.0.3",
     "png>=0.0.3",
 ]
 

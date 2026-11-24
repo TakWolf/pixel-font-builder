@@ -236,11 +236,11 @@ wheels = [
 
 [[package]]
 name = "dfont"
-version = "0.0.2"
+version = "0.0.3"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/62/44/9b9e721e947674f6dc360779eac8dae65501c3b553a3c110eafe96a8745c/dfont-0.0.2.tar.gz", hash = "sha256:8b9019defc63c5e32503ca9f182517a29365be8423ce12aee67d063a7885eb0f", size = 17640, upload-time = "2026-11-23T07:21:47.244Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/07/ce/216e903c6a4c813647628298f65404a9290498839a0be740b5d1ac2813a5/dfont-0.0.3.tar.gz", hash = "sha256:95ced57f8f518c44bb5073efd08c3f145dfea988aa20de1d73799fd839dba42c", size = 17706, upload-time = "2026-11-24T07:50:30.714Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/96/ab/c023b695b1277305a59f29a3435f93d5570449d5499072c7844ad62fa1ce/dfont-0.0.2-py3-none-any.whl", hash = "sha256:1606b461284a0cbb08602e1c504d62f822c141c42ec5f66e8bf4b3baf23cb7d0", size = 24688, upload-time = "2026-11-23T07:21:46.324Z" },
+    { url = "https://files.pythonhosted.org/packages/3e/16/b04164ee963839ea1d27c2c9a30dfcdf428ca792beeeb7780014486cbf59/dfont-0.0.3-py3-none-any.whl", hash = "sha256:5beedd25d11aad9a2549e1bed99fdfe1c5bd076c36b9f8ca9fae1c3815e72348", size = 24806, upload-time = "2026-11-24T07:50:29.642Z" },
 ]
 
 [[package]]
@@ -369,7 +369,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "bdffont", specifier = ">=0.0.42" },
-    { name = "dfont", specifier = ">=0.0.2" },
+    { name = "dfont", specifier = ">=0.0.3" },
     { name = "fonttools", extras = ["woff"], specifier = ">=4.68.0" },
     { name = "pcffont", specifier = ">=0.0.35" },
     { name = "png", specifier = ">=0.0.3" },

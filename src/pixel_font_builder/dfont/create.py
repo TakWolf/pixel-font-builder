@@ -1,16 +1,11 @@
 from __future__ import annotations
 
-from fractions import Fraction
 from io import BytesIO
 
 from dfont import DFont, SfntResource, NfntResource, NfntFontType, FondResource, FondFlags, FondAssociation, FondFontStyle
 
 import pixel_font_builder
 from pixel_font_builder import opentype
-
-
-def _pack_fixed(value: int, scale: int) -> int:
-    return round(Fraction(value * (1 << 12), scale))
 
 
 def create_font_builder(context: pixel_font_builder.FontBuilder) -> DFont:
@@ -67,10 +62,10 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> DFont:
             fixed_width=config.is_fixed_width,
         ),
         family_id=config.resource_id,
-        ascent=_pack_fixed(font_metric.horizontal_layout.ascent, font_metric.font_size),
-        descent=_pack_fixed(font_metric.horizontal_layout.descent, font_metric.font_size),
-        leading=_pack_fixed(font_metric.horizontal_layout.line_gap, font_metric.font_size),
-        width_max=_pack_fixed(width_max, font_metric.font_size),
+        ascent=font_metric.horizontal_layout.ascent / font_metric.font_size,
+        descent=font_metric.horizontal_layout.descent / font_metric.font_size,
+        leading=font_metric.horizontal_layout.line_gap / font_metric.font_size,
+        width_max=width_max / font_metric.font_size,
         associations=[
             FondAssociation(
                 font_style=fond_font_style,
