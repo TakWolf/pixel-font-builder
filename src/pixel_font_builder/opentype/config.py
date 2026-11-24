@@ -127,6 +127,10 @@ class Config:
                 self.user_kerning_mode == other.user_kerning_mode and
                 self.features == other.features)
 
+    def validate(self) -> None:
+        if self.px_to_units <= 0:
+            raise RuntimeError(f'OpenType px_to_units must be greater than 0, got {self.px_to_units}')
+
     def copy(self) -> Config:
         return copy(self)
 

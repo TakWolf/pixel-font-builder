@@ -10,30 +10,19 @@ from pixel_font_builder.meta import Spacing, Slant
 
 
 def create_font_builder(context: pixel_font_builder.FontBuilder) -> PcfFontBuilder:
-    config = context.pcf_config
     font_metric = context.font_metric
     meta_info = context.meta_info
+    config = context.pcf_config
 
-    if font_metric.font_size <= 0:
-        raise RuntimeError(f'font_size must be greater than 0, got {font_metric.font_size!r}')
-
-    if config.resolution_x <= 0:
-        raise RuntimeError(f'resolution_x must be greater than 0, got {config.resolution_x!r}')
-
-    if config.resolution_y <= 0:
-        raise RuntimeError(f'resolution_y must be greater than 0, got {config.resolution_y!r}')
-
-    if meta_info.family_name is None:
-        raise RuntimeError('family_name must not be None')
-
-    if config.default_char > 0xFFFF:
-        raise RuntimeError(f'default_char must be less than or equal to 0xFFFF, got 0x{config.default_char:04X}')
+    font_metric.validate(has_vertical_metrics=False)
+    meta_info.validate()
+    config.validate()
 
     glyph_order, name_to_glyph = context.prepare_glyphs(no_color_mode=True)
     character_mapping = context.prepare_character_mapping(name_to_glyph)
 
     if config.default_char in character_mapping:
-        raise RuntimeError(f'encoding 0x{config.default_char:04X} is reserved for the PCF default glyph')
+        raise RuntimeError(f'encoding 0x{config.default_char:04X} is reserved for PCF default_char')
 
     builder = PcfFontBuilder()
     builder.config.font_ascent = font_metric.horizontal_layout.ascent

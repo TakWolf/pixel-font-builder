@@ -31,6 +31,9 @@ class Config:
         return (self.resource_id == other.resource_id and
                 self.is_fixed_width == other.is_fixed_width)
 
+    def validate(self) -> None:
+        pass
+
     def copy(self) -> Config:
         return copy(self)
 

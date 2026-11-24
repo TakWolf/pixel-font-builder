@@ -52,26 +52,15 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> BdfFont:
     font_metric = context.font_metric
     meta_info = context.meta_info
 
-    if font_metric.font_size <= 0:
-        raise RuntimeError(f'font_size must be greater than 0, got {font_metric.font_size!r}')
-
-    if config.resolution_x <= 0:
-        raise RuntimeError(f'resolution_x must be greater than 0, got {config.resolution_x!r}')
-
-    if config.resolution_y <= 0:
-        raise RuntimeError(f'resolution_y must be greater than 0, got {config.resolution_y!r}')
-
-    if meta_info.family_name is None:
-        raise RuntimeError('family_name must not be None')
-
-    if config.only_basic_plane and config.default_char > 0xFFFF:
-        raise RuntimeError(f'default_char must be less than or equal to 0xFFFF when only_basic_plane is True, got 0x{config.default_char:04X}')
+    font_metric.validate(has_vertical_metrics=False)
+    meta_info.validate()
+    config.validate()
 
     _, name_to_glyph = context.prepare_glyphs(no_color_mode=True)
     character_mapping = context.prepare_character_mapping(name_to_glyph)
 
     if config.default_char in character_mapping:
-        raise RuntimeError(f'encoding 0x{config.default_char:04X} is reserved for the BDF default glyph')
+        raise RuntimeError(f'encoding 0x{config.default_char:04X} is reserved for BDF default_char')
 
     glyphs = []
     if config.default_char >= 0:

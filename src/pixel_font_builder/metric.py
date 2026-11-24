@@ -21,7 +21,7 @@ class LineMetric:
 
     def __mul__(self, other: Any) -> LineMetric:
         if not isinstance(other, int):
-            raise TypeError(f'LineMetric multiplier must be an integer, got {other!r}')
+            raise TypeError(f'multiplier must be an integer, got {other!r}')
         return LineMetric(
             self.ascent * other,
             self.descent * other,
@@ -91,7 +91,7 @@ class FontMetric:
 
     def __mul__(self, other: Any) -> FontMetric:
         if not isinstance(other, int):
-            raise TypeError(f'FontMetric multiplier must be an integer, got {other!r}')
+            raise TypeError(f'multiplier must be an integer, got {other!r}')
         return FontMetric(
             self.font_size * other,
             self.horizontal_layout * other,
@@ -142,6 +142,16 @@ class FontMetric:
                 self.underline_thickness == other.underline_thickness and
                 self.strikeout_position == other.strikeout_position and
                 self.strikeout_thickness == other.strikeout_thickness)
+
+    def validate(self, has_vertical_metrics: bool) -> None:
+        if self.font_size <= 0:
+            raise RuntimeError(f'font_size must be greater than 0, got {self.font_size}')
+
+        if self.horizontal_layout.line_height <= 0:
+            raise RuntimeError(f'horizontal_layout.line_height must be greater than 0, got {self.horizontal_layout.line_height}')
+
+        if has_vertical_metrics and self.vertical_layout.line_height <= 0:
+            raise RuntimeError(f'vertical_layout.line_height must be greater than 0, got {self.vertical_layout.line_height}')
 
     def copy(self) -> FontMetric:
         return copy(self)

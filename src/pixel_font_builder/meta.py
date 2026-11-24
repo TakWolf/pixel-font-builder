@@ -170,6 +170,10 @@ class MetaInfo:
                 self.license_url == other.license_url and
                 self.sample_text == other.sample_text)
 
+    def validate(self) -> None:
+        if self.family_name is None:
+            raise RuntimeError('family_name must not be None')
+
     def copy(self) -> MetaInfo:
         return copy(self)
 

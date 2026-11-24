@@ -9,34 +9,24 @@ import pixel_font_builder
 from pixel_font_builder import opentype
 
 
-def _check_int(field: str, value: int, minimum: int, maximum: int) -> None:
-    if type(value) is not int or not minimum <= value <= maximum:
-        raise RuntimeError(f'{field} must be an integer between {minimum} and {maximum}, got {value!r}')
-
-
 def _pack_fixed(value: int, scale: int) -> int:
-    result = round(Fraction(value * (1 << 12), scale))
-    _check_int('fixed-point value', result, -32768, 32767)
-    return result
+    return round(Fraction(value * (1 << 12), scale))
 
 
 def create_font_builder(context: pixel_font_builder.FontBuilder) -> DFont:
-    config = context.dfont_config
     font_metric = context.font_metric
-    horizontal_layout = font_metric.horizontal_layout
+    meta_info = context.meta_info
+    config = context.dfont_config
 
-    _check_int('dfont.font_size', font_metric.font_size, 1, 255)
-    _check_int('dfont horizontal ascent', horizontal_layout.ascent, 0, 32767)
-    _check_int('dfont horizontal descent', horizontal_layout.descent, -32767, 0)
-    _check_int('dfont horizontal line_gap', horizontal_layout.line_gap, -32768, 32767)
-    _check_int('resource_id', config.resource_id, -32768, 32767)
+    font_metric.validate(has_vertical_metrics=False)
+    meta_info.validate()
+    config.validate()
 
     width_max = max((
         glyph.advance_width
         for glyph in context.glyphs
         if glyph.name == '.notdef' or not glyph.is_color_raster_only
     ), default=0)
-    _check_int('dfont maximum advance_width', width_max, 0, 32767)
 
     font = opentype.create_font_builder(context, True, opentype.OutlineTableMode.OMIT, opentype.BitmapTableMode.APPLE).font
 
@@ -57,12 +47,12 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> DFont:
         ),
         width_max=width_max,
         kern_max=bitmap_metrics.minOriginSB,
-        negated_descent=horizontal_layout.descent,
+        negated_descent=font_metric.horizontal_layout.descent,
         rectangle_width=bitmap_metrics.widthMax,
-        rectangle_height=horizontal_layout.ascent - horizontal_layout.descent,
-        ascent=horizontal_layout.ascent,
-        descent=-horizontal_layout.descent,
-        leading=horizontal_layout.line_gap,
+        rectangle_height=font_metric.horizontal_layout.ascent - font_metric.horizontal_layout.descent,
+        ascent=font_metric.horizontal_layout.ascent,
+        descent=-font_metric.horizontal_layout.descent,
+        leading=font_metric.horizontal_layout.line_gap,
     )
 
     fond_resource = FondResource(
@@ -72,9 +62,9 @@ def create_font_builder(context: pixel_font_builder.FontBuilder) -> DFont:
             fixed_width=config.is_fixed_width,
         ),
         family_id=config.resource_id,
-        ascent=_pack_fixed(horizontal_layout.ascent, font_metric.font_size),
-        descent=_pack_fixed(horizontal_layout.descent, font_metric.font_size),
-        leading=_pack_fixed(horizontal_layout.line_gap, font_metric.font_size),
+        ascent=_pack_fixed(font_metric.horizontal_layout.ascent, font_metric.font_size),
+        descent=_pack_fixed(font_metric.horizontal_layout.descent, font_metric.font_size),
+        leading=_pack_fixed(font_metric.horizontal_layout.line_gap, font_metric.font_size),
         width_max=_pack_fixed(width_max, font_metric.font_size),
         associations=[
             FondAssociation(

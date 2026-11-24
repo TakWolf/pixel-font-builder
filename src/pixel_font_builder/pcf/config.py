@@ -63,6 +63,16 @@ class Config:
                 self.scan_unit == other.scan_unit and
                 self.default_char == other.default_char)
 
+    def validate(self) -> None:
+        if self.resolution_x <= 0:
+            raise RuntimeError(f'PCF resolution_x must be greater than 0, got {self.resolution_x}')
+
+        if self.resolution_y <= 0:
+            raise RuntimeError(f'PCF resolution_y must be greater than 0, got {self.resolution_y}')
+
+        if self.default_char > 0xFFFF:
+            raise RuntimeError(f'PCF default_char must be less than or equal to 0xFFFF, got 0x{self.default_char:04X}')
+
     def copy(self) -> Config:
         return copy(self)
 

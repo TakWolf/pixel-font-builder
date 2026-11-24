@@ -41,6 +41,16 @@ class Config:
                 self.default_char == other.default_char and
                 self.only_basic_plane == other.only_basic_plane)
 
+    def validate(self) -> None:
+        if self.resolution_x <= 0:
+            raise RuntimeError(f'BDF resolution_x must be greater than 0, got {self.resolution_x}')
+
+        if self.resolution_y <= 0:
+            raise RuntimeError(f'BDF resolution_y must be greater than 0, got {self.resolution_y}')
+
+        if self.only_basic_plane and self.default_char > 0xFFFF:
+            raise RuntimeError(f'BDF default_char must be less than or equal to 0xFFFF when only_basic_plane is True, got 0x{self.default_char:04X}')
+
     def copy(self) -> Config:
         return copy(self)
 
