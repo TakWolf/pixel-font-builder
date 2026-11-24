@@ -10,12 +10,7 @@ from pixel_font_builder.opentype.bitmap.common import RasterGlyph, encode_png_rg
 from pixel_font_builder.opentype.outline.pen.pen import OutlinePen
 
 
-def _check_integer(value: int, minimum: int, maximum: int, field: str) -> None:
-    if not isinstance(value, int) or not minimum <= value <= maximum:
-        raise ValueError(f'sbix {field} must be an integer in [{minimum}, {maximum}], got {value!r}')
-
-
-def draw_sbix_bounds(glyph_name: str, raster: ColorRaster, pen: OutlinePen, px_to_units: int) -> None:
+def draw_sbix_bounds(raster: ColorRaster, pen: OutlinePen, px_to_units: int) -> None:
     """Include TrueType bitmap bounds without adding monochrome ink.
 
     Core Text reports base-outline bounds even for sbix glyphs. Browsers
@@ -24,19 +19,14 @@ def draw_sbix_bounds(glyph_name: str, raster: ColorRaster, pen: OutlinePen, px_t
     that font smoothing could turn into visible hairlines. CFF engines
     discard these anchors, so this helper is only used for TrueType outlines.
     """
-    _check_integer(raster.horizontal_offset_x, -32768, 32767, f'originOffsetX for glyph {glyph_name!r}')
-    _check_integer(raster.horizontal_offset_y, -32768, 32767, f'originOffsetY for glyph {glyph_name!r}')
-
     width, height = raster.dimensions
     if width == 0 or height == 0:
         width = height = 1  # Match the explicit transparent PNG.
+
     x_min = raster.horizontal_offset_x * px_to_units
     y_min = raster.horizontal_offset_y * px_to_units
     x_max = (raster.horizontal_offset_x + width) * px_to_units
     y_max = (raster.horizontal_offset_y + height) * px_to_units
-
-    for field, value in (('xMin', x_min), ('yMin', y_min), ('xMax', x_max), ('yMax', y_max)):
-        _check_integer(value, -32768, 32767, f'bitmap {field} in font units for glyph {glyph_name!r}')
 
     for point in ((x_min, y_min), (x_max, y_max)):
         pen.move_to(point)
@@ -61,8 +51,6 @@ def create_sbix_strike(
     if not glyph_order:
         return None
 
-    _check_integer(font_metric.font_size, 1, 65535, 'pixels per em')
-
     name_to_color_glyph = {
         glyph_name: RasterGlyph.create_color(
             name_to_glyph[glyph_name],
@@ -82,9 +70,6 @@ def create_sbix_strike(
         x_min, y_min = (0, 0) if bounds is None else bounds[:2]
         offset_x = otRound(glyph.raster.horizontal_offset_x - x_min / px_to_units)
         offset_y = otRound(glyph.raster.horizontal_offset_y - y_min / px_to_units)
-
-        _check_integer(offset_x, -32768, 32767, f'originOffsetX for glyph {glyph_name!r}')
-        _check_integer(offset_y, -32768, 32767, f'originOffsetY for glyph {glyph_name!r}')
 
         png_data = encode_png_rgba(glyph.raster.width, glyph.raster.height, glyph.raster.bitmap)
 

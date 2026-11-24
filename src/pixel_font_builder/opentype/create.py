@@ -112,7 +112,7 @@ def create_font_builder(
             if (outline_table_mode == OutlineTableMode.NORMAL or glyph_name in color_layer_glyphs) and glyph.mono_raster is not None:
                 config.outline_painter.draw_outlines(glyph.mono_raster, pen, config.px_to_units)
             if emit_sbix and emit_outlines and glyph.color_raster is not None:
-                draw_sbix_bounds(glyph_name, glyph.color_raster, pen, config.px_to_units)
+                draw_sbix_bounds(glyph.color_raster, pen, config.px_to_units)
             ttf_glyphs[glyph_name] = pen.to_glyph()
         builder.setupGlyf(ttf_glyphs)
 
