@@ -47,7 +47,10 @@ def _collect_glyphs(
         if not file_path.is_file():
             continue
 
-        hex_name = file_path.stem.removesuffix('.color')
+        if not file_path.name.endswith(('.mono.png', '.color.png')):
+            continue
+
+        hex_name = file_path.stem.removesuffix('.mono').removesuffix('.color')
         code_point = -1 if hex_name == 'notdef' else int(hex_name, 16)
         code_points.add(code_point)
 
@@ -61,7 +64,7 @@ def _collect_glyphs(
             advance_height=font_size,
         )
 
-        mono_file_path = glyphs_dir.joinpath(f'{hex_name}.png')
+        mono_file_path = glyphs_dir.joinpath(f'{hex_name}.mono.png')
         if mono_file_path.is_file():
             width, height, bitmap = _load_mono_bitmap(mono_file_path)
 
