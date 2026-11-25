@@ -235,8 +235,6 @@ def create_font_builder(
         sCapHeight=font_metric.cap_height,
         yStrikeoutPosition=font_metric.strikeout_position,
         yStrikeoutSize=font_metric.strikeout_thickness,
-        ulCodePageRange1=0b_11100000_00111111_00000001_11111111,
-        ulCodePageRange2=0b_11111111_11111111_00000000_00000000,
     )
     builder.setupPost(
         underlinePosition=font_metric.underline_position,
@@ -251,6 +249,8 @@ def create_font_builder(
         tb_head.created = timeTools.timestampSinceEpoch(meta_info.created_time.timestamp())
     if meta_info.modified_time is not None:
         tb_head.modified = timeTools.timestampSinceEpoch(meta_info.modified_time.timestamp())
+
+    tb_os2.recalcCodePageRanges(builder.font)
 
     builder.font.recalcBBoxes = False
     if is_ttf:
