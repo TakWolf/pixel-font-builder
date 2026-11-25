@@ -28,7 +28,7 @@ def _load_color_bitmap(file_path: Path) -> tuple[int, int, list[list[ColorRgba]]
         image = image.to_rgba(bit_depth=8)
     bitmap = [
         [
-            (row[x], row[x + 1], row[x + 2], row[x + 3])
+            (row[x], row[x + 1], row[x + 2], row[x + 3]) if row[x + 3] > 0 else (0, 0, 0, 0)
             for x in range(0, len(row), 4)
         ]
         for row in image.bitmap
