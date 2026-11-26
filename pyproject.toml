@@ -11,7 +11,7 @@ authors = [
 maintainers = [
     { name = "TakWolf" },
 ]
-keywords = ["font", "pixel"]
+keywords = ["font", "pixel", "bitmap"]
 requires-python = ">=3.11"
 classifiers = [
     "Programming Language :: Python :: 3",
